@@ -237,6 +237,24 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     setViewMode('map');
   };
 
+  // Next-action CTAs return either external links (tel/sms/http) or internal
+  // app paths. This SPA has no router, so internal paths must switch tabs, not
+  // navigate the browser (which would reload to a 404 / back to the landing).
+  const goHref = (href: string) => {
+    if (/^(https?:|tel:|sms:|mailto:)/.test(href)) {
+      window.open(href, href.startsWith('http') ? '_blank' : '_self');
+      return;
+    }
+    const map: Record<string, string> = {
+      '/': 'dash',
+      '/daily-needs': 'resources',
+      '/my/referrals': 'profile',
+      '/check-in': 'check-yourself',
+    };
+    setActiveTab(map[href] || 'dash');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const Card: React.FC<{ children: React.ReactNode; className?: string; onClick?: (e: any) => void }> = ({ children, className = "", onClick }) => (
     <div
       className={`bg-white rounded-2xl border border-zinc-200/50 shadow-sm p-6 ${className}`}
@@ -323,11 +341,9 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
             <p className={`text-sm ${nextAction.id === 'crisis' ? 'text-zinc-700' : 'text-zinc-400'}`}>{nextAction.body}</p>
           </div>
           <div className="flex gap-3 shrink-0">
-            <a href={nextAction.cta.href} target={nextAction.cta.href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
-              <ButtonPrimary onClick={() => ctxApi.event('tool_open', { from: 'next_action', id: nextAction.id })}>{nextAction.cta.label}</ButtonPrimary>
-            </a>
+            <ButtonPrimary onClick={() => { ctxApi.event('tool_open', { from: 'next_action', id: nextAction.id }); goHref(nextAction.cta.href); }}>{nextAction.cta.label}</ButtonPrimary>
             {nextAction.secondary && (
-              <a href={nextAction.secondary.href}><ButtonSecondary>{nextAction.secondary.label}</ButtonSecondary></a>
+              <ButtonSecondary onClick={() => goHref(nextAction.secondary!.href)}>{nextAction.secondary.label}</ButtonSecondary>
             )}
           </div>
         </div>

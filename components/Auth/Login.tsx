@@ -74,7 +74,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   const inputStyle = "w-full h-[52px] px-5 rounded-2xl border border-zinc-200 bg-white text-base font-medium focus:ring-4 focus:ring-[#233DFF]/10 focus:border-[#233DFF]/30 outline-none transition-all placeholder:text-zinc-300";
   const labelStyle = "block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-3 ml-1";
-  const buttonStyle = "w-full h-[52px] bg-[#233DFF] text-white rounded-2xl font-semibold flex items-center justify-center gap-2 hover:bg-[#1a2acc] transition-all shadow-lg shadow-blue-500/10 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed";
+  const buttonStyle = "w-full h-[52px] bg-[#233DFF] text-white rounded-full font-bold uppercase tracking-wider text-xs flex items-center justify-center gap-2 hover:bg-[#1a2acc] transition-all shadow-lg shadow-blue-500/10 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed";
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-6 bg-[#f7f7f7]">
