@@ -7,16 +7,18 @@ import StaffDashboard from './components/Dashboards/StaffDashboard';
 import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
 import { context as ctxApi, client as clientApi } from './services/api';
+import SunnyNavigator from './components/Navigator/SunnyNavigator';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [view, setView] = useState<'login' | 'portal'>('login');
+  const [visitorId, setVisitorId] = useState<string | null>(null);
 
   // Establish the shared first-party visitor identity (hmc_vid) on load so
   // signals are captured before and after sign-in, and the same visitorId is
   // shared with Check Yourself, Calm Kit, Event Finder, and Sunny.
   useEffect(() => {
-    ctxApi.hello().catch(() => {});
+    ctxApi.hello().then((r) => setVisitorId(r.visitorId)).catch(() => {});
   }, []);
   const [activeTab, setActiveTab] = useState<string>('dash');
 
@@ -106,6 +108,9 @@ const App: React.FC = () => {
               {renderPortalContent()}
             </main>
           </div>
+          {currentUser.role === UserRole.CLIENT && (
+            <SunnyNavigator visitorId={visitorId} pageTitle={`HMC Member Hub — ${activeTab}`} pageContext={{ tab: activeTab }} />
+          )}
         </>
       )}
     </div>

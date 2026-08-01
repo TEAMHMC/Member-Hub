@@ -145,12 +145,26 @@ export const client = {
 };
 
 // ── Sunny — AI Wellness Navigator (orchestrates the ecosystem) ───────────
+export interface SunnyTurn {
+  role: 'user' | 'assistant';
+  content: string;
+}
 export const sunny = {
-  chat: (message: string, sessionId?: string) =>
-    req<{ reply?: string; response?: string; message?: string; sessionId?: string }>(
-      '/api/sunny/chat',
-      { method: 'POST', body: JSON.stringify({ message, sessionId }) }
-    ),
+  chat: (
+    message: string,
+    opts: {
+      history?: SunnyTurn[];
+      lang?: 'en' | 'es';
+      pageUrl?: string;
+      pageTitle?: string;
+      pageContext?: Record<string, unknown>;
+      sessionId?: string;
+    } = {}
+  ) =>
+    req<{ success?: boolean; reply?: string; message?: string }>('/api/sunny/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message, ...opts }),
+    }),
 };
 
 // Deep-link a sibling tool, carrying the shared visitorId (and screening scores
