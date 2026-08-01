@@ -23,7 +23,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, activeTab, onTabChange, onLogou
         { icon: <Compass size={18} />, label: 'Playbook', id: 'game-plan' },
         { icon: <Activity size={18} />, label: 'Results', id: 'health' },
         { icon: <ShieldCheck size={18} />, label: 'Resources', id: 'resources' },
-        { icon: <Brain size={18} />, label: 'Self-Check', id: 'check-yourself' },
+        { icon: <Brain size={18} />, label: 'Snapshot', id: 'check-yourself' },
       ];
     }
     return [

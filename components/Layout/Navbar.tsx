@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { User } from '../../types';
-import { Bell, Search, ChevronDown } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react';
 import { TOOLS, context as ctxApi } from '../../services/api';
 
 interface NavbarProps {
@@ -15,7 +15,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
     const q = query.trim();
     if (!q) return;
     ctxApi.event('tool_search', { via: 'navbar', query: q.slice(0, 120) });
-    window.open(`${TOOLS.resources}?q=${encodeURIComponent(q)}`, '_blank', 'noopener');
+    window.open(`${TOOLS.directory}?q=${encodeURIComponent(q)}`, '_blank', 'noopener');
   };
   return (
     <nav className="px-4 md:px-10 py-4 flex items-center justify-between lg:sticky lg:top-0 z-30 bg-[#f5f3ef]/95 backdrop-blur border-b border-zinc-200/40">
@@ -34,11 +34,6 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
       </div>
 
       <div className="flex items-center gap-6">
-        <button aria-label="Notifications" className="p-2 text-zinc-400 hover:text-zinc-900 transition-colors relative">
-          <Bell size={20} />
-          <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#233DFF] rounded-full"></span>
-        </button>
-
         <div className="flex items-center gap-3 group cursor-pointer">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-semibold text-zinc-900 leading-tight">{user.firstName} {user.lastName}</p>

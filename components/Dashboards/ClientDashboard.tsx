@@ -37,6 +37,41 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   });
   // AI-personalized Playbook intro from Sunny (server-side, secure). Cached per member.
   const [aiNarrative, setAiNarrative] = useState<string>(() => localStorage.getItem(`hmc_playbook_intro_${user.id}`) || '');
+  // Plays the member has explicitly requested a warm handoff for (creates a referral).
+  const [connectedPlays, setConnectedPlays] = useState<string[]>([]);
+
+  // Self-serve first: open the Resource Directory searched for the play's category
+  // (e.g. Doctor Visits -> Medi-Cal enrollment + low-cost clinics). No referral.
+  const openResourcesFor = (category: string) => {
+    const q: Record<string, string> = {
+      'Housing': 'housing',
+      'Food Access': 'food',
+      'Emotional Health': 'mental health',
+      'Doctor Visits': 'medi-cal enrollment health insurance clinic',
+      'Getting Around': 'transportation',
+    };
+    ctxApi.event('tool_search', { via: 'playbook', query: q[category] || category });
+    window.open(toolLink(TOOLS.directory, { q: q[category] || category }, visitorId), '_blank', 'noopener');
+  };
+
+  // Explicit "have someone reach out" on a play — the ONLY place a referral is created.
+  const connectPlay = (category: string) => {
+    if (connectedPlays.includes(category)) return;
+    setConnectedPlays((p) => [...p, category]);
+    ctxApi.event('tool_search', { via: 'playbook', query: category });
+    if (user.email) {
+      referralsApi.submit({
+        resourceId: `playbook:${category.toLowerCase().replace(/\s+/g, '-')}`,
+        resourceName: `${category} support`,
+        memberName: `${user.firstName} ${user.lastName}`.trim() || 'Member',
+        memberEmail: user.email,
+        memberPhone: user.phone || undefined,
+        reasonForReferral: `Member requested a warm handoff for ${category} from their Wellness Playbook.`,
+        urgencyLevel: 'routine',
+        preferredContactMethod: 'email',
+      }).then(() => clientApi.me().then(setMe).catch(() => {})).catch(() => {});
+    }
+  };
 
   // SDOH Screening State
   const [sdohScores, setSdohScores] = useState<Assessment>({
@@ -172,25 +207,10 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   const finishAssessment = async () => {
     setLoadingAi(true);
     // Record the self-check as a real signal so the Navigator remembers it and
-    // next-actions can respond (feeds /api/context/next-actions).
+    // next-actions can respond (feeds /api/context/next-actions). We do NOT
+    // auto-create referrals here — a referral only happens when the member
+    // explicitly taps "Get connected" on a play (see connectPlay).
     ctxApi.event('screening_complete', { kind: 'sdoh', scores: sdohScores as any });
-
-    // Auto-open a support pathway for any high-need social determinant (score >= 2).
-    const highNeed = Object.entries(sdohScores).filter(([, v]) => (v as number) >= 2);
-    if (user.email && highNeed.length) {
-      for (const [need] of highNeed) {
-        referralsApi.submit({
-          resourceId: `self-check:${need}`,
-          resourceName: `${need.charAt(0).toUpperCase() + need.slice(1)} support`,
-          memberName: `${user.firstName} ${user.lastName}`.trim() || 'Member',
-          memberEmail: user.email,
-          memberPhone: user.phone && user.phone !== '000-000-0000' ? user.phone : undefined,
-          reasonForReferral: `Self-check flagged elevated need in ${need} (score ${(sdohScores as any)[need]}/3).`,
-          urgencyLevel: (sdohScores as any)[need] >= 3 ? 'urgent' : 'routine',
-          preferredContactMethod: 'email',
-        }).catch(() => {});
-      }
-    }
 
     try {
       // Structured plan is derived deterministically from the member's own answers.
@@ -292,7 +312,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       icon: <Sparkles className="text-amber-400" size={32} />
     },
     {
-      title: "The Self-Check",
+      title: "Your Wellbeing Snapshot",
       description: "Start here. Tell us about your housing, food, and emotional needs. It's safe, private, and helps us build your plan.",
       icon: <Brain className="text-[#233DFF]" size={32} />
     },
@@ -315,7 +335,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         <h1 className="text-5xl font-semibold tracking-tight text-zinc-900">Hello, {user.firstName}.</h1>
         <p className="text-zinc-500 max-w-md mx-auto leading-relaxed text-lg">You're cleared to serve. Everything you need to manage your wellness is right here.</p>
         <div className="flex flex-wrap gap-4 pt-6 justify-center">
-             <ButtonPrimary onClick={() => setActiveTab('check-yourself')}>Finish Self-Check</ButtonPrimary>
+             <ButtonPrimary onClick={() => setActiveTab('check-yourself')}>Start my Snapshot</ButtonPrimary>
              <ButtonSecondary onClick={() => setActiveTab('events')}>Explore Events</ButtonSecondary>
         </div>
         {me && (me.credits.balance > 0 || me.referrals.length > 0) && (
@@ -393,37 +413,40 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-7 space-y-10">
-          <div className="bg-[#18181b] rounded-2xl p-10 text-white flex items-start justify-between gap-6 shadow-lg shadow-zinc-200 overflow-hidden relative group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#233DFF]/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+          <div className="bg-[#18181b] rounded-2xl p-10 text-white overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-[#233DFF]/15 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
             <div className="space-y-3 relative z-10">
                <div className="flex items-center gap-2">
                  <h3 className="text-2xl font-semibold tracking-tight">Stay Unstoppable.</h3>
-                 {aiNarrative && <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[#233DFF] bg-[#233DFF]/15 px-2 py-0.5 rounded-full"><Sparkles size={10} /> Sunny</span>}
+                 {aiNarrative && <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-white bg-[#233DFF] px-2 py-0.5 rounded-full"><Sparkles size={10} /> Sunny</span>}
                </div>
-               <p className="text-zinc-300 text-sm font-medium leading-relaxed">
-                 {aiNarrative || 'Your Playbook is built from your self-check. Take the first play today.'}
+               <p className="text-zinc-300 text-sm font-medium leading-relaxed max-w-xl">
+                 {aiNarrative || 'Your Playbook is built from your Wellbeing Snapshot. Take the first play today.'}
                </p>
             </div>
-            <Award size={42} className="text-[#233DFF] group-hover:scale-110 transition-transform duration-500 shrink-0" />
           </div>
 
           <div className="space-y-6">
-             <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">DAILY STEPS</h4>
+             <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Your next plays</h4>
              <div className="space-y-3">
                {[
-                 { title: 'Fill out my profile', done: true, label: 'COMPLETED' },
-                 { title: 'Finish my self-check', done: dynamicGoals.length > 0, label: dynamicGoals.length > 0 ? 'COMPLETED' : 'PENDING' },
-                 { title: 'Visit a health event', done: false, label: 'PENDING' },
+                 { title: 'Complete your Wellbeing Snapshot', done: dynamicGoals.length > 0, tab: 'check-yourself', cta: 'Start' },
+                 { title: 'Get connected to support', done: (me?.referrals?.length || 0) > 0, tab: 'resources', cta: 'Get connected' },
+                 { title: 'Find an event near you', done: false, tab: 'events', cta: 'Browse events' },
                ].map((s, i) => (
-                 <div key={i} className={`flex items-center justify-between p-5 px-6 rounded-2xl border transition-all ${s.done ? 'bg-zinc-50/50 border-zinc-100' : 'bg-white border-zinc-200'}`}>
-                   <div className="flex items-center gap-6">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm border ${s.done ? 'bg-emerald-50 text-emerald-500 border-emerald-100' : 'bg-zinc-50 text-zinc-300 border-zinc-100'}`}>
-                         {s.done ? <Check size={20} strokeWidth={3} /> : <div className="w-2 h-2 rounded-full bg-zinc-300" />}
+                 <button
+                   key={i}
+                   onClick={() => { setActiveTab(s.tab); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                   className={`w-full text-left flex items-center justify-between p-5 px-6 rounded-2xl border transition-all ${s.done ? 'bg-zinc-50/50 border-zinc-100' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40 hover:shadow-sm'}`}
+                 >
+                   <div className="flex items-center gap-5">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm border shrink-0 ${s.done ? 'bg-emerald-50 text-emerald-500 border-emerald-100' : 'bg-blue-50 text-[#233DFF] border-blue-100'}`}>
+                         {s.done ? <Check size={20} strokeWidth={3} /> : <ArrowRight size={18} />}
                       </div>
-                      <span className={`text-sm font-semibold ${s.done ? 'text-zinc-400' : 'text-zinc-700'}`}>{s.title}</span>
+                      <span className={`text-sm font-semibold ${s.done ? 'text-zinc-400' : 'text-zinc-800'}`}>{s.title}</span>
                    </div>
-                   <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{s.label}</span>
-                 </div>
+                   <span className={`text-[10px] font-bold uppercase tracking-widest shrink-0 ${s.done ? 'text-emerald-500' : 'text-[#233DFF]'}`}>{s.done ? 'Done' : s.cta}</span>
+                 </button>
                ))}
              </div>
           </div>
@@ -433,27 +456,40 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
           <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Your Plays</h4>
           <div className="space-y-4">
             {dynamicGoals.length > 0 ? (
-              dynamicGoals.map((goal, i) => (
-                <Card key={i} className="space-y-5 p-8 hover:shadow-md transition-shadow">
-                  <h5 className="text-base font-semibold text-zinc-900">{goal.category}</h5>
-                  <p className="text-base font-bold text-zinc-900 leading-snug">
-                    "{goal.suggestedGoal}"
-                  </p>
-                  <div className="pt-4 border-t border-zinc-100">
-                    <p className="text-[11px] text-zinc-500 leading-relaxed italic font-medium">
-                      Recommendation: {goal.recommendation}
-                    </p>
+              dynamicGoals.map((goal, i) => {
+                const requested = connectedPlays.includes(goal.category);
+                return (
+                <Card key={i} className="space-y-4 p-7">
+                  <div className="flex items-center justify-between gap-3">
+                    <h5 className="text-base font-semibold text-zinc-900">{goal.category}</h5>
+                    {goal.urgency === 'High' && <span className="pill pill-orange">Urgent</span>}
+                  </div>
+                  <p className="text-base font-bold text-zinc-900 leading-snug">"{goal.suggestedGoal}"</p>
+                  <p className="text-[12px] text-zinc-500 leading-relaxed">{goal.recommendation}</p>
+                  <div className="pt-3 border-t border-zinc-100 space-y-2">
+                    {/* Self-serve first: find resources / enrollment info yourself */}
+                    <ButtonPrimary onClick={() => openResourcesFor(goal.category)} className="w-full">Find resources</ButtonPrimary>
+                    {requested ? (
+                      <div className="flex items-center justify-center gap-2 text-emerald-600 text-[11px] font-bold uppercase tracking-wider py-1">
+                        <Check size={14} strokeWidth={3} /> A team member will reach out
+                      </div>
+                    ) : (
+                      <button onClick={() => connectPlay(goal.category)} className="w-full text-[11px] font-bold uppercase tracking-wider text-zinc-500 hover:text-[#233DFF] py-1">
+                        Or have someone reach out to me
+                      </button>
+                    )}
                   </div>
                 </Card>
-              ))
+                );
+              })
             ) : (
               <Card className="text-center py-20 space-y-6 bg-zinc-50/50 border-dashed border-zinc-200">
                  <Brain size={48} className="mx-auto text-zinc-200" strokeWidth={1} />
                  <div className="space-y-2">
-                   <p className="text-sm font-semibold text-zinc-600">Finish your self-check</p>
+                   <p className="text-sm font-semibold text-zinc-600">Finish your Wellbeing Snapshot</p>
                    <p className="text-xs text-zinc-400 max-w-[180px] mx-auto leading-relaxed">This will unlock your personalized health insights and local resources.</p>
                  </div>
-                 <ButtonPrimary onClick={() => setActiveTab('check-yourself')} className="px-10">Start Check</ButtonPrimary>
+                 <ButtonPrimary onClick={() => setActiveTab('check-yourself')} className="px-10">Start my Snapshot</ButtonPrimary>
               </Card>
             )}
           </div>
@@ -466,7 +502,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     <div className="max-w-3xl mx-auto py-10 animate-in slide-in-from-bottom-4 duration-500">
       <div className="text-center space-y-4 mb-12">
         <div className="pill pill-blue mx-auto">Safe & Confidential</div>
-        <h2 className="text-4xl font-semibold tracking-tight">Self-Check</h2>
+        <h2 className="text-4xl font-semibold tracking-tight">Wellbeing Snapshot</h2>
         <p className="text-zinc-500 max-w-md mx-auto text-lg leading-relaxed">Help us understand your needs so we can connect you with the right support partners.</p>
       </div>
 
@@ -484,8 +520,8 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
             <Brain size={20} />
           </div>
           <div>
-            <p className="text-sm font-semibold text-zinc-900">Mental health check (PHQ-9 &amp; GAD-7)</p>
-            <p className="text-xs text-zinc-500 mt-1">Take the full, private mental-health screening in Check Yourself. Your results connect back here.</p>
+            <p className="text-sm font-semibold text-zinc-900">Check Yourself &mdash; free mental health screening</p>
+            <p className="text-xs text-zinc-500 mt-1">A private, culturally-attuned check-in on how you are really doing. About 3 minutes, no judgment. Get a plain-language summary you can share with a provider.</p>
           </div>
         </div>
         <ChevronRight size={18} className="text-[#233DFF] shrink-0" />
@@ -638,7 +674,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         <p className="text-zinc-500 text-lg">Food, housing, safety, healthcare, and community connection near you.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <a href={toolLink(TOOLS.resources, {}, visitorId)} target="_blank" rel="noreferrer"
+        <a href={toolLink(TOOLS.directory, {}, visitorId)} target="_blank" rel="noreferrer"
            onClick={() => ctxApi.event('tool_open', { tool: 'resource-directory' })}
            className="group">
           <Card className="h-full flex flex-col gap-4 p-8 group-hover:border-[#233DFF]/30 transition-all">
@@ -655,9 +691,9 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
             <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-[#FF6E40]"><Heart size={24} /></div>
             <div className="space-y-2">
               <h3 className="text-xl font-semibold text-zinc-900">Request a warm handoff</h3>
-              <p className="text-sm text-zinc-500 leading-relaxed">Take the Self-Check and we will connect you with a real person for the needs you flag.</p>
+              <p className="text-sm text-zinc-500 leading-relaxed">Take the Wellbeing Snapshot and we will connect you with a real person for the needs you flag.</p>
             </div>
-            <ButtonPrimary onClick={() => setActiveTab('check-yourself')} className="w-full md:w-auto">Start Self-Check</ButtonPrimary>
+            <ButtonPrimary onClick={() => setActiveTab('check-yourself')} className="w-full md:w-auto">Start my Snapshot</ButtonPrimary>
           </Card>
         </div>
       </div>

@@ -87,7 +87,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Member Hub</h1>
           </div>
           <p className="text-zinc-500 text-sm leading-relaxed max-w-xs mx-auto">
-            Your free space for wellness support: mental health self-checks, community events, and help with food, housing, and care near you.
+            Your free space for wellness support: mental health screenings, community events, and help with food, housing, and care near you.
           </p>
         </div>
 
