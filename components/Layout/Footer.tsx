@@ -17,7 +17,7 @@ const Footer: React.FC = () => (
       emergency care or professional medical advice.
     </p>
     <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[11px] font-medium text-zinc-400">
-      <a href="https://www.healthmatters.clinic/privacy" target="_blank" rel="noreferrer" className="hover:text-zinc-700">Privacy Policy</a>
+      <a href="https://www.healthmatters.clinic/privacy-policy" target="_blank" rel="noreferrer" className="hover:text-zinc-700">Privacy Policy</a>
       <a href="https://www.healthmatters.clinic/terms" target="_blank" rel="noreferrer" className="hover:text-zinc-700">Terms</a>
       <a href="https://www.healthmatters.clinic" target="_blank" rel="noreferrer" className="hover:text-zinc-700">healthmatters.clinic</a>
       <span>© Health Matters Clinic</span>
