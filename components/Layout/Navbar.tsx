@@ -9,7 +9,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ user }) => {
   return (
-    <nav className="px-10 py-5 flex items-center justify-between sticky top-0 z-30 bg-transparent">
+    <nav className="px-4 md:px-10 py-4 flex items-center justify-between lg:sticky lg:top-0 z-30 bg-[#f5f3ef]/95 backdrop-blur border-b border-zinc-200/40">
       <div className="flex items-center gap-6 flex-1">
         <div className="relative hidden md:block w-full max-w-[420px]">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" size={18} />
@@ -30,7 +30,7 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
         <div className="flex items-center gap-3 group cursor-pointer">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-semibold text-zinc-900 leading-tight">{user.firstName} {user.lastName}</p>
-            <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-0.5">CLIENT ID</p>
+            <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-0.5">Member</p>
           </div>
           <div className="w-10 h-10 rounded-full border border-zinc-200 p-0.5 overflow-hidden group-hover:border-[#233DFF] transition-colors bg-white">
              <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} alt="Avatar" className="w-full h-full object-cover rounded-full" />

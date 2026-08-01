@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { UserRole } from '../../types';
-import { 
-  Home, Calendar, ClipboardList, 
-  Settings, LogOut, Compass, ShieldCheck, Activity, Brain,
+import {
+  Home, Calendar, ClipboardList,
+  LogOut, Compass, ShieldCheck, Activity, Brain,
   User as UserIcon
 } from 'lucide-react';
 
@@ -32,57 +32,81 @@ const Sidebar: React.FC<SidebarProps> = ({ role, activeTab, onTabChange, onLogou
     ];
   };
 
+  const items = getNavItems();
+
+  const navButton = (item: { icon: React.ReactNode; label: string; id: string }, horizontal = false) => (
+    <button
+      key={item.id}
+      onClick={() => onTabChange(item.id)}
+      className={`flex items-center gap-3 rounded-full transition-all font-bold uppercase tracking-wider text-[11px] whitespace-nowrap ${horizontal ? 'px-4 py-2.5 shrink-0' : 'w-full px-4 py-3'} ${
+        activeTab === item.id
+          ? 'bg-[#233DFF] text-white shadow-md shadow-[#233DFF]/20'
+          : 'text-zinc-500 hover:text-zinc-900 hover:bg-white/60'
+      }`}
+    >
+      <span className={activeTab === item.id ? 'text-white' : 'text-zinc-400'}>{item.icon}</span>
+      {item.label}
+    </button>
+  );
+
+  const Brand = (
+    <div className="flex items-center gap-3 cursor-pointer" onClick={() => onTabChange('dash')}>
+      <div className="w-9 h-9 rounded-xl bg-[#233DFF] flex items-center justify-center shadow-sm shrink-0">
+        <span className="text-white font-black text-sm tracking-tighter leading-none">H+</span>
+      </div>
+      <div className="flex flex-col">
+        <span className="text-base font-black tracking-tighter uppercase italic text-zinc-900 leading-none">Member Hub</span>
+        <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1">Health Matters Clinic</span>
+      </div>
+    </div>
+  );
+
   return (
-    <aside className="w-full lg:w-64 border-r border-zinc-100 flex flex-col h-screen sticky top-0 shrink-0 z-50 bg-transparent">
-      <div className="p-8">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => onTabChange('dash')}>
-          <div className="w-8 h-8 rounded-lg bg-[#233DFF] flex items-center justify-center">
-            <div className="w-4 h-4 bg-white rounded-md"></div>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-base font-semibold tracking-tight text-zinc-900 leading-none">Member Hub</span>
-            <span className="text-[10px] text-zinc-400 font-medium tracking-wide mt-1">Health Matters Clinic</span>
-          </div>
-        </div>
-      </div>
-
-      <nav className="flex-1 px-4 space-y-1">
-        <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-4 opacity-70">
-          Explore
-        </p>
-        {getNavItems().map((item) => (
-          <button
-            key={item.id}
-            onClick={() => onTabChange(item.id)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all font-medium text-sm ${
-              activeTab === item.id 
-                ? 'bg-white text-[#233DFF] shadow-sm border border-zinc-100' 
-                : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50/50'
-            }`}
-          >
-            <span className={activeTab === item.id ? 'text-[#233DFF]' : 'text-zinc-400'}>{item.icon}</span>
-            {item.label}
+    <>
+      {/* Mobile / narrow: solid top bar with horizontal nav (never overlaps content) */}
+      <div className="lg:hidden sticky top-0 z-50 bg-[#f5f3ef]/95 backdrop-blur border-b border-zinc-200/70">
+        <div className="flex items-center justify-between px-4 py-3">
+          {Brand}
+          <button onClick={onLogout} className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#FF6E40]">
+            <LogOut size={16} /> Sign Out
           </button>
-        ))}
-      </nav>
-
-      <div className="p-6 border-t border-zinc-100 space-y-1">
-        <button 
-          onClick={() => onTabChange('profile')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all font-medium text-sm ${activeTab === 'profile' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50/50'}`}
-        >
-          <UserIcon size={18} />
-          Profile
-        </button>
-        <button 
-          onClick={onLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all font-medium text-sm text-[#FF6E40] hover:bg-orange-50/50"
-        >
-          <LogOut size={18} />
-          Sign Out
-        </button>
+        </div>
+        <nav className="flex gap-2 overflow-x-auto px-4 pb-3 no-scrollbar">
+          {items.map((item) => navButton(item, true))}
+          <button
+            onClick={() => onTabChange('profile')}
+            className={`flex items-center gap-2 rounded-full px-4 py-2.5 shrink-0 font-bold uppercase tracking-wider text-[11px] ${activeTab === 'profile' ? 'bg-zinc-900 text-white' : 'text-zinc-500 hover:bg-white/60'}`}
+          >
+            <UserIcon size={16} /> Profile
+          </button>
+        </nav>
       </div>
-    </aside>
+
+      {/* Desktop: fixed-width vertical sidebar, solid background, own scroll */}
+      <aside className="hidden lg:flex w-64 shrink-0 flex-col h-screen sticky top-0 z-40 bg-[#f5f3ef] border-r border-zinc-200/70">
+        <div className="p-8">{Brand}</div>
+
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+          <p className="px-4 text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-4">Explore</p>
+          {items.map((item) => navButton(item))}
+        </nav>
+
+        <div className="p-6 border-t border-zinc-200/70 space-y-1">
+          <button
+            onClick={() => onTabChange('profile')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-full transition-all font-bold uppercase tracking-wider text-[11px] ${activeTab === 'profile' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-white/60'}`}
+          >
+            <UserIcon size={18} /> Profile
+          </button>
+          <button
+            onClick={onLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-full transition-all font-bold uppercase tracking-wider text-[11px] text-[#FF6E40] hover:bg-orange-50/60"
+          >
+            <LogOut size={18} /> Sign Out
+          </button>
+        </div>
+      </aside>
+    </>
   );
 };
 

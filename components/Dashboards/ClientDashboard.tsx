@@ -219,20 +219,21 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     </div>
   );
 
+  // HMC signature buttons: rounded-full, uppercase, tracking-wider, bold
   const ButtonPrimary = ({ children, onClick, disabled = false, className = "" }: any) => (
-    <button 
-      onClick={onClick} 
+    <button
+      onClick={onClick}
       disabled={disabled}
-      className={`px-8 py-3 bg-[#233DFF] text-white rounded-2xl font-semibold text-sm transition-all hover:bg-[#1a2acc] active:scale-95 disabled:opacity-50 ${className}`}
+      className={`px-8 py-3.5 bg-[#233DFF] text-white rounded-full font-bold uppercase tracking-wider text-xs transition-all hover:bg-[#1a2acc] active:scale-95 disabled:opacity-50 shadow-md shadow-[#233DFF]/20 inline-flex items-center justify-center gap-2 ${className}`}
     >
       {children}
     </button>
   );
 
   const ButtonSecondary = ({ children, onClick, className = "" }: any) => (
-    <button 
-      onClick={onClick} 
-      className={`px-8 py-3 border border-zinc-200 bg-white text-zinc-900 rounded-2xl font-semibold text-sm transition-all hover:bg-zinc-50 active:scale-95 ${className}`}
+    <button
+      onClick={onClick}
+      className={`px-8 py-3.5 border border-zinc-200 bg-white text-zinc-900 rounded-full font-bold uppercase tracking-wider text-xs transition-all hover:bg-zinc-50 active:scale-95 inline-flex items-center justify-center gap-2 ${className}`}
     >
       {children}
     </button>
@@ -240,7 +241,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
 
   const tourSteps = [
     {
-      title: "Welcome to HMC Hub",
+      title: "Welcome to your Member Hub",
       description: "Everything you need to manage your health and wellness is now in one place. Let's show you how it works.",
       icon: <Sparkles className="text-amber-400" size={32} />
     },
@@ -580,12 +581,78 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     </div>
   );
 
+  const renderResources = () => (
+    <div className="max-w-5xl mx-auto py-10 space-y-8 animate-in fade-in duration-500">
+      <div className="text-center space-y-3">
+        <div className="pill pill-blue mx-auto">Support Pathways</div>
+        <h2 className="text-4xl font-semibold tracking-tight text-zinc-900">Resources &amp; support</h2>
+        <p className="text-zinc-500 text-lg">Food, housing, safety, healthcare, and community connection near you.</p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <a href={toolLink(TOOLS.resources, {}, visitorId)} target="_blank" rel="noreferrer"
+           onClick={() => ctxApi.event('tool_open', { tool: 'resource-directory' })}
+           className="group">
+          <Card className="h-full flex flex-col gap-4 p-8 group-hover:border-[#233DFF]/30 transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-[#233DFF]"><Search size={24} /></div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-semibold text-zinc-900">Search the Resource Directory</h3>
+              <p className="text-sm text-zinc-500 leading-relaxed">290+ vetted LA County community resources: food, housing, legal aid, mental health, and more.</p>
+            </div>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#233DFF]">Open directory</span>
+          </Card>
+        </a>
+        <div>
+          <Card className="h-full flex flex-col gap-4 p-8">
+            <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-[#FF6E40]"><Heart size={24} /></div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-semibold text-zinc-900">Request a warm handoff</h3>
+              <p className="text-sm text-zinc-500 leading-relaxed">Take the Self-Check and we will connect you with a real person for the needs you flag.</p>
+            </div>
+            <ButtonPrimary onClick={() => setActiveTab('check-yourself')} className="w-full md:w-auto">Start Self-Check</ButtonPrimary>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderProfile = () => (
+    <div className="max-w-3xl mx-auto py-10 space-y-8 animate-in fade-in duration-500">
+      <div className="text-center space-y-3">
+        <h2 className="text-4xl font-semibold tracking-tight text-zinc-900">Your profile</h2>
+        <p className="text-zinc-500 text-lg">Your account and progress.</p>
+      </div>
+      <Card className="p-8 space-y-6">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-[#233DFF] text-white flex items-center justify-center text-2xl font-black">
+            {(user.firstName || 'M').charAt(0)}
+          </div>
+          <div>
+            <p className="text-xl font-semibold text-zinc-900">{user.firstName} {user.lastName}</p>
+            <p className="text-sm text-zinc-500">{user.email || 'No email on file'}</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t border-zinc-100">
+          <div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Health Credits</p><p className="text-2xl font-semibold text-zinc-900">{me?.credits.balance ?? 0}</p></div>
+          <div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Wellness Points</p><p className="text-2xl font-semibold text-zinc-900">{user.wellnessPoints ?? 0}</p></div>
+          <div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Zip</p><p className="text-2xl font-semibold text-zinc-900">{user.zipCode || '--'}</p></div>
+        </div>
+        {user.badges?.length > 0 && (
+          <div className="flex flex-wrap gap-2 pt-2">
+            {user.badges.map((b) => <span key={b} className="pill pill-yellow">{b}</span>)}
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case 'events': return renderEvents();
       case 'health': return renderHealthResults();
       case 'game-plan': return renderGamePlan();
       case 'check-yourself': return renderScreener();
+      case 'resources': return renderResources();
+      case 'profile': return renderProfile();
       case 'dash': default: return renderHome();
     }
   };

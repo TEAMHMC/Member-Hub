@@ -104,7 +104,7 @@ const App: React.FC = () => {
           />
           <div className="flex-1 flex flex-col min-w-0">
             <Navbar user={currentUser} />
-            <main className="p-4 md:p-8 overflow-y-auto">
+            <main className="px-4 md:px-8 pb-28 pt-2">
               {renderPortalContent()}
             </main>
           </div>
