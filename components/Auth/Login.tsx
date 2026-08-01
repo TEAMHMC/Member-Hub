@@ -195,6 +195,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           <div className="inline-flex items-center gap-2 py-2 px-4 rounded-full bg-zinc-100/60 text-[10px] text-zinc-500 font-bold uppercase tracking-widest border border-zinc-200/50">
             <Lock size={12} className="opacity-60" /> SECURE &amp; PRIVATE
           </div>
+          <p className="text-[11px] text-zinc-400 mt-4 leading-relaxed">
+            In crisis? Call or text{' '}
+            <a href="sms:988" className="font-bold text-[#FF6F91] underline">988</a>
+            {' '}any time.
+          </p>
         </div>
       </div>
     </div>

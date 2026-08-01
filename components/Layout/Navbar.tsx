@@ -1,25 +1,36 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { User } from '../../types';
 import { Bell, Search, ChevronDown } from 'lucide-react';
+import { TOOLS, context as ctxApi } from '../../services/api';
 
 interface NavbarProps {
   user: User;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ user }) => {
+  const [query, setQuery] = useState('');
+  const search = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = query.trim();
+    if (!q) return;
+    ctxApi.event('tool_search', { via: 'navbar', query: q.slice(0, 120) });
+    window.open(`${TOOLS.resources}?q=${encodeURIComponent(q)}`, '_blank', 'noopener');
+  };
   return (
     <nav className="px-4 md:px-10 py-4 flex items-center justify-between lg:sticky lg:top-0 z-30 bg-[#f5f3ef]/95 backdrop-blur border-b border-zinc-200/40">
       <div className="flex items-center gap-6 flex-1">
-        <div className="relative hidden md:block w-full max-w-[420px]">
+        <form onSubmit={search} className="relative hidden md:block w-full max-w-[420px]">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" size={18} />
           <input
-            type="text"
-            aria-label="Search resources, results, or programs"
-            placeholder="Search resources, results, or programs..."
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            aria-label="Search resources"
+            placeholder="Search food, housing, mental health, and more..."
             className="w-full pl-12 pr-6 py-3 bg-white/80 border border-zinc-100 rounded-full text-sm font-medium focus:bg-white focus:ring-4 focus:ring-blue-50/50 outline-none transition-all shadow-sm"
           />
-        </div>
+        </form>
       </div>
 
       <div className="flex items-center gap-6">

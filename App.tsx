@@ -6,12 +6,13 @@ import ClientDashboard from './components/Dashboards/ClientDashboard';
 import StaffDashboard from './components/Dashboards/StaffDashboard';
 import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
+import Footer from './components/Layout/Footer';
 import { context as ctxApi, client as clientApi } from './services/api';
 import SunnyNavigator from './components/Navigator/SunnyNavigator';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [view, setView] = useState<'login' | 'portal'>('login');
+  const [view, setView] = useState<'loading' | 'login' | 'portal'>('loading');
   const [visitorId, setVisitorId] = useState<string | null>(null);
 
   // Establish the shared first-party visitor identity (hmc_vid) on load so
@@ -119,22 +120,36 @@ const App: React.FC = () => {
     return <div className="p-20 text-center font-black uppercase italic">Access Denied</div>;
   };
 
+  if (view === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f3ef]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#233DFF] flex items-center justify-center animate-pulse">
+            <span className="text-white font-black tracking-tighter">H+</span>
+          </div>
+          <p className="text-xs font-bold uppercase tracking-widest text-zinc-400">Loading your hub</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[#f5f3ef]">
       {view === 'login' && <Login onLogin={handleLogin} />}
       {view === 'portal' && currentUser && (
         <>
-          <Sidebar 
-            role={currentUser.role!} 
-            activeTab={activeTab} 
-            onTabChange={setActiveTab} 
-            onLogout={handleLogout} 
+          <Sidebar
+            role={currentUser.role!}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            onLogout={handleLogout}
           />
           <div className="flex-1 flex flex-col min-w-0">
             <Navbar user={currentUser} />
-            <main className="px-4 md:px-8 pb-28 pt-2">
+            <main className="px-4 md:px-8 pb-28 pt-2 flex-1">
               {renderPortalContent()}
             </main>
+            <Footer />
           </div>
           {currentUser.role === UserRole.CLIENT && (
             <SunnyNavigator visitorId={visitorId} pageTitle={`HMC Member Hub — ${activeTab}`} pageContext={{ tab: activeTab }} />
