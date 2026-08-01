@@ -22,19 +22,46 @@ const App: React.FC = () => {
   }, []);
   const [activeTab, setActiveTab] = useState<string>('dash');
 
-  // Load user from session if available
+  // Restore a session by validating the httpOnly cookie with the backend
+  // (source of truth), not by trusting localStorage alone. localStorage only
+  // caches non-sensitive UI fields (name, zip, badges) for a fast first paint.
   useEffect(() => {
-    const savedUser = localStorage.getItem('hmc_user');
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
-      setView('portal');
-    }
+    const cached = localStorage.getItem('hmc_user');
+    clientApi.me()
+      .then((me) => {
+        const base: User = cached ? JSON.parse(cached) : ({} as User);
+        const restored: User = {
+          ...base,
+          id: base.id || `usr_${Math.random().toString(36).slice(2, 11)}`,
+          role: UserRole.CLIENT,
+          email: me.email || base.email || '',
+          firstName: me.profile?.firstName || base.firstName || 'Member',
+          lastName: base.lastName || '',
+          phone: base.phone || '',
+          zipCode: base.zipCode || '',
+          xp: base.xp ?? 0,
+          level: base.level ?? 1,
+          badges: base.badges || ['Member'],
+          hoursLogged: base.hoursLogged ?? 0,
+          shiftsRegistered: base.shiftsRegistered ?? 0,
+          wellnessPoints: base.wellnessPoints ?? me.credits?.balance ?? 0,
+        };
+        setCurrentUser(restored);
+        localStorage.setItem('hmc_user', JSON.stringify(restored));
+        setView('portal');
+      })
+      .catch(() => {
+        // No valid session — require sign-in and drop any stale cache.
+        localStorage.removeItem('hmc_user');
+        setCurrentUser(null);
+        setView('login');
+      });
   }, []);
 
   const handleLogin = (userData: Partial<User>, role: UserRole = UserRole.CLIENT) => {
     const activeUser: User = {
-      id: 'usr_' + Math.random().toString(36).substr(2, 9),
-      phone: userData.phone || '000-000-0000',
+      id: 'usr_' + Math.random().toString(36).slice(2, 11),
+      phone: userData.phone || '',
       role: role,
       firstName: userData.firstName || 'Member',
       lastName: userData.lastName || '',
@@ -42,7 +69,7 @@ const App: React.FC = () => {
       zipCode: userData.zipCode || '',
       xp: 0,
       level: 1,
-      badges: ['New Member'],
+      badges: ['Member'],
       hoursLogged: 0,
       shiftsRegistered: 0,
       wellnessPoints: 0,
@@ -76,10 +103,11 @@ const App: React.FC = () => {
 
     if (currentUser.role === UserRole.CLIENT) {
       return (
-        <ClientDashboard 
-          user={currentUser} 
-          initialTab={activeTab} 
+        <ClientDashboard
+          user={currentUser}
+          initialTab={activeTab}
           onUpdateUser={handleUpdateUser}
+          visitorId={visitorId}
         />
       );
     }

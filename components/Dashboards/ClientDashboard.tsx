@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Shift, Resource, ServiceEncounter, Referral, Assessment } from '../../types';
-import { getResourceRecommendations } from '../../services/geminiService';
+import { buildPlanFromScores } from '../../services/plan';
 import { context as ctxApi, client as clientApi, referrals as referralsApi, toolLink, TOOLS, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
-import { useEvents, useVisitorContext } from '../../services/hooks';
+import { useEvents } from '../../services/hooks';
 import { 
   Brain, Calendar, MapPin, Clock, ShieldCheck,
   ArrowLeft, Users, Activity,
@@ -16,9 +16,10 @@ interface ClientDashboardProps {
   user: User;
   initialTab?: string;
   onUpdateUser?: (data: Partial<User>) => void;
+  visitorId?: string | null;
 }
 
-const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'dash', onUpdateUser }) => {
+const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'dash', onUpdateUser, visitorId = null }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [zipInput, setZipInput] = useState(user.zipCode || '');
@@ -49,8 +50,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
 
   const mapRef = useRef<any>(null);
 
-  // ── Live ecosystem data ──────────────────────────────────────────────
-  const { visitorId } = useVisitorContext();          // shared identity across tools
+  // ── Live ecosystem data (visitorId comes from App — single hello() handshake) ──
   const { events: liveEvents } = useEvents();          // real Event Finder data
   const [me, setMe] = useState<ClientMe | null>(null); // credits, referrals, next steps
   useEffect(() => {
@@ -156,8 +156,12 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         }
         mapRef.current = mapInstance;
       };
-      setTimeout(initMap, 200);
-      return () => { if (mapInstance) mapInstance.remove(); mapRef.current = null; };
+      const timer = setTimeout(initMap, 200);
+      return () => {
+        clearTimeout(timer);
+        if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
+        else if (mapInstance) { mapInstance.remove(); }
+      };
     }
   }, [activeTab, viewMode, liveEvents]);
 
@@ -187,7 +191,8 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     }
 
     try {
-      const recommendations = await getResourceRecommendations(sdohScores);
+      // Plan is derived deterministically from the member's own answers.
+      const recommendations = buildPlanFromScores(sdohScores);
       setDynamicGoals(recommendations);
       localStorage.setItem(`hmc_goals_${user.id}`, JSON.stringify(recommendations));
 
@@ -213,8 +218,12 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     setViewMode('map');
   };
 
-  const Card: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className = "" }) => (
-    <div className={`bg-white rounded-2xl border border-zinc-200/50 shadow-sm p-6 ${className}`}>
+  const Card: React.FC<{ children: React.ReactNode; className?: string; onClick?: (e: any) => void }> = ({ children, className = "", onClick }) => (
+    <div
+      className={`bg-white rounded-2xl border border-zinc-200/50 shadow-sm p-6 ${className}`}
+      onClick={onClick}
+      {...(onClick ? { role: 'button', tabIndex: 0, onKeyDown: (e: any) => { if (e.key === 'Enter' || e.key === ' ') onClick(e); } } : {})}
+    >
       {children}
     </div>
   );
@@ -251,8 +260,8 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       icon: <Brain className="text-[#233DFF]" size={32} />
     },
     {
-      title: "Your AI Health Plan",
-      description: "Once you finish the check, Gemini AI creates a roadmap just for you, connecting you with local partners who can help.",
+      title: "Your Health Plan",
+      description: "Once you finish the check, we build a roadmap from your answers and connect you with local partners who can help.",
       icon: <Compass className="text-[#FF6E40]" size={32} />
     },
     {
@@ -381,7 +390,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         </div>
 
         <div className="lg:col-span-5 space-y-6">
-          <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">AI INSIGHTS</h4>
+          <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Your Plan</h4>
           <div className="space-y-4">
             {dynamicGoals.length > 0 ? (
               dynamicGoals.map((goal, i) => (
@@ -658,9 +667,9 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   };
 
   return (
-    <div className="min-h-screen pb-24 px-4 sm:px-6">
+    <div className="w-full">
       {activeTab !== 'dash' && (activeTab !== 'check-yourself') && (
-        <div className="max-w-6xl mx-auto pt-6 flex mb-4">
+        <div className="max-w-6xl mx-auto pt-2 flex mb-2">
           <button onClick={() => setActiveTab('dash')} className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 font-bold text-xs uppercase tracking-widest transition-colors px-2 group">
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back to Dashboard
           </button>
