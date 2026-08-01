@@ -40,8 +40,8 @@ const Sidebar: React.FC<SidebarProps> = ({ role, activeTab, onTabChange, onLogou
             <div className="w-4 h-4 bg-white rounded-md"></div>
           </div>
           <div className="flex flex-col">
-            <span className="text-base font-semibold tracking-tight text-zinc-900 leading-none">HMC Hub</span>
-            <span className="text-[10px] text-zinc-400 font-medium tracking-wide mt-1">Member Portal</span>
+            <span className="text-base font-semibold tracking-tight text-zinc-900 leading-none">Member Hub</span>
+            <span className="text-[10px] text-zinc-400 font-medium tracking-wide mt-1">Health Matters Clinic</span>
           </div>
         </div>
       </div>
