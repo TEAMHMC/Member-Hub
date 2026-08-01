@@ -80,14 +80,15 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     <div className="min-h-screen w-full flex items-center justify-center p-6 bg-[#f7f7f7]">
       <div className={`w-full bg-white rounded-[40px] p-10 md:p-12 space-y-10 animate-in fade-in zoom-in-95 duration-500 shadow-2xl shadow-zinc-200/40 border border-zinc-100/50 ${step === 'onboarding' ? 'max-w-xl' : 'max-w-sm'}`}>
 
-        <div className="text-center space-y-6">
-          <div className="w-16 h-16 bg-[#233DFF] rounded-3xl mx-auto shadow-lg shadow-[#233DFF]/20 flex items-center justify-center">
-            <div className="w-8 h-8 bg-white rounded-xl"></div>
+        <div className="text-center space-y-5">
+          <img src="/hmc-logo.png" alt="Health Matters Clinic" className="w-16 h-16 rounded-3xl mx-auto shadow-lg shadow-[#233DFF]/20" />
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#233DFF]">Health Matters Clinic</p>
+            <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Member Hub</h1>
           </div>
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Welcome home</h1>
-            <p className="text-zinc-500 text-sm">Health help and support near you.</p>
-          </div>
+          <p className="text-zinc-500 text-sm leading-relaxed max-w-xs mx-auto">
+            Your free space for wellness support: mental health self-checks, community events, and help with food, housing, and care near you.
+          </p>
         </div>
 
         {step === 'email' && (

@@ -51,9 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, activeTab, onTabChange, onLogou
 
   const Brand = (
     <div className="flex items-center gap-3 cursor-pointer" onClick={() => onTabChange('dash')}>
-      <div className="w-9 h-9 rounded-xl bg-[#233DFF] flex items-center justify-center shadow-sm shrink-0">
-        <span className="text-white font-black text-sm tracking-tighter leading-none">H+</span>
-      </div>
+      <img src="/hmc-logo.png" alt="Health Matters Clinic" className="w-9 h-9 rounded-xl shadow-sm shrink-0" />
       <div className="flex flex-col">
         <span className="text-base font-black tracking-tighter uppercase italic text-zinc-900 leading-none">Member Hub</span>
         <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1">Health Matters Clinic</span>

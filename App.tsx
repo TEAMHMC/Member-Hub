@@ -124,9 +124,7 @@ const App: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f5f3ef]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-[#233DFF] flex items-center justify-center animate-pulse">
-            <span className="text-white font-black tracking-tighter">H+</span>
-          </div>
+          <img src="/hmc-logo.png" alt="Health Matters Clinic" className="w-14 h-14 rounded-2xl animate-pulse" />
           <p className="text-xs font-bold uppercase tracking-widest text-zinc-400">Loading your hub</p>
         </div>
       </div>
