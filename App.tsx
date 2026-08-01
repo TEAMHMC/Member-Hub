@@ -6,10 +6,18 @@ import ClientDashboard from './components/Dashboards/ClientDashboard';
 import StaffDashboard from './components/Dashboards/StaffDashboard';
 import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
+import { context as ctxApi, client as clientApi } from './services/api';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [view, setView] = useState<'login' | 'portal'>('login');
+
+  // Establish the shared first-party visitor identity (hmc_vid) on load so
+  // signals are captured before and after sign-in, and the same visitorId is
+  // shared with Check Yourself, Calm Kit, Event Finder, and Sunny.
+  useEffect(() => {
+    ctxApi.hello().catch(() => {});
+  }, []);
   const [activeTab, setActiveTab] = useState<string>('dash');
 
   // Load user from session if available
@@ -54,6 +62,7 @@ const App: React.FC = () => {
   };
 
   const handleLogout = () => {
+    clientApi.logout().catch(() => {});
     localStorage.removeItem('hmc_user');
     setCurrentUser(null);
     setView('login');

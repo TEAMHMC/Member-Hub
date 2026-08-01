@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Shift, Resource, ServiceEncounter, Referral, Assessment } from '../../types';
 import { getResourceRecommendations } from '../../services/geminiService';
+import { context as ctxApi, client as clientApi, referrals as referralsApi, toolLink, TOOLS, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
+import { useEvents, useVisitorContext } from '../../services/hooks';
 import { 
   Brain, Calendar, MapPin, Clock, ShieldCheck,
   ArrowLeft, Users, Activity,
@@ -46,6 +48,15 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   });
 
   const mapRef = useRef<any>(null);
+
+  // ── Live ecosystem data ──────────────────────────────────────────────
+  const { visitorId } = useVisitorContext();          // shared identity across tools
+  const { events: liveEvents } = useEvents();          // real Event Finder data
+  const [me, setMe] = useState<ClientMe | null>(null); // credits, referrals, next steps
+  useEffect(() => {
+    clientApi.me().then(setMe).catch(() => setMe(null));
+  }, []);
+  const nextAction: NextAction | undefined = me?.nextActions?.[0];
 
   // Check for tour requirement
   useEffect(() => {
@@ -128,35 +139,68 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         const L = (window as any).L;
         if (!L) return;
         if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
-        const center: [number, number] = [34.0522, -118.2437]; 
+        const center: [number, number] = [34.0522, -118.2437];
         mapInstance = L.map('event-map', { zoomControl: false }).setView(center, 11);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
-          attribution: '&copy; OpenStreetMap' 
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; OpenStreetMap'
         }).addTo(mapInstance);
+        // Plot real events that carry coordinates.
+        const geoEvents = liveEvents.filter((e) => typeof e.lat === 'number' && typeof e.lng === 'number');
+        geoEvents.forEach((e) => {
+          const m = L.marker([e.lat as number, e.lng as number]).addTo(mapInstance);
+          m.bindPopup(`<strong>${e.title}</strong><br/>${[e.dateDisplay || e.date, e.time, e.location].filter(Boolean).join(' · ')}`);
+        });
+        if (geoEvents.length) {
+          const bounds = L.latLngBounds(geoEvents.map((e) => [e.lat, e.lng]));
+          mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 });
+        }
         mapRef.current = mapInstance;
       };
       setTimeout(initMap, 200);
       return () => { if (mapInstance) mapInstance.remove(); mapRef.current = null; };
     }
-  }, [activeTab, viewMode]);
+  }, [activeTab, viewMode, liveEvents]);
 
   useEffect(() => { setActiveTab(initialTab); }, [initialTab]);
 
   const finishAssessment = async () => {
     setLoadingAi(true);
+    // Record the self-check as a real signal so the Navigator remembers it and
+    // next-actions can respond (feeds /api/context/next-actions).
+    ctxApi.event('screening_complete', { kind: 'sdoh', scores: sdohScores as any });
+
+    // Auto-open a support pathway for any high-need social determinant (score >= 2).
+    const highNeed = Object.entries(sdohScores).filter(([, v]) => (v as number) >= 2);
+    if (user.email && highNeed.length) {
+      for (const [need] of highNeed) {
+        referralsApi.submit({
+          resourceId: `self-check:${need}`,
+          resourceName: `${need.charAt(0).toUpperCase() + need.slice(1)} support`,
+          memberName: `${user.firstName} ${user.lastName}`.trim() || 'Member',
+          memberEmail: user.email,
+          memberPhone: user.phone && user.phone !== '000-000-0000' ? user.phone : undefined,
+          reasonForReferral: `Self-check flagged elevated need in ${need} (score ${(sdohScores as any)[need]}/3).`,
+          urgencyLevel: (sdohScores as any)[need] >= 3 ? 'urgent' : 'routine',
+          preferredContactMethod: 'email',
+        }).catch(() => {});
+      }
+    }
+
     try {
       const recommendations = await getResourceRecommendations(sdohScores);
       setDynamicGoals(recommendations);
       localStorage.setItem(`hmc_goals_${user.id}`, JSON.stringify(recommendations));
-      
-      onUpdateUser?.({ 
+
+      onUpdateUser?.({
         badges: Array.from(new Set([...(user.badges || []), 'Health Navigator'])),
         wellnessPoints: (user.wellnessPoints || 0) + 200,
         xp: (user.xp || 0) + 100
       });
+      // Pull refreshed next-actions / referrals for the plan + home.
+      clientApi.me().then(setMe).catch(() => {});
       setActiveTab('game-plan');
-    } catch (e) { 
-      console.error(e); 
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoadingAi(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -227,7 +271,38 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
              <ButtonPrimary onClick={() => setActiveTab('check-yourself')}>Finish Self-Check</ButtonPrimary>
              <ButtonSecondary onClick={() => setActiveTab('events')}>Explore Events</ButtonSecondary>
         </div>
+        {me && (me.credits.balance > 0 || me.referrals.length > 0) && (
+          <div className="flex flex-wrap gap-3 justify-center pt-2">
+            {me.credits.balance > 0 && (
+              <span className="pill pill-blue">{me.credits.balance} Health Credits</span>
+            )}
+            {me.referrals.filter((r) => r.status !== 'completed' && r.status !== 'closed').length > 0 && (
+              <span className="pill pill-orange">
+                {me.referrals.filter((r) => r.status !== 'completed' && r.status !== 'closed').length} referral in progress
+              </span>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Live "your next step" from the rules engine — the Navigator noticing for you */}
+      {nextAction && (
+        <div className={`rounded-3xl p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm ${nextAction.id === 'crisis' ? 'bg-[#FF6F91]/10 border border-[#FF6F91]/30' : 'bg-[#18181b] text-white'}`}>
+          <div className="space-y-2">
+            <p className={`text-[10px] font-bold uppercase tracking-[0.2em] ${nextAction.id === 'crisis' ? 'text-[#FF6F91]' : 'text-zinc-400'}`}>Your next step</p>
+            <h3 className={`text-2xl font-semibold tracking-tight ${nextAction.id === 'crisis' ? 'text-zinc-900' : 'text-white'}`}>{nextAction.title}</h3>
+            <p className={`text-sm ${nextAction.id === 'crisis' ? 'text-zinc-700' : 'text-zinc-400'}`}>{nextAction.body}</p>
+          </div>
+          <div className="flex gap-3 shrink-0">
+            <a href={nextAction.cta.href} target={nextAction.cta.href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
+              <ButtonPrimary onClick={() => ctxApi.event('tool_open', { from: 'next_action', id: nextAction.id })}>{nextAction.cta.label}</ButtonPrimary>
+            </a>
+            {nextAction.secondary && (
+              <a href={nextAction.secondary.href}><ButtonSecondary>{nextAction.secondary.label}</ButtonSecondary></a>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={() => setActiveTab('game-plan')}>
@@ -345,6 +420,27 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         <p className="text-zinc-500 max-w-md mx-auto text-lg leading-relaxed">Help us understand your needs so we can connect you with the right support partners.</p>
       </div>
 
+      {/* Clinical mental-health screen lives in the Check Yourself tool.
+          Deep-linked with the shared visitorId so scores flow back to the Navigator. */}
+      <a
+        href={toolLink(TOOLS.checkYourself, {}, visitorId)}
+        target="_blank"
+        rel="noreferrer"
+        onClick={() => ctxApi.event('screening_view', { tool: 'check-yourself' })}
+        className="flex items-center justify-between gap-4 rounded-2xl border border-[#233DFF]/20 bg-blue-50/40 p-5 mb-10 hover:border-[#233DFF]/40 transition-all"
+      >
+        <div className="flex items-start gap-4">
+          <div className="w-11 h-11 rounded-2xl bg-white flex items-center justify-center text-[#233DFF] shrink-0 shadow-sm">
+            <Brain size={20} />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-zinc-900">Mental health check (PHQ-9 &amp; GAD-7)</p>
+            <p className="text-xs text-zinc-500 mt-1">Take the full, private mental-health screening in Check Yourself. Your results connect back here.</p>
+          </div>
+        </div>
+        <ChevronRight size={18} className="text-[#233DFF] shrink-0" />
+      </a>
+
       <div className="space-y-12 pb-24">
         {sdohCategories.map((cat) => (
           <div key={cat.id} className="space-y-5">
@@ -432,15 +528,52 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       <div className="h-[580px] w-full bg-white border border-zinc-200 rounded-3xl overflow-hidden relative shadow-md">
          <div id="event-map" className="h-full w-full"></div>
          {viewMode === 'list' && (
-           <div className="absolute inset-0 bg-white/95 z-20 flex items-center justify-center p-10 overflow-y-auto">
-              <div className="text-center space-y-6 max-w-sm animate-in zoom-in-95 duration-300">
-                 <Calendar size={80} className="mx-auto text-zinc-200" strokeWidth={1} />
-                 <div className="space-y-2">
-                   <h3 className="text-xl font-semibold text-zinc-900">No events found for {mapCenterZip || 'your area'}</h3>
-                   <p className="text-sm text-zinc-500 leading-relaxed">We are constantly adding new clinic sites. Check back tomorrow or try a neighboring zip code.</p>
-                 </div>
-                 <ButtonSecondary onClick={() => setZipInput('90001')} className="px-10">Try Nearby</ButtonSecondary>
-              </div>
+           <div className="absolute inset-0 bg-white/95 z-20 p-6 md:p-10 overflow-y-auto">
+              {liveEvents.length === 0 ? (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center space-y-6 max-w-sm animate-in zoom-in-95 duration-300">
+                    <Calendar size={80} className="mx-auto text-zinc-200" strokeWidth={1} />
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-semibold text-zinc-900">Loading upcoming events</h3>
+                      <p className="text-sm text-zinc-500 leading-relaxed">Pulling the latest from the Health Matters Clinic event calendar. Or view the full calendar below.</p>
+                    </div>
+                    <a href={TOOLS.eventFinder} target="_blank" rel="noreferrer">
+                      <ButtonSecondary className="px-10">Open Event Finder</ButtonSecondary>
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3 max-w-3xl mx-auto">
+                  {liveEvents.map((ev: HmcEvent) => (
+                    <a
+                      key={ev.id}
+                      href={toolLink(ev.rsvpUrl || ev.url || TOOLS.eventFinder, { event: ev.id }, visitorId)}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() => ctxApi.event('event_view', { eventId: ev.id, title: ev.title })}
+                      className="flex items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-white p-5 hover:border-[#233DFF]/40 hover:shadow-sm transition-all"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="w-11 h-11 rounded-2xl bg-blue-50 flex items-center justify-center text-[#233DFF] shrink-0">
+                          <Calendar size={20} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-zinc-900">{ev.title}</p>
+                          <p className="text-xs text-zinc-500 mt-1">
+                            {[ev.dateDisplay || ev.date, ev.time, ev.location].filter(Boolean).join(' · ') || 'See details'}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight size={18} className="text-zinc-300 shrink-0" />
+                    </a>
+                  ))}
+                  <div className="pt-2 text-center">
+                    <a href={TOOLS.eventFinder} target="_blank" rel="noreferrer" className="text-xs font-bold uppercase tracking-widest text-[#233DFF] hover:underline">
+                      View full calendar
+                    </a>
+                  </div>
+                </div>
+              )}
            </div>
          )}
       </div>
