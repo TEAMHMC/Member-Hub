@@ -14,7 +14,7 @@ export const TOOLS = {
   calmKit: 'https://calmkit.healthmatters.clinic',
   eventFinder: 'https://eventfinder.healthmatters.clinic',
   resources: 'https://healthmatters.clinic/resources', // branded landing hub
-  directory: 'https://teamhmc.github.io/Resource-Directory/', // the searchable directory app
+  directory: 'https://www.healthmatters.clinic/resources/resourcedirectory', // branded directory (never expose the github source)
   donate: 'https://www.healthmatters.clinic/donate',
 };
 
