@@ -1,48 +1,20 @@
-# Helping + Healing Hub
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
 
-The public, no-login client front door for Health Matters Clinic. Clients self-serve:
-personalized next steps, mental health screenings, community events, daily-needs support,
-and (once signed in) their referrals and Health Credits balance.
+# Run and deploy your AI Studio app
 
-This is the **client portal**, distinct from the staff-facing PHI system in
-`hmc-volunteer-portal`. It talks to the same Cloud Run backend but only through
-public and client-session endpoints.
+This contains everything you need to run your app locally.
 
-## Stack
+View your app in AI Studio: https://ai.studio/apps/2cd1ebc5-0ff4-4bbd-a7df-17c8c693e52d
 
-- Vite + React + TypeScript + Tailwind
-- framer-motion, lucide-react, shadcn-style UI primitives (local, in `src/components/ui`)
-- No Airtable, no third-party trackers. All data comes from the live backend.
+## Run Locally
 
-## How it is wired
+**Prerequisites:**  Node.js
 
-Everything routes through `src/lib/api.ts` (see `src/lib/hooks.ts` for the React bindings):
 
-| UI need | Endpoint |
-|---|---|
-| Visitor identity (sets `hmc_vid` cookie on load) | `GET /api/context/hello` |
-| "Your next step" cards | `GET /api/context/next-actions` |
-| Signal capture (searches, tool opens, check-ins) | `POST /api/public/context/event` |
-| Upcoming events | `GET /api/public/events` |
-| Daily-needs / referral submit | `POST /api/public/referrals` |
-| Client sign-in (passwordless) | `POST /api/client/auth/request-link` + `/verify-link` |
-| Signed-in profile, credits, referrals | `GET /api/client/me` |
-| Donate | https://www.healthmatters.clinic/donate |
-
-All requests send `credentials: 'include'` so the first-party `hmc_vid` and
-`hmc_client` cookies flow across `*.healthmatters.clinic`.
-
-## Develop
-
-```bash
-npm install
-npm run dev      # http://localhost:5175
-npm run build    # production build to dist/
-```
-
-Set `VITE_API_BASE` in `.env` to point at a non-production backend if needed.
-
-## Deploy
-
-Static build. Intended to serve at `hub.healthmatters.clinic` (see `public/CNAME`),
-the same GitHub Pages pattern as the other HMC micro-apps.
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`

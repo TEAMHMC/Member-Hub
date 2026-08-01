@@ -1,0 +1,82 @@
+
+:root {
+  --brand-blue: #233DFF;
+  --brand-orange: #FF6E40;
+  --brand-yellow: #F9C74F;
+  --brand-pink: #FF6F91;
+  --bg-main: #FAFAFA;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(180deg, rgba(35, 61, 255, 0.04), white 40%);
+  background-attachment: fixed;
+  color: #18181b; /* zinc-900 */
+}
+
+/* Pill System */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem; /* text-xs */
+  font-weight: 500;
+  border-width: 1px;
+}
+
+.pill-blue {
+  background: rgba(35, 61, 255, 0.10);
+  color: rgb(35, 61, 255);
+  border-color: rgba(35, 61, 255, 0.18);
+}
+
+.pill-orange {
+  background: rgba(255, 110, 64, 0.12);
+  color: rgb(255, 110, 64);
+  border-color: rgba(255, 110, 64, 0.20);
+}
+
+.pill-yellow {
+  background: rgba(249, 199, 79, 0.18);
+  color: rgb(120, 80, 0);
+  border-color: rgba(249, 199, 79, 0.28);
+}
+
+.pill-neutral {
+  background: rgba(15, 15, 15, 0.04);
+  color: #27272a; /* zinc-800 */
+  border-color: rgba(15, 15, 15, 0.10);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #e4e4e7; /* zinc-200 */
+  border-radius: 10px;
+}
+
+#event-map {
+  z-index: 10;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}

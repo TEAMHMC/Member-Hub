@@ -1,0 +1,9 @@
+{
+  "name": "HMC Operating System",
+  "description": "A fully automated self-service platform for clinics, managing volunteer lifecycles, client referrals with 72-hour SLAs, and healthcare documentation with gamified impact tracking.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ],
+  "majorCapabilities": []
+}
