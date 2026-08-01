@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Shift, Resource, ServiceEncounter, Referral, Assessment } from '../../types';
 import { buildPlanFromScores } from '../../services/plan';
-import { context as ctxApi, client as clientApi, referrals as referralsApi, toolLink, TOOLS, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
+import { context as ctxApi, client as clientApi, referrals as referralsApi, sunny as sunnyApi, toolLink, TOOLS, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
 import { useEvents } from '../../services/hooks';
 import { 
   Brain, Calendar, MapPin, Clock, ShieldCheck,
@@ -35,6 +35,8 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     const saved = localStorage.getItem(`hmc_goals_${user.id}`);
     return saved ? JSON.parse(saved) : [];
   });
+  // AI-personalized Playbook intro from Sunny (server-side, secure). Cached per member.
+  const [aiNarrative, setAiNarrative] = useState<string>(() => localStorage.getItem(`hmc_playbook_intro_${user.id}`) || '');
 
   // SDOH Screening State
   const [sdohScores, setSdohScores] = useState<Assessment>({
@@ -191,7 +193,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     }
 
     try {
-      // Plan is derived deterministically from the member's own answers.
+      // Structured plan is derived deterministically from the member's own answers.
       const recommendations = buildPlanFromScores(sdohScores);
       setDynamicGoals(recommendations);
       localStorage.setItem(`hmc_goals_${user.id}`, JSON.stringify(recommendations));
@@ -204,6 +206,23 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       // Pull refreshed next-actions / referrals for the plan + home.
       clientApi.me().then(setMe).catch(() => {});
       setActiveTab('game-plan');
+
+      // AI personalization from Sunny (server-side, no exposed key). Non-blocking;
+      // the structured Playbook already renders if this is slow or unavailable.
+      const focus = recommendations.map((g) => g.category).join(', ');
+      sunnyApi
+        .chat(
+          `I just finished my wellness self-check. My focus areas are: ${focus}. As my Unstoppable wellness coach, write 2 to 3 short, warm, motivating sentences to introduce my Wellness Playbook and encourage my first step. Do not diagnose or give medical advice.`,
+          { pageTitle: 'Wellness Playbook', pageContext: { focus } }
+        )
+        .then((r) => {
+          const intro = (r.reply || r.message || '').trim();
+          if (intro) {
+            setAiNarrative(intro);
+            localStorage.setItem(`hmc_playbook_intro_${user.id}`, intro);
+          }
+        })
+        .catch(() => {});
     } catch (e) {
       console.error(e);
     } finally {
@@ -260,7 +279,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       icon: <Brain className="text-[#233DFF]" size={32} />
     },
     {
-      title: "Your Health Plan",
+      title: "Your Wellness Playbook",
       description: "Once you finish the check, we build a roadmap from your answers and connect you with local partners who can help.",
       icon: <Compass className="text-[#FF6E40]" size={32} />
     },
@@ -320,10 +339,10 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
               <Compass size={24} />
            </div>
            <div className="space-y-2">
-             <h3 className="text-xl font-semibold text-zinc-900">My Health Plan</h3>
+             <h3 className="text-xl font-semibold text-zinc-900">Wellness Playbook</h3>
              <p className="text-sm text-zinc-500 leading-relaxed">Your AI-powered roadmap to recovery and local community resources.</p>
            </div>
-           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('game-plan'); }} className="w-full">Open Plan</ButtonSecondary>
+           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('game-plan'); }} className="w-full">Open Playbook</ButtonSecondary>
         </Card>
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#FF6E40]/30 transition-all cursor-pointer" onClick={() => setActiveTab('events')}>
            <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-[#FF6E40] shadow-sm group-hover:bg-[#FF6E40] group-hover:text-white transition-all">
@@ -352,19 +371,24 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   const renderGamePlan = () => (
     <div className="max-w-6xl mx-auto py-10 space-y-12 animate-in fade-in duration-500">
       <div className="text-center space-y-3">
-         <h2 className="text-4xl font-semibold tracking-tight text-zinc-900">My Health Plan</h2>
+         <h2 className="text-4xl font-semibold tracking-tight text-zinc-900">Wellness Playbook</h2>
          <p className="text-zinc-500 text-lg">A step-by-step guide to your unstoppable wellness.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div className="lg:col-span-7 space-y-10">
-          <div className="bg-[#18181b] rounded-2xl p-10 text-white flex items-center justify-between shadow-lg shadow-zinc-200 overflow-hidden relative group">
+          <div className="bg-[#18181b] rounded-2xl p-10 text-white flex items-start justify-between gap-6 shadow-lg shadow-zinc-200 overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#233DFF]/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
             <div className="space-y-3 relative z-10">
-               <h3 className="text-2xl font-semibold tracking-tight">Stay Unstoppable.</h3>
-               <p className="text-zinc-400 text-sm font-medium">Your roadmap is active and verified.</p>
+               <div className="flex items-center gap-2">
+                 <h3 className="text-2xl font-semibold tracking-tight">Stay Unstoppable.</h3>
+                 {aiNarrative && <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[#233DFF] bg-[#233DFF]/15 px-2 py-0.5 rounded-full"><Sparkles size={10} /> Sunny</span>}
+               </div>
+               <p className="text-zinc-300 text-sm font-medium leading-relaxed">
+                 {aiNarrative || 'Your Playbook is built from your self-check. Take the first play today.'}
+               </p>
             </div>
-            <Award size={42} className="text-[#233DFF] group-hover:scale-110 transition-transform duration-500" />
+            <Award size={42} className="text-[#233DFF] group-hover:scale-110 transition-transform duration-500 shrink-0" />
           </div>
 
           <div className="space-y-6">
@@ -390,7 +414,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         </div>
 
         <div className="lg:col-span-5 space-y-6">
-          <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Your Plan</h4>
+          <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Your Plays</h4>
           <div className="space-y-4">
             {dynamicGoals.length > 0 ? (
               dynamicGoals.map((goal, i) => (
@@ -480,7 +504,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         
         <div className="pt-12 border-t border-zinc-100 flex flex-col items-center gap-6">
           <ButtonPrimary onClick={finishAssessment} disabled={loadingAi} className="w-full md:w-auto px-16 h-[60px] text-lg">
-            {loadingAi ? 'Creating Your Plan...' : 'Confirm & Generate Plan'}
+            {loadingAi ? 'Building your Playbook...' : 'Build My Wellness Playbook'}
           </ButtonPrimary>
           <div className="flex items-center gap-2 text-zinc-400">
              <ShieldCheck size={16} />
