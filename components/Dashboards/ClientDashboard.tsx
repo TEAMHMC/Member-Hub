@@ -42,8 +42,11 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   });
   // AI-personalized Playbook intro from Sunny (server-side, secure). Cached per member.
   const [aiNarrative, setAiNarrative] = useState<string>(() => localStorage.getItem(`hmc_playbook_intro_${user.id}`) || '');
-  // Plays the member has explicitly requested a warm handoff for (creates a referral).
-  const [connectedPlays, setConnectedPlays] = useState<string[]>([]);
+  // Outcome of each warm-handoff request. This must reflect what the SERVER did,
+  // never what we hoped it did. Telling someone in housing or emotional distress
+  // that a person will reach out, when nothing was actually created, is the worst
+  // failure this product can have.
+  const [handoff, setHandoff] = useState<Record<string, 'sending' | 'sent' | 'failed'>>({});
 
   // Self-serve first: open the Resource Directory searched for the play's category
   // (e.g. Doctor Visits -> Medi-Cal enrollment + low-cost clinics). No referral.
@@ -60,12 +63,20 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   };
 
   // Explicit "have someone reach out" on a play — the ONLY place a referral is created.
-  const connectPlay = (category: string) => {
-    if (connectedPlays.includes(category)) return;
-    setConnectedPlays((p) => [...p, category]);
+  const connectPlay = async (category: string) => {
+    if (handoff[category] === 'sending' || handoff[category] === 'sent') return;
     ctxApi.event('tool_search', { via: 'playbook', query: category });
-    if (user.email) {
-      referralsApi.submit({
+
+    // No email means there is no way to route a referral back to this person.
+    // Fail loudly rather than showing a confirmation nobody can act on.
+    if (!user.email) {
+      setHandoff((h) => ({ ...h, [category]: 'failed' }));
+      return;
+    }
+
+    setHandoff((h) => ({ ...h, [category]: 'sending' }));
+    try {
+      const res = await referralsApi.submit({
         resourceId: `playbook:${category.toLowerCase().replace(/\s+/g, '-')}`,
         resourceName: `${category} support`,
         memberName: `${user.firstName} ${user.lastName}`.trim() || 'Member',
@@ -74,7 +85,13 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         reasonForReferral: `Member requested a warm handoff for ${category} from their Wellness Playbook.`,
         urgencyLevel: 'routine',
         preferredContactMethod: 'email',
-      }).then(() => clientApi.me().then(setMe).catch(() => {})).catch(() => {});
+      });
+      // The endpoint can answer 200 with { ok: false }. Treat that as a failure.
+      if (res && res.ok === false) throw new Error(res.error || 'referral_rejected');
+      setHandoff((h) => ({ ...h, [category]: 'sent' }));
+      clientApi.me().then(setMe).catch(() => {});
+    } catch {
+      setHandoff((h) => ({ ...h, [category]: 'failed' }));
     }
   };
 
@@ -478,7 +495,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
           <div className="space-y-4">
             {dynamicGoals.length > 0 ? (
               dynamicGoals.map((goal, i) => {
-                const requested = connectedPlays.includes(goal.category);
+                const status = handoff[goal.category];
                 return (
                 <Card key={i} className="space-y-4 p-7">
                   <div className="flex items-center justify-between gap-3">
@@ -490,9 +507,32 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
                   <div className="pt-3 border-t border-zinc-100 space-y-2">
                     {/* Self-serve first: find resources / enrollment info yourself */}
                     <ButtonPrimary onClick={() => openResourcesFor(goal.category)} className="w-full">Find resources</ButtonPrimary>
-                    {requested ? (
+                    {status === 'sent' ? (
                       <div className="flex items-center justify-center gap-2 text-emerald-600 text-[11px] font-bold uppercase tracking-wider py-1">
-                        <Check size={14} strokeWidth={3} /> A team member will reach out
+                        <Check size={14} strokeWidth={3} /> Request received. A team member will reach out.
+                      </div>
+                    ) : status === 'sending' ? (
+                      <div className="flex items-center justify-center gap-2 text-zinc-400 text-[11px] font-bold uppercase tracking-wider py-1">
+                        Sending your request
+                      </div>
+                    ) : status === 'failed' ? (
+                      /* Never leave someone believing help is coming when it is not.
+                         Give them a route they can act on right now. */
+                      <div className="rounded-xl bg-[#FF6F91]/10 border border-[#FF6F91]/30 p-4 space-y-2">
+                        <p className="text-[12px] font-semibold text-zinc-900">
+                          We could not send that request.
+                        </p>
+                        <p className="text-[12px] text-zinc-700 leading-relaxed">
+                          Please call HMC at{' '}
+                          <a href="tel:+13239904325" className="font-bold text-[#233DFF] underline">(323) 990-4325</a>{' '}
+                          or email{' '}
+                          <a href="mailto:contact@healthmatters.clinic" className="font-bold text-[#233DFF] underline">contact@healthmatters.clinic</a>.
+                          If this is an emergency, call or text{' '}
+                          <a href="sms:988" className="font-bold text-[#FF6F91] underline">988</a>.
+                        </p>
+                        <button onClick={() => connectPlay(goal.category)} className="text-[11px] font-bold uppercase tracking-wider text-[#233DFF]">
+                          Try again
+                        </button>
                       </div>
                     ) : (
                       <button onClick={() => connectPlay(goal.category)} className="w-full text-[11px] font-bold uppercase tracking-wider text-zinc-500 hover:text-[#233DFF] py-1">
