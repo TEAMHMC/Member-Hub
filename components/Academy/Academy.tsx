@@ -22,7 +22,7 @@ import {
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
-  type LearnerState,
+  isArtifactComplete, type LearnerState,
 } from './progress';
 import { PERSONAS, CREDENTIALS, CREDENTIAL_FAQ } from './credentials';
 
@@ -41,6 +41,7 @@ type View =
   | { name: 'course'; pathwayId: string; courseId: string }
   | { name: 'lesson'; pathwayId: string; courseId: string; index: number }
   | { name: 'activity'; pathwayId: string; courseId: string }
+  | { name: 'artifact'; pathwayId: string; courseId: string }
   | { name: 'test'; pathwayId: string; kind: 'pre' | 'post' }
   | { name: 'capstone'; pathwayId: string }
   | { name: 'credentials' }
@@ -105,6 +106,19 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
       onSignal?.('academy_enroll', { pathwayId: p.id });
     }
   };
+
+  const artifactValue = (courseId: string, fieldId: string, i = 0): string =>
+    (state.artifacts[courseId]?.[fieldId] || [])[i] || '';
+
+  const setArtifactValue = (courseId: string, fieldId: string, i: number, v: string) =>
+    set((s2) => {
+      const course = { ...(s2.artifacts[courseId] || {}) };
+      const arr = [...(course[fieldId] || [])];
+      while (arr.length <= i) arr.push('');
+      arr[i] = v;
+      course[fieldId] = arr;
+      return { ...s2, artifacts: { ...s2.artifacts, [courseId]: course } };
+    });
 
   const completeLesson = (lessonId: string) =>
     set((s) => (s.lessons.includes(lessonId) ? s : { ...s, lessons: [...s.lessons, lessonId] }));
@@ -826,6 +840,24 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                   );
                 })}
 
+                {c.artifact && (
+                  <button
+                    onClick={() => setView({ name: 'artifact', pathwayId, courseId })}
+                    className={`w-full text-left flex items-start gap-5 p-6 rounded-2xl border transition-all ${isArtifactComplete(c, state) ? 'bg-zinc-50/60 border-zinc-100' : 'bg-white border-zinc-200 hover:border-[#FF6E40]/40 hover:shadow-sm'}`}
+                  >
+                    <span className={`w-11 h-11 rounded-2xl flex items-center justify-center border shrink-0 ${isArtifactComplete(c, state) ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-orange-50 text-[#FF6E40] border-orange-100'}`}>
+                      {isArtifactComplete(c, state) ? <Check size={18} strokeWidth={3} /> : <FileText size={17} />}
+                    </span>
+                    <span className="min-w-0 flex-1 space-y-1.5">
+                      <span className="block text-[15px] font-semibold text-zinc-900 leading-snug">{c.artifact.title}</span>
+                      <span className="block text-[13px] text-zinc-500 leading-relaxed">{c.artifact.purpose}</span>
+                      <span className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 pt-0.5">
+                        Carried forward to your roadmap{isArtifactComplete(c, state) ? ' · Complete' : ''}
+                      </span>
+                    </span>
+                  </button>
+                )}
+
                 {c.activity && (
                   <button
                     onClick={() => setView({ name: 'activity', pathwayId, courseId })}
@@ -1013,6 +1045,80 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     );
   };
 
+
+  // ── Carried-forward artifact ───────────────────────────────────────────
+
+  const renderArtifact = (pathwayId: string, courseId: string) => {
+    const p = pathwayById(pathwayId);
+    const c = p?.courses.find((x) => x.id === courseId);
+    if (!p || !c || !c.artifact) return renderCatalog();
+    const a = c.artifact;
+    const done = isArtifactComplete(c, state);
+
+    return (
+      <div className="max-w-3xl mx-auto py-8 space-y-8 animate-in fade-in duration-500">
+        <Back label={c.title} onClick={() => setView({ name: 'course', pathwayId, courseId })} />
+        <div className="space-y-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF6E40]">Carried forward</p>
+          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">{a.title}</h1>
+          <p className="text-lg text-zinc-600 leading-relaxed">{a.purpose}</p>
+        </div>
+
+        {a.reference && (
+          <section className="bg-zinc-50/80 rounded-2xl border border-zinc-200/70 p-7 space-y-3">
+            <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">{a.reference.title}</h2>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1.5">
+              {a.reference.items.map((item) => (
+                <li key={item} className="text-[14px] text-zinc-700 leading-relaxed flex items-start gap-2.5">
+                  <span className="w-1 h-1 rounded-full bg-zinc-300 shrink-0 mt-2.5" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <div className="space-y-7">
+          {a.fields.map((f) => {
+            const n = f.repeat || 1;
+            return (
+              <div key={f.id} className="space-y-3">
+                <div className="space-y-1">
+                  <label htmlFor={`${c.id}-${f.id}-0`} className="block text-base font-semibold text-zinc-900">{f.label}</label>
+                  {f.help && <p className="text-[13px] text-zinc-500 leading-relaxed">{f.help}</p>}
+                </div>
+                {Array.from({ length: n }).map((_, i) => (
+                  <div key={i} className="space-y-1.5">
+                    {n > 1 && (
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                        {f.repeatLabel || 'Entry'} {i + 1}
+                      </p>
+                    )}
+                    <textarea
+                      id={`${c.id}-${f.id}-${i}`}
+                      rows={f.multiline ? (n > 1 ? 4 : 7) : 2}
+                      value={artifactValue(c.id, f.id, i)}
+                      onChange={(e) => setArtifactValue(c.id, f.id, i, e.target.value)}
+                      placeholder={f.placeholder}
+                      className="w-full p-4 border border-zinc-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 text-[15px] leading-relaxed resize-y"
+                    />
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-zinc-100">
+          <p className="text-[12px] text-zinc-500">
+            {done ? 'Saved. This carries into your roadmap in Course 8.' : 'Saves as you type. Fill every field to mark this complete.'}
+          </p>
+          <Btn onClick={() => setView({ name: 'course', pathwayId, courseId })}>Back to course</Btn>
+        </div>
+      </div>
+    );
+  };
+
   // ── Pre / post test ────────────────────────────────────────────────────
 
   const renderTest = (pathwayId: string, kind: 'pre' | 'post') => {
@@ -1092,13 +1198,64 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           </ul>
         </section>
 
+        {/* Assembled from the work already done, not a blank essay box. */}
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold text-zinc-900">Your work so far</h2>
+          <p className="text-[14px] text-zinc-500 leading-relaxed">
+            Each course produced a piece of this roadmap. Review them here and revise anything that has
+            changed. What you write below is the synthesis, not the whole document.
+          </p>
+          <div className="space-y-3">
+            {p.courses.filter((c) => c.artifact).map((c) => {
+              const complete = isArtifactComplete(c, state);
+              const vals = state.artifacts[c.id] || {};
+              return (
+                <div key={c.id} className={`rounded-2xl border p-6 ${complete ? 'bg-white border-zinc-200' : 'bg-zinc-50/60 border-dashed border-zinc-300'}`}>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Course {c.num}</p>
+                      <p className="text-[15px] font-semibold text-zinc-900 mt-1">{c.artifact!.title}</p>
+                    </div>
+                    <button
+                      onClick={() => setView({ name: 'artifact', pathwayId: p.id, courseId: c.id })}
+                      className="text-[11px] font-bold uppercase tracking-widest text-[#233DFF] hover:underline shrink-0"
+                    >
+                      {complete ? 'Revise' : 'Complete it'}
+                    </button>
+                  </div>
+                  {complete ? (
+                    <div className="mt-4 space-y-3">
+                      {c.artifact!.fields.map((f) => (
+                        <div key={f.id}>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">{f.label}</p>
+                          {(vals[f.id] || []).filter((v) => (v || '').trim()).map((v, i) => (
+                            <p key={i} className="text-[14px] text-zinc-700 leading-relaxed whitespace-pre-wrap border-l-2 border-zinc-200 pl-3 mb-2">{v}</p>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[13px] text-zinc-500 mt-3">Not done yet. This section of your roadmap is still empty.</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
         <div className="bg-white border border-zinc-200 rounded-2xl p-7 space-y-4 shadow-sm">
-          <label htmlFor="capstone" className="block text-base font-semibold text-zinc-900 leading-snug">{cap.prompt}</label>
+          <label htmlFor="capstone" className="block text-base font-semibold text-zinc-900 leading-snug">
+            Synthesis and 30, 60 and 90 day actions
+          </label>
+          <p className="text-[13px] text-zinc-500 leading-relaxed">
+            Pull the pieces above together. What is your plan, what changed as you worked through it, and
+            what will you actually do in the next 30, 60 and 90 days? Include your review date.
+          </p>
           <textarea
             id="capstone"
-            rows={12}
-            value={value}
-            onChange={(e) => set((s) => ({ ...s, capstone: { ...s.capstone, [p.id]: e.target.value } }))}
+            rows={10}
+            value={state.capstone[p.id] || ''}
+            onChange={(e) => set((s2) => ({ ...s2, capstone: { ...s2.capstone, [p.id]: e.target.value } }))}
             className="w-full p-4 border border-zinc-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 text-base leading-relaxed resize-y"
           />
         </div>
@@ -1253,6 +1410,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
       {view.name === 'course' && renderCourse(view.pathwayId, view.courseId)}
       {view.name === 'lesson' && renderLesson(view.pathwayId, view.courseId, view.index)}
       {view.name === 'activity' && renderActivity(view.pathwayId, view.courseId)}
+      {view.name === 'artifact' && renderArtifact(view.pathwayId, view.courseId)}
       {view.name === 'test' && renderTest(view.pathwayId, view.kind)}
       {view.name === 'capstone' && renderCapstone(view.pathwayId)}
       {view.name === 'credentials' && renderCredentials()}

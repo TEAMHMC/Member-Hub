@@ -24,6 +24,8 @@ export interface LearnerState {
   checks: Record<string, number>;
   /** Course id -> the learner's applied-activity submission. */
   activities: Record<string, string>;
+  /** Course id -> artifact field id -> value(s). Carried forward to the capstone. */
+  artifacts: Record<string, Record<string, string[]>>;
   /** Pathway id -> baseline result. Taken once, before learning. */
   preTest: Record<string, TestResult>;
   /** Pathway id -> best post-test result. Retries allowed. */
@@ -42,6 +44,7 @@ const EMPTY: LearnerState = {
   lessons: [],
   checks: {},
   activities: {},
+  artifacts: {},
   preTest: {},
   postTest: {},
   postAttempts: {},
@@ -76,6 +79,18 @@ export const courseLessonsDone = (
   done: string[]
 ): number => courseLessonIds.filter((id) => done.includes(id)).length;
 
+/** An artifact counts as done when every field has at least one non-empty entry. */
+export function isArtifactComplete(
+  course: { id: string; artifact?: { fields: { id: string; repeat?: number }[] } },
+  s: LearnerState
+): boolean {
+  if (!course.artifact) return true;
+  const vals = s.artifacts[course.id] || {};
+  return course.artifact.fields.every((f) =>
+    (vals[f.id] || []).some((v) => (v || '').trim().length > 0)
+  );
+}
+
 export function coursePercent(
   p: Pathway,
   courseId: string,
@@ -83,10 +98,11 @@ export function coursePercent(
 ): number {
   const course = p.courses.find((c) => c.id === courseId);
   if (!course) return 0;
-  const units = course.lessons.length + (course.activity ? 1 : 0);
+  const units = course.lessons.length + (course.activity ? 1 : 0) + (course.artifact ? 1 : 0);
   if (!units) return 0;
   let done = course.lessons.filter((l) => s.lessons.includes(l.id)).length;
   if (course.activity && (s.activities[course.id] || '').trim()) done++;
+  if (course.artifact && isArtifactComplete(course, s)) done++;
   return Math.round((done / units) * 100);
 }
 
@@ -96,14 +112,15 @@ export const isCourseComplete = (p: Pathway, courseId: string, s: LearnerState) 
 export function pathwayPercent(p: Pathway, s: LearnerState): number {
   if (!p.courses.length) return 0;
   const total = p.courses.reduce(
-    (n, c) => n + c.lessons.length + (c.activity ? 1 : 0),
+    (n, c) => n + c.lessons.length + (c.activity ? 1 : 0) + (c.artifact ? 1 : 0),
     0
   );
   const done = p.courses.reduce(
     (n, c) =>
       n +
       c.lessons.filter((l) => s.lessons.includes(l.id)).length +
-      (c.activity && (s.activities[c.id] || '').trim() ? 1 : 0),
+      (c.activity && (s.activities[c.id] || '').trim() ? 1 : 0) +
+      (c.artifact && isArtifactComplete(c, s) ? 1 : 0),
     0
   );
   return total ? Math.round((done / total) * 100) : 0;
@@ -150,6 +167,8 @@ export function evaluateGates(p: Pathway, s: LearnerState): {
   const post = s.postTest[p.id]?.score ?? null;
   const postMet = post !== null && post >= PASS_THRESHOLD;
   const capstoneText = (s.capstone[p.id] || '').trim();
+  const artifactCourses = p.courses.filter((c) => c.artifact);
+  const artifactsDone = artifactCourses.filter((c) => isArtifactComplete(c, s)).length;
   // A capstone is scored by a reviewer. The learner-facing gate is submission;
   // the credential rules require reviewer approval before issuance, which the
   // portal records separately. Submission is what the learner controls.
@@ -178,6 +197,14 @@ export function evaluateGates(p: Pathway, s: LearnerState): {
       detail: post === null ? 'Not yet attempted' : `Best score ${post}%`,
     }
   );
+
+  if (artifactCourses.length) {
+    gates.push({
+      label: 'Complete the carried-forward work from each course',
+      met: artifactsDone === artifactCourses.length,
+      detail: `${artifactsDone} of ${artifactCourses.length} pieces complete`,
+    });
+  }
 
   if (p.capstone) {
     gates.push({

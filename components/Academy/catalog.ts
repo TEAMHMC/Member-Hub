@@ -41,6 +41,38 @@ export interface Check {
   why: string;
 }
 
+/**
+ * A named piece of work a learner produces in one course and carries forward.
+ * The capstone assembles these rather than asking for one large essay, so by
+ * the final course the roadmap is mostly refinement of work already done.
+ *
+ * Fields are declared per course in the catalog, so content can change without
+ * touching the engine that stores, renders and assembles them.
+ */
+export interface ArtifactField {
+  id: string;
+  label: string;
+  /** Shown under the label. Use it to teach, not just to instruct. */
+  help?: string;
+  placeholder?: string;
+  /** Long-form answers get a textarea; short ones get an input. */
+  multiline?: boolean;
+  /** Repeating groups, e.g. three career hypotheses. */
+  repeat?: number;
+  repeatLabel?: string;
+}
+
+export interface Artifact {
+  id: string;
+  title: string;
+  /** One line explaining why this piece matters to the final roadmap. */
+  purpose: string;
+  fields: ArtifactField[];
+  /** Optional reference data the exercise needs, shown inline so the learner
+   *  never has to hunt for a worksheet that lives somewhere else. */
+  reference?: { title: string; items: string[] };
+}
+
 export interface Activity {
   title: string;
   body: string[];
@@ -63,6 +95,8 @@ export interface Course {
   lessons: Lesson[];
   checks: Check[];
   activity?: Activity;
+  /** The artifact this course contributes to the capstone. */
+  artifact?: Artifact;
   /** Source keys from the pathway source library. */
   sources?: string[];
 }
@@ -196,6 +230,53 @@ const HCE_COURSES: Course[] = [
         'Choose 12 occupations from an HMC-provided list. Sort them into career families and write one sentence describing how each could contribute to a community-health problem such as asthma, diabetes prevention, homelessness or mental wellness.',
       ],
       prompt: 'List your 12 occupations, the family each belongs to, and one sentence on how each could contribute to a community health problem.',
+    },
+    artifact: {
+      id: 'career-hypotheses',
+      title: 'Career hypotheses',
+      purpose:
+        'The three roles you are currently considering, and what you still need to verify about each. Course 8 builds your roadmap on top of this.',
+      reference: {
+        title: 'Occupations to classify. Choose 12 of these 18.',
+        items: [
+          'Registered nurse',
+          'Physician associate',
+          'Respiratory therapist',
+          'Community health worker',
+          'Epidemiologist',
+          'Medical laboratory scientist',
+          'Licensed clinical social worker',
+          'Health informatics analyst',
+          'Occupational therapist',
+          'Pharmacy technician',
+          'Substance use counselor',
+          'Radiologic technologist',
+          'Public health educator',
+          'Care coordinator',
+          'Speech-language pathologist',
+          'Biomedical engineer',
+          'Healthcare compliance officer',
+          'Medical interpreter',
+        ],
+      },
+      fields: [
+        {
+          id: 'sort',
+          label: 'Your 12 occupations, sorted into career families',
+          help: 'List each occupation with the family it belongs to, and one sentence on how it could contribute to a community health problem such as asthma, diabetes prevention, homelessness or mental wellness.',
+          multiline: true,
+          placeholder: 'Respiratory therapist. Allied health and rehabilitation. Could run asthma education at a school clinic so families manage triggers before an ER visit.',
+        },
+        {
+          id: 'hypothesis',
+          label: 'Career hypothesis',
+          help: 'For each: what interests you about it, what you are currently assuming, and what you still need to verify.',
+          multiline: true,
+          repeat: 3,
+          repeatLabel: 'Hypothesis',
+          placeholder: 'Interested in: ...\nCurrently assuming: ...\nStill need to verify: ...',
+        },
+      ],
     },
     sources: ['J1'],
   },
