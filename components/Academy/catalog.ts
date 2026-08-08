@@ -709,7 +709,11 @@ const HCE_COURSES: Course[] = [
   },
 ];
 
-const HCE_PRE_POST: Check[] = [
+// Baseline form. Reviewed immediately after submission with rationales, which
+// is good teaching but means these exact items can never carry the credential.
+// The post-test below is a parallel form: same ten constructs, different items,
+// different correct-option positions.
+const HCE_PRE: Check[] = [
   {
     id: 'hce-t1',
     q: 'Which source is the appropriate starting point for occupation descriptions, typical entry education and pay?',
@@ -814,6 +818,126 @@ const HCE_PRE_POST: Check[] = [
 
 import { CARE_NAVIGATION_COVERAGE } from './pathwayFieldBased';
 
+// Post-test. Parallel form to HCE_PRE, testing the same objectives with items
+// the learner has not already been shown the answers to.
+const HCE_POST: Check[] = [
+  {
+    id: 'hce-p1',
+    q: 'You want to know the typical entry-level education for a respiratory therapist. Which source do you start with?',
+    options: [
+        'The BLS Occupational Outlook Handbook',
+        'A program brochure from a school that offers the degree',
+        'A discussion thread from current students',
+        'The salary page of a job board',
+      ],
+    answer: 0,
+    why: 'BLS is the starting point for occupation descriptions, typical entry education, work environment and projections. Program brochures describe one program, not the occupation.',
+  },
+  {
+    id: 'hce-p2',
+    q: 'A nursing program is described as accredited. What does that tell you?',
+    options: [
+        'Its graduates are automatically licensed',
+        'The state guarantees employment for graduates',
+        'The program is free',
+        'A recognized accrediting body reviewed the program against established standards',
+      ],
+    answer: 3,
+    why: 'Accreditation is external review of an institution or program against standards. It is separate from licensure, which is granted by a government authority to an individual.',
+  },
+  {
+    id: 'hce-p3',
+    q: 'A learner interested in public health is told to follow the AAMC premed competencies. What is the problem with that advice?',
+    options: [
+      'The AAMC competencies are outdated',
+      'Those competencies are oriented to medical school admissions; public health programs use their own standards',
+      'Public health does not require any competencies',
+      'Nothing, they apply to all health fields',
+    ],
+    answer: 1,
+    why: 'One path does not fit every career. Use the standards relevant to the field you are actually pursuing.',
+  },
+  {
+    id: 'hce-p4',
+    q: 'Which reflection tells a reviewer the most about what a learner gained from an experience?',
+    options: [
+      '"Volunteered 200 hours at a community clinic"',
+      '"Shadowed in three departments over one semester"',
+      '"Observed intake workflow and saw how transportation barriers caused missed appointments, which changed how I think about access"',
+      '"Completed my required service hours ahead of schedule"',
+    ],
+    answer: 2,
+    why: 'Hours state presence. Strong reflection names the work, the problem it addressed, the skill practiced, and what changed in the learner\'s understanding.',
+  },
+  {
+    id: 'hce-p5',
+    q: 'Federal Work-Study is best described as:',
+    options: [
+        'Part-time employment for eligible students at participating schools',
+        'A grant that does not need to be repaid',
+        'A loan with a subsidized interest rate',
+        'A scholarship awarded on academic merit',
+      ],
+    answer: 0,
+    why: 'Work-Study provides part-time employment for eligible students at participating schools. It is neither a grant nor a loan.',
+  },
+  {
+    id: 'hce-p6',
+    q: 'Program A costs $12,000 a year in tuition in your home city. Program B costs $9,000 but requires relocating. What is the correct comparison?',
+    options: [
+        'Program B, because tuition is lower',
+        'Whichever has the higher projected starting salary',
+        'Program A, because relocation is always more expensive',
+        'Estimated net cost after gift aid plus housing, transportation, food and other living costs, over the full program length',
+      ],
+    answer: 3,
+    why: 'Price is more than tuition. Compare total cost of attendance and net cost after aid, across the full duration.',
+  },
+  {
+    id: 'hce-p7',
+    q: 'You want to reach a physical therapist you have never met. Which opening is most likely to get a reply?',
+    options: [
+      'A message asking whether they have any job openings',
+      'A short note saying why you chose them, asking for fifteen minutes, with two questions a website could not answer',
+      'A long message describing your entire academic history',
+      'A request to shadow them next week',
+    ],
+    answer: 1,
+    why: 'Ask for information before asking for opportunity. Specific, respectful, and easy to answer is the standard.',
+  },
+  {
+    id: 'hce-p8',
+    q: 'A mentor strongly recommends a career the learner is unsure about. What is the appropriate role of that advice?',
+    options: [
+        'The learner should follow it, since the mentor has more experience',
+        'The learner should end the mentoring relationship',
+        'It is one input; mentors support reflection and networks but should not control the decision or be the only source of support',
+        'The learner should ask the mentor to decide',
+      ],
+    answer: 2,
+    why: 'Mentors are guides, not decision-makers.',
+  },
+  {
+    id: 'hce-p9',
+    q: 'Which of these is a health career that works at population rather than individual level?',
+    options: ['Occupational therapist', 'Medical laboratory scientist', 'Epidemiologist', 'Pharmacy technician'],
+    answer: 2,
+    why: 'Epidemiology sits in public and community health, working across populations rather than in direct patient care.',
+  },
+  {
+    id: 'hce-p10',
+    q: 'A learner lists their HMC pathway completion on an application. How should it be described?',
+    options: [
+        'As a professional certification in community health',
+        'As a state-recognized credential',
+        'As equivalent to a CHW certificate',
+        'As an educational completion record from Health Matters Clinic',
+      ],
+    answer: 3,
+    why: 'HMC credential rules are explicit. A completion is an educational record, not certification, licensure, clinical scope, or admission eligibility.',
+  },
+];
+
 // ── The catalog ──────────────────────────────────────────────────────────
 
 export const PATHWAYS: Pathway[] = [
@@ -834,8 +958,8 @@ export const PATHWAYS: Pathway[] = [
     ],
     guidedStart: 'September 1, 12:00 PM PT',
     courses: HCE_COURSES,
-    preTest: HCE_PRE_POST,
-    postTest: HCE_PRE_POST,
+    preTest: HCE_PRE,
+    postTest: HCE_POST,
     capstone: {
       title: 'Personal Health-Career Roadmap',
       intro:

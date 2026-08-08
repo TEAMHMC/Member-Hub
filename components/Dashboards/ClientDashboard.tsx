@@ -16,11 +16,13 @@ import {
 interface ClientDashboardProps {
   user: User;
   initialTab?: string;
+  /** Keeps the sidebar highlight in sync when navigation happens inside the dashboard. */
+  onTabChange?: (tab: string) => void;
   onUpdateUser?: (data: Partial<User>) => void;
   visitorId?: string | null;
 }
 
-const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'dash', onUpdateUser, visitorId = null }) => {
+const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'dash', onTabChange, onUpdateUser, visitorId = null }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [zipInput, setZipInput] = useState(user.zipCode || '');
@@ -206,6 +208,10 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   }, [activeTab, viewMode, liveEvents]);
 
   useEffect(() => { setActiveTab(initialTab); }, [initialTab]);
+  // Cards, tool links and lesson handoffs all change the tab from in here. The
+  // sidebar owns the highlight, so it has to be told or it goes stale and Home
+  // stays lit while the learner is inside the Academy.
+  useEffect(() => { onTabChange?.(activeTab); }, [activeTab, onTabChange]);
   // Entering Academy from anywhere other than a credentials card lands on the catalog.
   useEffect(() => { if (activeTab !== 'academy') setAcademyView('catalog'); }, [activeTab]);
 

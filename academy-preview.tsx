@@ -123,6 +123,7 @@ const Preview: React.FC = () => {
               key={key}
               user={user}
               initialTab={tab}
+              onTabChange={setTab}
               onUpdateUser={(d) => setUsers((u) => ({ ...u, [key]: { ...u[key], ...d } }))}
               visitorId={null}
             />

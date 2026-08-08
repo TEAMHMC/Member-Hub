@@ -107,6 +107,7 @@ const App: React.FC = () => {
         <ClientDashboard
           user={currentUser}
           initialTab={activeTab}
+          onTabChange={setActiveTab}
           onUpdateUser={handleUpdateUser}
           visitorId={visitorId}
         />
