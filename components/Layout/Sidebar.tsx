@@ -3,7 +3,7 @@ import React from 'react';
 import { UserRole } from '../../types';
 import {
   Home, Calendar, ClipboardList,
-  LogOut, Compass, ShieldCheck, Activity, Brain,
+  LogOut, Compass, ShieldCheck, Activity, Brain, GraduationCap,
   User as UserIcon
 } from 'lucide-react';
 
@@ -19,6 +19,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, activeTab, onTabChange, onLogou
     if (role === UserRole.CLIENT) {
       return [
         { icon: <Home size={18} />, label: 'Home', id: 'dash' },
+        { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
         { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
         { icon: <Compass size={18} />, label: 'Playbook', id: 'game-plan' },
         { icon: <Activity size={18} />, label: 'Results', id: 'health' },

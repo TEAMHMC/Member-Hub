@@ -4,8 +4,10 @@ import { User, Shift, Resource, ServiceEncounter, Referral, Assessment } from '.
 import { buildPlanFromScores } from '../../services/plan';
 import { context as ctxApi, client as clientApi, referrals as referralsApi, sunny as sunnyApi, toolLink, TOOLS, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
 import { useEvents } from '../../services/hooks';
-import { 
-  Brain, Calendar, MapPin, Clock, ShieldCheck,
+import Academy from '../Academy/Academy';
+import type { Course } from '../Academy/catalog';
+import {
+  Brain, Calendar, MapPin, Clock, ShieldCheck, GraduationCap,
   ArrowLeft, Users, Activity,
   Zap, ChevronRight, Map as MapIcon, List, Info, CheckCircle2, X,
   Search, Award, FileText, Check, Heart, Smartphone,
@@ -369,7 +371,17 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={() => setActiveTab('academy')}>
+           <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-[#8B6D00] shadow-sm group-hover:bg-[#F9C74F] group-hover:text-zinc-900 transition-all">
+              <GraduationCap size={24} />
+           </div>
+           <div className="space-y-2">
+             <h3 className="text-xl font-semibold text-zinc-900">HMC Academy</h3>
+             <p className="text-sm text-zinc-500 leading-relaxed">Short courses on wellness, keeping your coverage, and community power.</p>
+           </div>
+           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('academy'); }} className="w-full">Start learning</ButtonSecondary>
+        </Card>
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={() => setActiveTab('game-plan')}>
            <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-[#233DFF] shadow-sm group-hover:bg-[#233DFF] group-hover:text-white transition-all">
               <Compass size={24} />
@@ -730,8 +742,29 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     </div>
   );
 
+  // Finishing a course awards the badge and Health Credits on the member record.
+  // The Academy owns lesson progress; the Hub owns the member's standing.
+  const handleCourseComplete = (course: Course) => {
+    onUpdateUser?.({
+      badges: Array.from(new Set([...(user.badges || []), course.badge])),
+      wellnessPoints: (user.wellnessPoints || 0) + course.credits,
+      xp: (user.xp || 0) + course.credits,
+    });
+  };
+
+  const renderAcademy = () => (
+    <Academy
+      userId={user.id}
+      memberName={`${user.firstName} ${user.lastName}`.trim() || 'Member'}
+      onNavigateTab={(tab) => { setActiveTab(tab); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+      onSignal={(type, payload) => ctxApi.event(type, payload)}
+      onCourseComplete={handleCourseComplete}
+    />
+  );
+
   const renderContent = () => {
     switch (activeTab) {
+      case 'academy': return renderAcademy();
       case 'events': return renderEvents();
       case 'health': return renderHealthResults();
       case 'game-plan': return renderGamePlan();
@@ -744,7 +777,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
 
   return (
     <div className="w-full">
-      {activeTab !== 'dash' && (activeTab !== 'check-yourself') && (
+      {activeTab !== 'dash' && activeTab !== 'check-yourself' && activeTab !== 'academy' && (
         <div className="max-w-6xl mx-auto pt-2 flex mb-2">
           <button onClick={() => setActiveTab('dash')} className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 font-bold text-xs uppercase tracking-widest transition-colors px-2 group">
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back to Dashboard
