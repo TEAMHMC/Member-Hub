@@ -24,6 +24,7 @@ import {
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
   type LearnerState,
 } from './progress';
+import { PERSONAS, CREDENTIALS, CREDENTIAL_FAQ } from './credentials';
 
 interface AcademyProps {
   userId: string;
@@ -40,6 +41,7 @@ type View =
   | { name: 'activity'; pathwayId: string; courseId: string }
   | { name: 'test'; pathwayId: string; kind: 'pre' | 'post' }
   | { name: 'capstone'; pathwayId: string }
+  | { name: 'credentials' }
   | { name: 'transcript' };
 
 const Btn: React.FC<{
@@ -117,6 +119,10 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             community-health learners, interns, fellows, and emerging leaders. Self-paced,
             text-first, and free.
           </p>
+          <div className="flex flex-wrap justify-center gap-3 pt-1">
+            <Btn onClick={() => setView({ name: 'credentials' })}>Browse credentials</Btn>
+            <Btn variant="secondary" onClick={() => setView({ name: 'transcript' })}>My transcript</Btn>
+          </div>
           <div className="flex flex-wrap justify-center gap-2 pt-2">
             {LEARNING_MODEL.map((step, i) => (
               <React.Fragment key={step}>
@@ -227,6 +233,239 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
       </div>
     );
   };
+
+  // ── Credentials ────────────────────────────────────────────────────────
+
+  const renderCredentials = () => (
+    <div className="max-w-6xl mx-auto py-8 space-y-16 animate-in fade-in duration-500">
+      <Back label="Academy" onClick={() => setView({ name: 'catalog' })} />
+
+      {/* Hero */}
+      <header className="text-center space-y-5 max-w-3xl mx-auto">
+        <div className="pill pill-blue mx-auto">HMC Academy Credentials</div>
+        <h1 className="text-5xl font-semibold tracking-tight text-zinc-900 leading-[1.08]">
+          Earn a credential that says exactly what you did.
+        </h1>
+        <p className="text-lg text-zinc-500 leading-relaxed">
+          HMC credentials recognize demonstrated learning and applied community health experience.
+          Every one of them is gated on evidence, verifiable by an employer or school, and written to
+          claim only what Health Matters Clinic can substantiate. Free to every learner.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3 pt-2">
+          <Btn onClick={() => document.getElementById('credential-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
+            Compare credentials
+          </Btn>
+          <Btn variant="secondary" onClick={() => setView({ name: 'catalog' })}>Start preparing</Btn>
+        </div>
+      </header>
+
+      {/* Personas */}
+      <section className="space-y-6">
+        <div className="text-center space-y-2">
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">Choose the role you are building toward</h2>
+          <p className="text-zinc-500">Credentials are grouped by who they are for, not by how hard they are.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {PERSONAS.map((persona) => {
+            const specs = CREDENTIALS.filter((c) => persona.pathwayIds.includes(c.pathwayId));
+            return (
+              <div key={persona.id} className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-7 space-y-4 flex flex-col">
+                <div className="w-11 h-11 rounded-2xl bg-blue-50 flex items-center justify-center text-[#233DFF]">
+                  <GraduationCap size={20} />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="text-xl font-semibold text-zinc-900">{persona.title}</h3>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 leading-relaxed">{persona.audience}</p>
+                </div>
+                <p className="text-sm text-zinc-500 leading-relaxed flex-1">{persona.description}</p>
+                <div className="space-y-2 pt-1 border-t border-zinc-100">
+                  {specs.map((s) => (
+                    <button
+                      key={s.pathwayId}
+                      onClick={() => setView({ name: 'pathway', pathwayId: s.pathwayId })}
+                      className="w-full text-left flex items-start justify-between gap-3 py-2 group"
+                    >
+                      <span className="text-[13px] font-semibold text-zinc-700 group-hover:text-[#233DFF] leading-snug">
+                        {s.title.replace('HMC ', '')}
+                      </span>
+                      <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full shrink-0 ${s.available ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-500'}`}>
+                        {s.available ? 'Open' : 'Soon'}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Comparison table */}
+      <section id="credential-table" className="space-y-6">
+        <div className="space-y-2">
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">Compare every credential</h2>
+          <p className="text-zinc-500">What each one requires, what verifies it, and whether it expires.</p>
+        </div>
+        <div className="overflow-x-auto rounded-2xl border border-zinc-200/60 bg-white shadow-sm">
+          <table className="w-full min-w-[900px] text-left border-collapse">
+            <thead>
+              <tr className="bg-zinc-50/70">
+                {['Credential', 'Type', 'Assessment', 'Applied requirement', 'Sign-off', 'Expires'].map((h) => (
+                  <th key={h} className="px-5 py-4 text-[9px] font-bold uppercase tracking-widest text-zinc-400 border-b border-zinc-200">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {CREDENTIALS.map((c) => (
+                <tr key={c.pathwayId} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50/50 transition-colors">
+                  <td className="px-5 py-5 align-top">
+                    <button onClick={() => setView({ name: 'pathway', pathwayId: c.pathwayId })} className="text-left group">
+                      <span className="block text-[13.5px] font-semibold text-zinc-900 group-hover:text-[#233DFF] leading-snug">{c.title}</span>
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mt-1.5">
+                        {c.level} · {c.available ? 'Open for enrollment' : 'In development'}
+                      </span>
+                    </button>
+                  </td>
+                  <td className="px-5 py-5 align-top text-[12.5px] text-zinc-600">{c.type}</td>
+                  <td className="px-5 py-5 align-top text-[12.5px] text-zinc-600">{c.assessment}</td>
+                  <td className="px-5 py-5 align-top text-[12.5px] text-zinc-600">{c.applied}</td>
+                  <td className="px-5 py-5 align-top text-[12.5px] text-zinc-600">{c.signOff}</td>
+                  <td className="px-5 py-5 align-top text-[12.5px] text-zinc-600">{c.expires}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-zinc-400">
+          Every credential is free. HMC does not charge learners for pathways, assessments, or completion records.
+        </p>
+      </section>
+
+      {/* Per-credential detail */}
+      <section className="space-y-6">
+        <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">What each credential proves</h2>
+        <div className="space-y-5">
+          {CREDENTIALS.map((c) => (
+            <div key={c.pathwayId} className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-8 space-y-6">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                <div className="space-y-2 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${LEVEL_ACCENT[c.level].bg} ${LEVEL_ACCENT[c.level].text}`}>{c.level}</span>
+                    <span className="pill pill-neutral">{c.type}</span>
+                    {!c.available && <span className="pill pill-neutral">In development</span>}
+                  </div>
+                  <h3 className="text-xl font-semibold text-zinc-900 leading-snug">{c.title}</h3>
+                </div>
+                <Btn
+                  variant={c.available ? 'primary' : 'secondary'}
+                  className="shrink-0"
+                  onClick={() => setView({ name: 'pathway', pathwayId: c.pathwayId })}
+                >
+                  {c.available ? 'Start preparing' : 'View pathway'}
+                </Btn>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-5">
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">What it proves</p>
+                    <p className="text-sm text-zinc-700 leading-relaxed">{c.proves}</p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Who it is for</p>
+                    <p className="text-sm text-zinc-700 leading-relaxed">{c.forWhom}</p>
+                  </div>
+                </div>
+                <div className="space-y-5">
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Evidence required</p>
+                    <ul className="space-y-1.5">
+                      {c.evidence.map((e) => (
+                        <li key={e} className="flex items-start gap-2.5">
+                          <Check size={13} strokeWidth={3} className="text-[#233DFF] mt-1 shrink-0" />
+                          <span className="text-[13px] text-zinc-700 leading-relaxed">{e}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF6E40]">What it does not authorize</p>
+                    <ul className="space-y-1.5">
+                      {c.doesNotAuthorize.map((d) => (
+                        <li key={d} className="flex items-start gap-2.5">
+                          <X size={13} strokeWidth={3} className="text-[#FF6E40] mt-1 shrink-0" />
+                          <span className="text-[13px] text-zinc-600 leading-relaxed">{d}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Verification */}
+      <section className="bg-[#18181b] rounded-3xl p-10 text-white space-y-5 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-56 h-56 bg-[#233DFF]/20 rounded-full -translate-y-1/2 translate-x-1/3 blur-3xl" />
+        <div className="relative z-10 space-y-5 max-w-2xl">
+          <ShieldCheck size={28} className="text-[#233DFF]" />
+          <h2 className="text-3xl font-semibold tracking-tight">Verifiable, and careful not to overclaim</h2>
+          <p className="text-zinc-300 leading-relaxed">
+            Every issued credential carries a certificate ID and a public verification link. Verification
+            returns the status, learner name, credential title, issuer and issue date. It never exposes
+            assessment scores, other course history, service records, or contact information.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-3">
+            {[
+              { v: 'Valid', l: 'Credential is current' },
+              { v: 'Expired', l: 'Renewal required' },
+              { v: 'Superseded', l: 'Replaced by a newer version' },
+              { v: 'Revoked', l: 'Withdrawn under policy' },
+            ].map((s) => (
+              <div key={s.v}>
+                <p className="text-lg font-semibold">{s.v}</p>
+                <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">{s.l}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="space-y-6">
+        <div className="space-y-2">
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">Data, privacy and governance</h2>
+          <p className="text-zinc-500">The questions a school, employer or funder asks before they trust a credential.</p>
+        </div>
+        <div className="space-y-3">
+          {CREDENTIAL_FAQ.map((f) => (
+            <details key={f.q} className="group bg-white rounded-2xl border border-zinc-200/60 shadow-sm overflow-hidden">
+              <summary className="cursor-pointer list-none px-7 py-5 flex items-center justify-between gap-4 hover:bg-zinc-50/60 transition-colors">
+                <span className="text-[15px] font-semibold text-zinc-900 leading-snug">{f.q}</span>
+                <ChevronRight size={17} className="text-zinc-300 shrink-0 transition-transform group-open:rotate-90" />
+              </summary>
+              <div className="px-7 pb-6 -mt-1">
+                <p className="text-sm text-zinc-600 leading-relaxed">{f.a}</p>
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section className="text-center space-y-5 py-6">
+        <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">Start with the pathway that is open now</h2>
+        <p className="text-zinc-500 max-w-lg mx-auto leading-relaxed">
+          Health Careers Exploration is self-paced, free, and takes eight to twelve hours. The next guided
+          start is September 1.
+        </p>
+        <Btn onClick={() => setView({ name: 'pathway', pathwayId: 'health-careers-exploration' })}>
+          Open Health Careers Exploration
+        </Btn>
+      </section>
+    </div>
+  );
 
   // ── Pathway ────────────────────────────────────────────────────────────
 
@@ -909,6 +1148,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
       {view.name === 'activity' && renderActivity(view.pathwayId, view.courseId)}
       {view.name === 'test' && renderTest(view.pathwayId, view.kind)}
       {view.name === 'capstone' && renderCapstone(view.pathwayId)}
+      {view.name === 'credentials' && renderCredentials()}
       {view.name === 'transcript' && renderTranscript()}
       {showCert && renderCertificate(showCert)}
     </div>
