@@ -985,6 +985,7 @@ const HCE_PRE: Check[] = [
 import { CARE_NAVIGATION_COVERAGE } from './pathwayFieldBased';
 import type { Block, SourceRef } from './blocks';
 import { MENTAL_HEALTH_COURSES } from './pathwayMentalHealth';
+import { STEM_CAMP } from './programStemCollab';
 
 // Post-test. Parallel form to HCE_PRE, testing the same objectives with items
 // the learner has not already been shown the answers to.
@@ -1193,7 +1194,10 @@ export const PATHWAYS: Pathway[] = [
       'Meet the People Behind Healthcare',
       'Build Something That Matters — Capstone',
     ],
-    courses: [],
+    // The self-paced eight-course sequence above is separate from the delivered
+    // camp below. The camp is site-based with physical kits and partner
+    // instructors; collapsing them would misrepresent both.
+    courses: [STEM_CAMP],
     version: '0.9 draft',
     effectiveDate: 'In development',
     nextReview: 'Pending curriculum review',
