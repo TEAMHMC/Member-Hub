@@ -29,40 +29,69 @@ import type { Course } from './catalog';
 /** Content dates from 2022. Partner commitments and kit links need re-verification. */
 export const STEM_COLLAB_SOURCE_YEAR = 2022;
 
-export interface WeeklyTheme {
-  domain: 'Science' | 'Technology' | 'Engineering' | 'Mathematics';
-  topics: string[];
-  /** The hands-on kit or resource the theme is built around. */
-  materials?: string;
-  /** Who delivers it, per the program design. */
-  instructors: string;
+export interface CampWeek {
+  week: number;
+  /** Dates as delivered in 2022. Reset when the camp is next scheduled. */
+  dates: string;
+  /** Subject areas paired for the week: a STEM domain and a health-tech domain. */
+  subjects: string;
+  /** The hands-on activity topics students actually do. */
+  activities: string[];
+  note?: string;
 }
 
-export const WEEKLY_THEMES: WeeklyTheme[] = [
+/**
+ * The delivered six-week schedule, from the STEM + Health Deck.
+ *
+ * The pairing is the design: each week couples a classic STEM subject with a
+ * health or health-technology subject, so students meet the science and the
+ * health application in the same week rather than in separate units.
+ */
+export const CAMP_WEEKS: CampWeek[] = [
   {
-    domain: 'Science',
-    topics: ['Chemistry', 'Biology', 'Physics'],
-    materials: 'Science toolkit for hands-on activities on virus transmission and response',
-    instructors: 'UCLA Center X Science Project Team',
+    week: 1,
+    dates: 'June 27 to July 1, 2022',
+    subjects: 'Chemistry and Computing',
+    activities: ['Things that Bubble and Fizz', 'Principles of Examination'],
   },
   {
-    domain: 'Technology',
-    topics: ['Computing', 'Health IT', 'Internet of Medical Things'],
-    materials: 'Coronavirus education kit and diagnosing diabetes kit',
-    instructors: 'Technologists, engineers, physicians and athletes',
+    week: 2,
+    dates: 'July 5 to July 8, 2022',
+    subjects: 'Biology and Health Information Technology',
+    activities: ['Things that Crawl and Grow', 'The Human Body Systems'],
+    note: 'Closed July 4.',
   },
   {
-    domain: 'Engineering',
-    topics: ['Engineering', 'Product Design', 'Web 3.0'],
-    materials: 'Bristlebot robots kit and coding and robotics challenge pack',
-    instructors: 'HMC partner engineers, including Kaiser Permanente engineers',
+    week: 3,
+    dates: 'July 11 to July 15, 2022',
+    subjects: 'Physics and Internet of Medical Things',
+    activities: ['Things that Fly and Roll', 'The Human Body Systems'],
   },
   {
-    domain: 'Mathematics',
-    topics: ['Electricity and Magnetism', 'Space, Science and Water', 'Innovation and Inventions'],
-    materials: 'Tracking activities using data on viruses, epidemics, immunity and contagion',
-    instructors: 'UCLA Center X Mathematics Project Team',
+    week: 4,
+    dates: 'July 18 to July 22, 2022',
+    subjects: 'Electricity, Magnetism and Engineering',
+    activities: ['Things that Stick and Zap', 'Diagnosing Diseases'],
   },
+  {
+    week: 5,
+    dates: 'July 25 to July 29, 2022',
+    subjects: 'Space, Science, Water and Product Design',
+    activities: ['Things that Shake and Flow', 'Water and Electrolytes'],
+  },
+  {
+    week: 6,
+    dates: 'August 1 to August 5, 2022',
+    subjects: 'Innovation, Inventions and Web 3.0',
+    activities: ['Makerspace', 'Careers in Medicine and Technology'],
+    note: 'Closes with the Family STEM and Health Expo, where students, teachers and mentors present demos to the public.',
+  },
+];
+
+/** Off-site days. No class on these dates. */
+export const CAMP_FIELD_TRIPS = [
+  { date: 'July 7, 2022', destination: 'UC Irvine' },
+  { date: 'July 27, 2022', destination: 'Dodger Stadium tour and baseball game' },
 ];
 
 export const STEM_CAMP: Course = {
@@ -76,7 +105,8 @@ export const STEM_CAMP: Course = {
   about: [
     'The STEM Collaborative grew out of shared concerns between Health Matters Clinic and Baldwin Bethany Community Development Corporation while both were delivering pandemic support, including food, health screenings and vaccines, to underserved communities in South Los Angeles.',
     'The camp engages youth in STEM topics relevant to communities of color, taught by health professionals of color, using hands-on activities driven by the engineering process. It runs alongside BBCDC\'s LAUNCH Academy Summer Nutritional Academic Camp, which has partnered with the University of California Office of the President and UCLA since 2016.',
-    'Roughly 50 students, five days a week for six weeks, with an athletic and character-building block each afternoon reflecting HMC\'s whole-person approach to health.',
+    'Six weeks, Monday to Friday, 8:00 AM to 4:00 PM, at Stella Middle Charter Academy in South Los Angeles, closing with a public Family STEM and Health Expo where students present their demos.',
+    'Each week pairs a classic STEM subject with a health or health-technology subject, so students meet the science and its health application together rather than in separate units.',
   ],
   objectives: [
     'Deliver each weekly STEM theme with its matched hands-on kit and partner instructor.',

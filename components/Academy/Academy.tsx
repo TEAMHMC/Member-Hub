@@ -19,6 +19,7 @@ import {
   PATHWAYS, PASS_THRESHOLD, LEARNING_MODEL, LEVEL_ACCENT, pathwayById,
   pathwayMinutes, type Check as CheckQ, type Course, type Pathway,
 } from './catalog';
+import { CAMP_WEEKS, CAMP_FIELD_TRIPS } from './programStemCollab';
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
@@ -787,6 +788,41 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           <div className="lg:col-span-8 space-y-10">
+            {c.id === 'stem-collab-camp' && (
+              <section className="space-y-4">
+                <div className="space-y-1">
+                  <h2 className="text-xl font-semibold text-zinc-900">The six-week schedule</h2>
+                  <p className="text-[13.5px] text-zinc-500 leading-relaxed">
+                    Each week pairs a STEM subject with a health or health-technology subject. Dates below are
+                    from the last delivery and reset when the camp is next scheduled.
+                  </p>
+                </div>
+                <div className="space-y-2.5">
+                  {CAMP_WEEKS.map((w) => (
+                    <div key={w.week} className="rounded-2xl border border-zinc-200 bg-white p-5 flex items-start gap-5">
+                      <span className="w-11 h-11 rounded-2xl bg-blue-50 text-[#233DFF] flex items-center justify-center shrink-0">
+                        <span className="text-[11px] font-black leading-none text-center">WK<br />{w.week}</span>
+                      </span>
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <p className="text-[15px] font-semibold text-zinc-900 leading-snug">{w.subjects}</p>
+                        <p className="text-[13px] text-zinc-600 leading-relaxed">{w.activities.join(' · ')}</p>
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 pt-0.5">{w.dates}</p>
+                        {w.note && <p className="text-[12px] text-[#FF6E40] leading-relaxed">{w.note}</p>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="rounded-2xl bg-zinc-50/70 border border-zinc-200/70 p-5 space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Field trips, no class</p>
+                  {CAMP_FIELD_TRIPS.map((f) => (
+                    <p key={f.date} className="text-[13.5px] text-zinc-700">
+                      <span className="font-semibold">{f.date}</span> · {f.destination}
+                    </p>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {c.requirements && c.requirements.length > 0 && (
               <section className="space-y-3">
                 <h2 className="text-xl font-semibold text-zinc-900">What completion requires</h2>
