@@ -787,6 +787,48 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           <div className="lg:col-span-8 space-y-10">
+            {c.requirements && c.requirements.length > 0 && (
+              <section className="space-y-3">
+                <h2 className="text-xl font-semibold text-zinc-900">What completion requires</h2>
+                <p className="text-[13.5px] text-zinc-500 leading-relaxed">
+                  Some of this happens outside the platform. It is listed here so nothing required is buried in an
+                  email or treated as optional.
+                </p>
+                <ol className="space-y-2">
+                  {c.requirements.map((r, i) => (
+                    <li key={r.id} className="flex items-start gap-4 rounded-2xl border border-zinc-200 bg-white p-5">
+                      <span className="w-8 h-8 rounded-full bg-zinc-100 text-zinc-500 flex items-center justify-center text-[12px] font-bold shrink-0">{i + 1}</span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[14.5px] font-semibold text-zinc-900 leading-snug">{r.label}</span>
+                        {r.detail && <span className="block text-[13px] text-zinc-500 leading-relaxed mt-1">{r.detail}</span>}
+                        <span className="inline-block text-[9px] font-bold uppercase tracking-wider text-zinc-400 mt-2">
+                          {r.kind === 'attend' ? 'Attendance' : r.kind === 'assignment' ? 'Assignment' : r.kind === 'practicum' ? 'Applied practice' : 'Evaluation'}
+                        </span>
+                      </span>
+                      <Lock size={14} className="text-zinc-300 shrink-0 mt-1" />
+                    </li>
+                  ))}
+                </ol>
+                <p className="text-[12px] text-zinc-500 leading-relaxed">
+                  Your completion record unlocks once every item above is satisfied and recorded by HMC.
+                </p>
+              </section>
+            )}
+
+            {c.retroEval && (
+              <section className="rounded-2xl border border-zinc-200 bg-zinc-50/60 p-7 space-y-3">
+                <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Program evaluation</h2>
+                <p className="text-[14px] text-zinc-700 leading-relaxed">
+                  This program uses a retrospective questionnaire rather than a pre-test. You rate each statement
+                  twice at the end, once for now and once for before the workshops. It measures change more
+                  accurately and does not open the session with an exam.
+                </p>
+                <p className="text-[12.5px] text-zinc-500 leading-relaxed">
+                  Voluntary and confidential. Conducted for {c.retroEval.conductedFor}.
+                </p>
+              </section>
+            )}
+
             {c.ce && (
               <section className="rounded-2xl border border-[#233DFF]/20 bg-blue-50/40 p-7 space-y-4">
                 <div className="flex items-center gap-2 text-[#233DFF]">

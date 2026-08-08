@@ -112,6 +112,26 @@ export interface Session {
   facilitator?: string;
 }
 
+/**
+ * Retrospective post-then-pre evaluation.
+ *
+ * Unstoppable does NOT use a baseline-then-post design. Per the approved
+ * instrument, participants rate each statement twice at the END of the program,
+ * once for "now" and once for "before". HMC chose this deliberately: it
+ * measures change with less response-shift bias than a separate pre-test, and
+ * it avoids front-loading a workshop with an exam. It is administered once, on
+ * completion, and is conducted for LACDMH.
+ *
+ * Do not replace this with a pre-test. It is an approved evaluation instrument.
+ */
+export interface RetroPrePost {
+  intro: string[];
+  scale: string[];
+  statements: string[];
+  /** Who the evaluation is conducted for. */
+  conductedFor: string;
+}
+
 /** Continuing education, only where HMC holds a real approval. */
 export interface CeApproval {
   /** Board-recognized approval agency. */
@@ -135,6 +155,10 @@ export interface Course {
   /** Populated for live and blended courses. */
   sessions?: Session[];
   ce?: CeApproval;
+  /** Used instead of preTest/postTest where HMC's instrument is retrospective. */
+  retroEval?: RetroPrePost;
+  /** Ordered completion requirements, including work done outside the platform. */
+  requirements?: { id: string; label: string; detail?: string; kind: 'attend' | 'assignment' | 'practicum' | 'evaluation' }[];
   /** Shown only where currency materially affects the learner's action. */
   freshness?: string;
   /** Rendered as a Sources and further learning accordion at course end. */

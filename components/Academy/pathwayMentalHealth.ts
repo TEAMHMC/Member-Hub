@@ -63,6 +63,25 @@ export const UNSTOPPABLE_CE: Course = {
       'This approval covers the scheduled session format. Attendance is recorded per session, and the certificate is issued against that session date.',
   },
   sessions: [],
+  retroEval: {
+    conductedFor: 'Los Angeles County Department of Mental Health',
+    intro: [
+      'You are invited to participate in this evaluation conducted for the Los Angeles County Department of Mental Health. Your participation is voluntary and confidential.',
+      'At the end of this program, we ask you to reflect on your knowledge and attitudes both before and after the workshops. Instead of completing a pre-test at the start, this method allows you to assess changes in your understanding more accurately, helping us measure the program\'s impact while reducing bias.',
+    ],
+    scale: ['Strongly disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly agree'],
+    statements: [
+      'I feel comfortable discussing topics related to mental health within the community.',
+      'I understand the systemic challenges faced by individuals in accessing mental health services.',
+      'I am aware of community resources available to support mental health within the community.',
+      'I feel equipped to support individuals facing mental health challenges.',
+      'I can identify signs and symptoms of depression and anxiety in children, youth, and adults.',
+    ],
+  },
+  requirements: [
+    { id: 'attend', kind: 'attend', label: 'Attend the full scheduled session', detail: 'Attendance is recorded per session and the certificate is issued against that date.' },
+    { id: 'eval', kind: 'evaluation', label: 'Complete the post-session evaluation', detail: 'The retrospective questionnaire conducted for LACDMH.' },
+  ],
   lessons: [],
   checks: [],
 };
@@ -85,7 +104,7 @@ export const CMHW_FACILITATOR: Course = {
   about: [
     'This is the training HMC already requires of community mental health workers, migrated so members and volunteers take the same canonical course rather than separate copies that drift apart.',
     'Part 1 covers foundations of community mental health work, trauma-informed principles, and working with vulnerable populations. Part 2 covers applied engagement, de-escalation, communication skills, and field-based mental health work.',
-    'Facilitator readiness requires more than watching both parts. The practice, observation and sign-off sequence is set by HMC program leadership and is recorded against your enrollment.',
+    'Facilitator readiness requires more than watching both parts. Certification requires attending the training sessions, completing the facilitator homework, and leading or co-facilitating a community workshop using the Unstoppable Curriculum.',
   ],
   objectives: [
     'Explain what trauma-informed care means and why it matters with vulnerable populations.',
@@ -95,7 +114,7 @@ export const CMHW_FACILITATOR: Course = {
   minutes: 51,
   prerequisites: 'HMC orientation. Facilitator readiness additionally requires program leadership approval.',
   whoFor:
-    'Community mental health workers, and volunteers or staff preparing to facilitate HMC community mental health education and Unstoppable programming.',
+    'Community health workers, medical students, educators, social workers, HMC volunteers, and anyone preparing to facilitate community mental health education.',
   lessons: [
     {
       id: 'cmhw-l1',
@@ -165,6 +184,12 @@ export const CMHW_FACILITATOR: Course = {
       answer: 2,
       why: 'De-escalation reduces tension through tone, space, active listening and cultural humility. Escalating your own volume or dismissing the person reliably makes it worse.',
     },
+  ],
+  requirements: [
+    { id: 'register', kind: 'attend', label: 'Register for the training through Health Matters Clinic' },
+    { id: 'sessions', kind: 'attend', label: 'Attend all required training sessions and participate in discussions', detail: 'Includes the introduction and facilitation techniques session, optional co-working review of community presentation slides and resources, and office hours with Dr. Bounds for final practice, questions and feedback.' },
+    { id: 'homework', kind: 'assignment', label: 'Complete the facilitator homework', detail: 'Submitted by the published due date.' },
+    { id: 'cofacilitate', kind: 'practicum', label: 'Lead or co-facilitate a community workshop using the Unstoppable Curriculum', detail: 'This is the applied requirement. Certification is issued after it is completed.' },
   ],
   artifact: {
     id: 'facilitator-readiness',
