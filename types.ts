@@ -26,8 +26,22 @@ export enum ContactPreference {
   PHONE = 'Phone'
 }
 
+/**
+ * How the person came to HMC, which determines what the Hub shows them.
+ *  - 'care'    met through a health fair, screening, or outreach encounter
+ *  - 'learner' self-registered for the Academy only, no care relationship
+ *  - 'both'    a care participant who also enrolled in a learning pathway
+ *
+ * A 'learner' account intentionally has no screening, playbook, or results
+ * surface. Per the Academy credential rules, participation in education does
+ * not create a clinician-patient relationship, and learning records are kept
+ * separate from clinical records.
+ */
+export type Audience = 'care' | 'learner' | 'both';
+
 export interface User {
   id: string;
+  audience?: Audience;
   phone: string;
   role: UserRole | null;
   firstName: string;

@@ -26,6 +26,8 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   const [zipInput, setZipInput] = useState(user.zipCode || '');
   const [mapCenterZip, setMapCenterZip] = useState(user.zipCode || '');
   const [showTour, setShowTour] = useState(false);
+  // Which Academy sub-page a Home card asked for.
+  const [academyView, setAcademyView] = useState<'catalog' | 'credentials' | 'transcript'>('catalog');
   const [tourStep, setTourStep] = useState(0);
   
   // Member State
@@ -204,6 +206,8 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   }, [activeTab, viewMode, liveEvents]);
 
   useEffect(() => { setActiveTab(initialTab); }, [initialTab]);
+  // Entering Academy from anywhere other than a credentials card lands on the catalog.
+  useEffect(() => { if (activeTab !== 'academy') setAcademyView('catalog'); }, [activeTab]);
 
   const finishAssessment = async () => {
     setLoadingAi(true);
@@ -743,6 +747,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
 
   const renderAcademy = () => (
     <Academy
+      initialView={academyView}
       userId={user.id}
       memberName={`${user.firstName} ${user.lastName}`.trim() || 'Member'}
       onNavigateTab={(tab) => { setActiveTab(tab); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
@@ -750,7 +755,75 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     />
   );
 
+  // A learner has no care relationship, so the screening, playbook and results
+  // surfaces do not exist for them. Home is the Academy front door instead.
+  const renderLearnerHome = () => (
+    <div className="space-y-12 animate-in fade-in duration-500 max-w-5xl mx-auto py-8">
+      <div className="text-center space-y-4">
+        <div className="pill pill-blue mx-auto">Academy Learner</div>
+        <h1 className="text-5xl font-semibold tracking-tight text-zinc-900">Welcome, {user.firstName}.</h1>
+        <p className="text-zinc-500 max-w-lg mx-auto leading-relaxed text-lg">
+          You are registered for the HMC Health and Education Pathways Academy. Everything is
+          self-paced, text-first, and free.
+        </p>
+        <div className="flex flex-wrap gap-4 pt-6 justify-center">
+          <ButtonPrimary onClick={() => setActiveTab('academy')}>Go to my pathway</ButtonPrimary>
+          <ButtonSecondary onClick={() => setActiveTab('events')}>Browse events</ButtonSecondary>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={() => setActiveTab('academy')}>
+          <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-[#8B6D00] shadow-sm group-hover:bg-[#F9C74F] group-hover:text-zinc-900 transition-all">
+            <GraduationCap size={24} />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold text-zinc-900">Continue learning</h3>
+            <p className="text-sm text-zinc-500 leading-relaxed">Pick up your pathway where you left off, or browse the full catalog.</p>
+          </div>
+          <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('academy'); }} className="w-full">Open Academy</ButtonSecondary>
+        </Card>
+        <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={() => { setAcademyView('credentials'); setActiveTab('academy'); }}>
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-[#233DFF] shadow-sm group-hover:bg-[#233DFF] group-hover:text-white transition-all">
+            <Award size={24} />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold text-zinc-900">Credentials</h3>
+            <p className="text-sm text-zinc-500 leading-relaxed">See what each HMC completion record proves, what it requires, and how it is verified.</p>
+          </div>
+          <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setAcademyView('credentials'); setActiveTab('academy'); }} className="w-full">Browse credentials</ButtonSecondary>
+        </Card>
+        <Card className="flex flex-col gap-6 p-8 group hover:border-[#FF6E40]/30 transition-all cursor-pointer" onClick={() => setActiveTab('events')}>
+          <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-[#FF6E40] shadow-sm group-hover:bg-[#FF6E40] group-hover:text-white transition-all">
+            <Calendar size={24} />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold text-zinc-900">Learn in the field</h3>
+            <p className="text-sm text-zinc-500 leading-relaxed">Applied pathways are completed at real HMC outreach events across LA County.</p>
+          </div>
+          <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('events'); }} className="w-full">View calendar</ButtonSecondary>
+        </Card>
+      </div>
+
+      <div className="rounded-2xl border border-zinc-200/60 bg-white p-7 space-y-2">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Your learning record</p>
+        <p className="text-sm text-zinc-600 leading-relaxed">
+          Academy records are kept separately from clinical and client records. Registering for a
+          pathway does not create a clinician-patient relationship with Health Matters Clinic.
+        </p>
+      </div>
+    </div>
+  );
+
+  const LEARNER_TABS = ['dash', 'academy', 'events', 'profile'];
+
   const renderContent = () => {
+    // Care-only surfaces are not reachable for a learner account.
+    if (user.audience === 'learner' && !LEARNER_TABS.includes(activeTab)) {
+      return renderAcademy();
+    }
+    if (user.audience === 'learner' && activeTab === 'dash') return renderLearnerHome();
+
     switch (activeTab) {
       case 'academy': return renderAcademy();
       case 'events': return renderEvents();

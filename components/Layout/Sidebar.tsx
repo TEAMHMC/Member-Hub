@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { UserRole } from '../../types';
+import { UserRole, type Audience } from '../../types';
 import {
   Home, Calendar, ClipboardList,
   LogOut, Compass, ShieldCheck, Activity, Brain, GraduationCap,
@@ -9,14 +9,24 @@ import {
 
 interface SidebarProps {
   role: UserRole;
+  audience?: Audience;
   activeTab: string;
   onTabChange: (id: string) => void;
   onLogout: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ role, activeTab, onTabChange, onLogout }) => {
+const Sidebar: React.FC<SidebarProps> = ({ role, audience = 'care', activeTab, onTabChange, onLogout }) => {
   const getNavItems = () => {
     if (role === UserRole.CLIENT) {
+      // A learner has no care relationship with HMC, so the screening,
+      // playbook, and results surfaces are not shown at all.
+      if (audience === 'learner') {
+        return [
+          { icon: <Home size={18} />, label: 'Home', id: 'dash' },
+          { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
+          { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
+        ];
+      }
       return [
         { icon: <Home size={18} />, label: 'Home', id: 'dash' },
         { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },

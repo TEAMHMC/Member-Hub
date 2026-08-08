@@ -31,6 +31,8 @@ interface AcademyProps {
   memberName: string;
   onNavigateTab: (tab: string) => void;
   onSignal?: (type: string, payload: Record<string, unknown>) => void;
+  /** Lets the Hub deep-link a sub-page of the Academy, e.g. straight to credentials. */
+  initialView?: 'catalog' | 'credentials' | 'transcript';
 }
 
 type View =
@@ -76,9 +78,9 @@ const Back: React.FC<{ label: string; onClick: () => void }> = ({ label, onClick
   </button>
 );
 
-const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal }) => {
+const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal, initialView = 'catalog' }) => {
   const [state, setState] = useState<LearnerState>(() => loadState(userId));
-  const [view, setView] = useState<View>({ name: 'catalog' });
+  const [view, setView] = useState<View>({ name: initialView } as View);
   const [showCert, setShowCert] = useState<string | null>(null);
 
   // Braces matter here. An arrow with an expression body returns that
@@ -90,6 +92,10 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [view]);
+  // Follow a deep link from the Hub (Home cards link straight to credentials).
+  useEffect(() => {
+    setView({ name: initialView } as View);
+  }, [initialView]);
 
   const set = (fn: (s: LearnerState) => LearnerState) => setState((s) => fn(s));
 

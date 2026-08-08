@@ -138,6 +138,7 @@ const App: React.FC = () => {
         <>
           <Sidebar
             role={currentUser.role!}
+            audience={currentUser.audience}
             activeTab={activeTab}
             onTabChange={setActiveTab}
             onLogout={handleLogout}
