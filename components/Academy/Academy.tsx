@@ -19,7 +19,7 @@ import {
   PATHWAYS, PASS_THRESHOLD, LEARNING_MODEL, LEVEL_ACCENT, pathwayById,
   pathwayMinutes, type Check as CheckQ, type Course, type Pathway,
 } from './catalog';
-import { CAMP_WEEKS, CAMP_FIELD_TRIPS } from './programStemCollab';
+import { CAMP_WEEKS, CAMP_TEMPLATE } from './programStemCollab';
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
@@ -791,10 +791,10 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             {c.id === 'stem-collab-camp' && (
               <section className="space-y-4">
                 <div className="space-y-1">
-                  <h2 className="text-xl font-semibold text-zinc-900">The six-week schedule</h2>
+                  <h2 className="text-xl font-semibold text-zinc-900">The six-week curriculum</h2>
                   <p className="text-[13.5px] text-zinc-500 leading-relaxed">
-                    Each week pairs a STEM subject with a health or health-technology subject. Dates below are
-                    from the last delivery and reset when the camp is next scheduled.
+                    Each week pairs a STEM subject with a health or health-technology subject, so students meet the
+                    science and its application together. The sequence builds toward design, invention and careers.
                   </p>
                 </div>
                 <div className="space-y-2.5">
@@ -803,22 +803,39 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                       <span className="w-11 h-11 rounded-2xl bg-blue-50 text-[#233DFF] flex items-center justify-center shrink-0">
                         <span className="text-[11px] font-black leading-none text-center">WK<br />{w.week}</span>
                       </span>
-                      <div className="min-w-0 flex-1 space-y-1">
+                      <div className="min-w-0 flex-1 space-y-1.5">
                         <p className="text-[15px] font-semibold text-zinc-900 leading-snug">{w.subjects}</p>
                         <p className="text-[13px] text-zinc-600 leading-relaxed">{w.activities.join(' · ')}</p>
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 pt-0.5">{w.dates}</p>
-                        {w.note && <p className="text-[12px] text-[#FF6E40] leading-relaxed">{w.note}</p>}
+                        <p className="text-[12.5px] text-zinc-500 leading-relaxed">{w.focus}</p>
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="rounded-2xl bg-zinc-50/70 border border-zinc-200/70 p-5 space-y-2">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Field trips, no class</p>
-                  {CAMP_FIELD_TRIPS.map((f) => (
-                    <p key={f.date} className="text-[13.5px] text-zinc-700">
-                      <span className="font-semibold">{f.date}</span> · {f.destination}
-                    </p>
-                  ))}
+
+                <div className="rounded-2xl bg-zinc-50/70 border border-zinc-200/70 p-6 space-y-4">
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">What every run needs</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {[
+                      ['Length', `${CAMP_TEMPLATE.weeks} weeks`],
+                      ['Schedule', `${CAMP_TEMPLATE.daysPerWeek} days a week`],
+                      ['Hours', CAMP_TEMPLATE.dailyHours],
+                      ['Grades', CAMP_TEMPLATE.grades],
+                    ].map(([k, v]) => (
+                      <div key={k}>
+                        <p className="text-[13.5px] font-semibold text-zinc-900">{v}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mt-0.5">{k}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="space-y-1.5 pt-1">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Roles to fill locally</p>
+                    {CAMP_TEMPLATE.instructionModel.map((r) => (
+                      <p key={r} className="text-[13px] text-zinc-700 leading-relaxed">{r}</p>
+                    ))}
+                  </div>
+                  <p className="text-[13px] text-zinc-700 leading-relaxed border-t border-zinc-200/70 pt-3">
+                    <span className="font-semibold">Closing capstone. </span>{CAMP_TEMPLATE.capstone}
+                  </p>
                 </div>
               </section>
             )}
