@@ -79,8 +79,15 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
   const [view, setView] = useState<View>({ name: 'catalog' });
   const [showCert, setShowCert] = useState<string | null>(null);
 
-  useEffect(() => saveState(userId, state), [userId, state]);
-  useEffect(() => window.scrollTo({ top: 0, behavior: 'smooth' }), [view]);
+  // Braces matter here. An arrow with an expression body returns that
+  // expression, and React treats a non-undefined effect return as a cleanup
+  // function, then throws "destroy is not a function" on the next run.
+  useEffect(() => {
+    saveState(userId, state);
+  }, [userId, state]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [view]);
 
   const set = (fn: (s: LearnerState) => LearnerState) => setState((s) => fn(s));
 
