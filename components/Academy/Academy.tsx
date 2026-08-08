@@ -695,102 +695,182 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     if (!p || !c) return renderCatalog();
     const firstUnfinished = c.lessons.findIndex((l) => !state.lessons.includes(l.id));
     const activityDone = !!(state.activities[c.id] || '').trim();
+    const registered = state.enrolled.includes(p.id);
+    const pct = coursePercent(p, c.id, state);
 
     return (
-      <div className="max-w-3xl mx-auto py-8 space-y-9 animate-in fade-in duration-500">
+      <div className="max-w-5xl mx-auto py-8 space-y-12 animate-in fade-in duration-500">
         <Back label={p.title} onClick={() => setView({ name: 'pathway', pathwayId })} />
 
-        <div className="space-y-4">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-            Course {c.num} of {p.courses.length} in {p.title}
-          </p>
-          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">{c.title}</h1>
-          <p className="text-lg text-zinc-600 leading-relaxed">{c.promise}</p>
-        </div>
-
-        <section className="space-y-3">
-          <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">About this course</h2>
-          {c.about.map((para, i) => (
-            <p key={i} className="text-[15px] text-zinc-600 leading-relaxed">{para}</p>
-          ))}
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Learning objectives</h2>
-          <p className="text-sm text-zinc-500">By the end of this course, you will be able to:</p>
-          <ul className="space-y-2">
-            {c.objectives.map((o) => (
-              <li key={o} className="flex items-start gap-3">
-                <Check size={15} strokeWidth={3} className="text-[#233DFF] mt-1 shrink-0" />
-                <span className="text-[15px] text-zinc-700 leading-relaxed">{o}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="bg-white rounded-2xl border border-zinc-200/60 p-7 grid grid-cols-2 md:grid-cols-4 gap-5">
-          {[
-            { l: 'Format', v: 'Self-paced' },
-            { l: 'Estimated time', v: `${c.minutes} min` },
-            { l: 'Lessons', v: String(c.lessons.length) },
-            { l: 'Knowledge checks', v: String(c.checks.length) },
-          ].map((x) => (
-            <div key={x.l}>
-              <p className="text-base font-semibold text-zinc-900">{x.v}</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mt-1">{x.l}</p>
+        {/* Header */}
+        <header className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          <div className="lg:col-span-7 space-y-5">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+              Course {c.num} of {p.courses.length} in {p.title}
+            </p>
+            <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 leading-[1.12]">{c.title}</h1>
+            <p className="text-lg text-zinc-600 leading-relaxed">{c.promise}</p>
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              {registered ? (
+                <Btn onClick={() => setView({ name: 'lesson', pathwayId, courseId, index: Math.max(firstUnfinished, 0) })}>
+                  {pct === 0 ? 'Start course' : pct === 100 ? 'Review course' : 'Continue course'}
+                </Btn>
+              ) : (
+                <Btn onClick={() => { enroll(p); setView({ name: 'test', pathwayId: p.id, kind: 'pre' }); }}>
+                  Register, free
+                </Btn>
+              )}
+              <span className="text-[11px] text-zinc-400 font-semibold">
+                {registered ? `${pct}% complete` : 'Already registered? Sign in from the Hub'}
+              </span>
             </div>
-          ))}
-        </section>
+          </div>
 
-        <section className="space-y-3">
-          <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">What you will complete</h2>
-          <div className="space-y-2">
-            {c.lessons.map((l, i) => {
-              const done = state.lessons.includes(l.id);
-              return (
-                <button
-                  key={l.id}
-                  onClick={() => setView({ name: 'lesson', pathwayId, courseId, index: i })}
-                  className={`w-full text-left flex items-center justify-between gap-4 p-4 px-5 rounded-2xl border transition-all ${done ? 'bg-zinc-50/50 border-zinc-100' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40'}`}
-                >
-                  <span className="flex items-center gap-4 min-w-0">
-                    <span className={`w-8 h-8 rounded-full flex items-center justify-center border shrink-0 ${done ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-white text-zinc-400 border-zinc-200'}`}>
-                      {done ? <Check size={14} strokeWidth={3} /> : <span className="text-[11px] font-bold">{i + 1}</span>}
+          {/* Course facts */}
+          <div className="lg:col-span-5 bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-7 space-y-4">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Course format</p>
+            <dl className="space-y-3">
+              {[
+                ['Delivery', 'Self-paced, text first'],
+                ['Estimated time', `${c.minutes} minutes`],
+                ['Modules', `${c.lessons.length}`],
+                ['Knowledge checks', `${c.checks.length}`],
+                ['Applied activity', c.activity ? 'Yes, with a saved artifact' : 'None'],
+                ['Cost', 'Free'],
+              ].map(([k, v]) => (
+                <div key={k} className="flex items-baseline justify-between gap-4 border-b border-zinc-50 pb-2.5 last:border-0 last:pb-0">
+                  <dt className="text-[12px] text-zinc-500">{k}</dt>
+                  <dd className="text-[13px] font-semibold text-zinc-900 text-right">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="lg:col-span-8 space-y-10">
+            <section className="space-y-3">
+              <h2 className="text-xl font-semibold text-zinc-900">About this course</h2>
+              {c.about.map((para, i) => (
+                <p key={i} className="text-[15px] text-zinc-600 leading-relaxed">{para}</p>
+              ))}
+            </section>
+
+            <section className="space-y-3">
+              <h2 className="text-xl font-semibold text-zinc-900">Learning objectives</h2>
+              <p className="text-sm text-zinc-500">By the end of this course, you will be able to:</p>
+              <ul className="space-y-2.5">
+                {c.objectives.map((o) => (
+                  <li key={o} className="flex items-start gap-3">
+                    <Check size={15} strokeWidth={3} className="text-[#233DFF] mt-1 shrink-0" />
+                    <span className="text-[15px] text-zinc-700 leading-relaxed">{o}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <h2 className="text-xl font-semibold text-zinc-900">Prerequisites</h2>
+                <p className="text-[15px] text-zinc-600 leading-relaxed">{c.prerequisites}</p>
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-xl font-semibold text-zinc-900">Who this is for</h2>
+                <p className="text-[15px] text-zinc-600 leading-relaxed">{c.whoFor}</p>
+              </div>
+            </section>
+
+            <section className="space-y-4">
+              <h2 className="text-xl font-semibold text-zinc-900">This course contains the following modules</h2>
+              <div className="space-y-3">
+                {c.lessons.map((l, i) => {
+                  const done = state.lessons.includes(l.id);
+                  return (
+                    <button
+                      key={l.id}
+                      onClick={() => setView({ name: 'lesson', pathwayId, courseId, index: i })}
+                      className={`w-full text-left flex items-start gap-5 p-6 rounded-2xl border transition-all ${done ? 'bg-zinc-50/60 border-zinc-100' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40 hover:shadow-sm'}`}
+                    >
+                      <span className={`w-11 h-11 rounded-2xl flex items-center justify-center border shrink-0 ${done ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-[#233DFF] border-blue-100'}`}>
+                        {done ? <Check size={18} strokeWidth={3} /> : <span className="text-[13px] font-black">{i + 1}</span>}
+                      </span>
+                      <span className="min-w-0 flex-1 space-y-1.5">
+                        <span className="block text-[15px] font-semibold text-zinc-900 leading-snug">{l.title}</span>
+                        <span className="block text-[13px] text-zinc-500 leading-relaxed">{l.summary}</span>
+                        <span className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 pt-0.5">
+                          {l.minutes} minutes{done ? ' · Complete' : ''}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+
+                {c.activity && (
+                  <button
+                    onClick={() => setView({ name: 'activity', pathwayId, courseId })}
+                    className={`w-full text-left flex items-start gap-5 p-6 rounded-2xl border transition-all ${activityDone ? 'bg-zinc-50/60 border-zinc-100' : 'bg-white border-zinc-200 hover:border-[#FF6E40]/40 hover:shadow-sm'}`}
+                  >
+                    <span className={`w-11 h-11 rounded-2xl flex items-center justify-center border shrink-0 ${activityDone ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-orange-50 text-[#FF6E40] border-orange-100'}`}>
+                      {activityDone ? <Check size={18} strokeWidth={3} /> : <PenLine size={17} />}
                     </span>
-                    <span className={`text-sm font-semibold truncate ${done ? 'text-zinc-400' : 'text-zinc-800'}`}>{l.title}</span>
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 shrink-0">{done ? 'Done' : 'Lesson'}</span>
-                </button>
-              );
-            })}
-            {c.activity && (
-              <button
-                onClick={() => setView({ name: 'activity', pathwayId, courseId })}
-                className={`w-full text-left flex items-center justify-between gap-4 p-4 px-5 rounded-2xl border transition-all ${activityDone ? 'bg-zinc-50/50 border-zinc-100' : 'bg-white border-zinc-200 hover:border-[#FF6E40]/40'}`}
-              >
-                <span className="flex items-center gap-4 min-w-0">
-                  <span className={`w-8 h-8 rounded-full flex items-center justify-center border shrink-0 ${activityDone ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-orange-50 text-[#FF6E40] border-orange-100'}`}>
-                    {activityDone ? <Check size={14} strokeWidth={3} /> : <PenLine size={14} />}
-                  </span>
-                  <span className={`text-sm font-semibold truncate ${activityDone ? 'text-zinc-400' : 'text-zinc-800'}`}>{c.activity.title}</span>
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 shrink-0">{activityDone ? 'Submitted' : 'Applied activity'}</span>
-              </button>
+                    <span className="min-w-0 flex-1 space-y-1.5">
+                      <span className="block text-[15px] font-semibold text-zinc-900 leading-snug">{c.activity.title}</span>
+                      <span className="block text-[13px] text-zinc-500 leading-relaxed">{c.activity.body[0]}</span>
+                      <span className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 pt-0.5">
+                        Applied activity{activityDone ? ' · Submitted' : ''}
+                      </span>
+                    </span>
+                  </button>
+                )}
+              </div>
+            </section>
+
+            {c.sources && (
+              <p className="text-[11px] text-zinc-400 border-t border-zinc-100 pt-5">
+                Course sources: {c.sources.map((x) => `[${x}]`).join(' ')}. Full citations are held in the
+                Academy source library.
+              </p>
             )}
           </div>
-        </section>
 
-        <div className="pt-2">
-          <Btn onClick={() => setView({ name: 'lesson', pathwayId, courseId, index: Math.max(firstUnfinished, 0) })}>
-            {firstUnfinished > 0 ? 'Continue course' : 'Start course'} <ChevronRight size={14} />
-          </Btn>
+          {/* Curriculum rail */}
+          <aside className="lg:col-span-4">
+            <div className="bg-zinc-50/70 rounded-2xl border border-zinc-200/60 p-6 space-y-3 lg:sticky lg:top-6">
+              <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Curriculum</h2>
+              <ol className="divide-y divide-zinc-200/70">
+                {c.lessons.map((l, i) => {
+                  const done = state.lessons.includes(l.id);
+                  return (
+                    <li key={l.id}>
+                      <button
+                        onClick={() => setView({ name: 'lesson', pathwayId, courseId, index: i })}
+                        className="w-full text-left py-3 flex items-start gap-3 group"
+                      >
+                        <span className={`text-[11px] font-bold shrink-0 mt-0.5 ${done ? 'text-emerald-600' : 'text-zinc-300'}`}>
+                          {done ? <Check size={13} strokeWidth={3} /> : i + 1}
+                        </span>
+                        <span className="min-w-0">
+                          <span className={`block text-[13px] leading-snug ${done ? 'text-zinc-400' : 'text-zinc-700 group-hover:text-[#233DFF]'}`}>{l.title}</span>
+                          <span className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mt-0.5">{l.minutes} min</span>
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+                {c.activity && (
+                  <li>
+                    <button onClick={() => setView({ name: 'activity', pathwayId, courseId })} className="w-full text-left py-3 flex items-start gap-3 group">
+                      <span className={`text-[11px] font-bold shrink-0 mt-0.5 ${activityDone ? 'text-emerald-600' : 'text-zinc-300'}`}>
+                        {activityDone ? <Check size={13} strokeWidth={3} /> : <PenLine size={12} />}
+                      </span>
+                      <span className="block text-[13px] leading-snug text-zinc-700 group-hover:text-[#FF6E40]">{c.activity.title}</span>
+                    </button>
+                  </li>
+                )}
+              </ol>
+            </div>
+          </aside>
         </div>
-
-        {c.sources && (
-          <p className="text-[11px] text-zinc-400 border-t border-zinc-100 pt-5">
-            Course sources: {c.sources.map((s) => `[${s}]`).join(' ')}
-          </p>
-        )}
       </div>
     );
   };
@@ -980,7 +1060,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
         </section>
 
         <section className="bg-white rounded-2xl border border-zinc-200/60 p-7 space-y-4">
-          <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Rubric — {total} points, {cap.passing} to pass</h2>
+          <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Rubric, {total} points with {cap.passing} to pass</h2>
           <ul className="divide-y divide-zinc-100">
             {cap.rubric.map((r) => (
               <li key={r.label} className="flex items-center justify-between py-2.5 text-sm">

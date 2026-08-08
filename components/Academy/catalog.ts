@@ -26,6 +26,9 @@ export type CredentialType =
 export interface Lesson {
   id: string;
   title: string;
+  /** One line shown on the course outline, before the learner opens the module. */
+  summary: string;
+  minutes: number;
   body: string[];
 }
 
@@ -54,6 +57,9 @@ export interface Course {
   about: string[];
   objectives: string[];
   minutes: number;
+  /** Stated plainly on the course page. 'None' is a valid answer. */
+  prerequisites: string;
+  whoFor: string;
   lessons: Lesson[];
   checks: Check[];
   activity?: Activity;
@@ -122,10 +128,14 @@ const HCE_COURSES: Course[] = [
       'Identify three career families worth exploring further.',
     ],
     minutes: 55,
+    prerequisites: 'None. This is the entry point to the pathway.',
+    whoFor: 'Anyone curious about health careers, including learners with no prior exposure to the field.',
     lessons: [
       {
         id: 'hce-1-l1',
         title: 'Healthcare is a team sport',
+        summary: 'See how many roles touch a single patient encounter, and how many shape care without ever meeting a patient.',
+        minutes: 18,
         body: [
           'A single patient encounter may involve physicians, nurses, physician associates/assistants, pharmacists, social workers, behavioral-health professionals, medical assistants, interpreters, community health workers, laboratory professionals, imaging staff, care coordinators, administrators, and others.',
           'Outside direct care, epidemiologists, researchers, engineers, analysts, public-health workers, educators, policy professionals, and technology teams shape how services are designed and delivered.',
@@ -134,6 +144,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-1-l2',
         title: 'Career families',
+        summary: 'Nine career families spanning clinical care, allied health, behavioral health, public health, research, technology and operations.',
+        minutes: 22,
         body: [
           'Clinical medicine and advanced practice: physician, PA, advanced practice nursing, dentistry, optometry and other licensed professions.',
           'Nursing: registered nursing, advanced practice, public-health nursing, specialty nursing and related roles.',
@@ -149,6 +161,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-1-l3',
         title: 'Verify the job, not the myth',
+        summary: 'Use BLS as a starting point, then verify licensure with the board that actually grants it.',
+        minutes: 15,
         body: [
           'Use BLS Occupational Outlook Handbook data as a starting point for occupation descriptions, typical entry-level education, work environment, pay and projections.',
           'Then verify licensure, certification and accreditation requirements with the relevant state board, accreditor, professional body or educational institution. Requirements can change and may differ by state.',
@@ -200,10 +214,14 @@ const HCE_COURSES: Course[] = [
       'Select two to four careers for deeper research.',
     ],
     minutes: 50,
+    prerequisites: 'Course 1, The Health Professions Ecosystem.',
+    whoFor: 'Learners who can name several health careers and now need to narrow the list to a few worth researching.',
     lessons: [
       {
         id: 'hce-2-l1',
         title: 'Start with the problem you want to work on',
+        summary: 'Five questions that narrow a career search faster than reading job titles.',
+        minutes: 18,
         body: [
           'Questions to consider: Do I want direct patient contact or mostly behind-the-scenes work? Do I enjoy science, technology, communication, counseling, policy, design or data?',
           'Do I prefer highly structured environments or more flexible community settings? How much formal education or training am I prepared to pursue? What schedule, physical demands and work environment fit my life?',
@@ -212,6 +230,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-2-l2',
         title: 'Strengths can be developed',
+        summary: 'Why career readiness is built through school, work and service rather than something you either have or do not.',
+        minutes: 17,
         body: [
           'Learners often think they must already possess every quality a profession values. Career readiness is developmental.',
           'The NACE career-readiness framework includes communication, critical thinking, teamwork, professionalism, technology, leadership, and career/self-development. These are skills that can be built through school, work, service and projects.',
@@ -220,6 +240,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-2-l3',
         title: 'Do not overfit one quiz',
+        summary: 'Interest inventories prompt reflection. They do not decide a career for you.',
+        minutes: 15,
         body: [
           'Interest inventories can prompt reflection, but they should not decide a career for you.',
           'Use multiple sources of information: coursework, job descriptions, shadowing, informational interviews, mentors, volunteering, research experience and your own evolving priorities.',
@@ -265,10 +287,14 @@ const HCE_COURSES: Course[] = [
       'Recognize why requirements must be verified with authoritative sources.',
     ],
     minutes: 60,
+    prerequisites: 'Courses 1 and 2.',
+    whoFor: 'Learners with two to four target careers who need to know what it actually takes to enter them.',
     lessons: [
       {
         id: 'hce-3-l1',
         title: 'Five terms that are not interchangeable',
+        summary: 'Degree, certificate, certification, licensure and accreditation mean different things and carry different authority.',
+        minutes: 22,
         body: [
           'Degree: an academic credential awarded by an educational institution.',
           'Certificate of completion: documentation that a learner completed a particular program. Meaning varies by program.',
@@ -280,6 +306,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-3-l2',
         title: 'Build a requirements chain',
+        summary: 'Seven things to research for any target career, in the order that saves the most time.',
+        minutes: 20,
         body: [
           'For each target career, research: typical entry education from BLS; required degree or program accreditation, if applicable; state licensure or registration requirements, if applicable; national certification requirements, if applicable.',
           'Then: supervised clinical or practical hours, if applicable; continuing education or renewal requirements, if applicable; and program-specific admissions prerequisites.',
@@ -288,6 +316,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-3-l3',
         title: 'One path does not fit every career',
+        summary: 'Premed competencies apply to medical school. Other fields have their own standards.',
+        minutes: 18,
         body: [
           'The AAMC premed competencies are useful for learners considering medical school, but they are not universal requirements for every health profession. For medicine, AAMC describes professional, thinking/reasoning and science competencies that medical schools may consider in holistic review.',
           'Learners pursuing nursing, pharmacy, public health, CHW work, physical therapy, counseling or other fields should use the standards relevant to that field.',
@@ -340,10 +370,14 @@ const HCE_COURSES: Course[] = [
       'Document skills and reflection ethically.',
     ],
     minutes: 50,
+    prerequisites: 'Courses 1 through 3.',
+    whoFor: 'Learners planning to volunteer, shadow, intern or do research, and anyone who has logged hours without knowing how to describe them.',
     lessons: [
       {
         id: 'hce-4-l1',
         title: 'Experience types',
+        summary: 'Shadowing, volunteering, research, internships, employment and service learning are not interchangeable.',
+        minutes: 18,
         body: [
           'Shadowing: observing professionals to understand workflow and role. Usually limited in scope and highly dependent on privacy and site rules.',
           'Volunteering and service: contributing to an organization’s mission within an assigned role.',
@@ -356,6 +390,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-4-l2',
         title: 'Hours are not the learning outcome',
+        summary: 'What a strong reflection describes, and why a total hour count says almost nothing.',
+        minutes: 17,
         body: [
           '"Completed 100 hours" tells a reviewer how long you were present, not what you learned.',
           'Strong reflection describes what you did; what problem the work addressed; what skill you practiced; what you observed about the system or profession; how the experience changed your understanding; and what you would do next.',
@@ -364,6 +400,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-4-l3',
         title: 'Respect the role',
+        summary: 'Observed is different from assisted, and assisted is different from performed.',
+        minutes: 15,
         body: [
           'Students should never exaggerate what they did. "Observed wound-care workflow" is different from "performed wound care." "Supported resource navigation" is different from "managed a case."',
           'Accurate descriptions protect participants and your credibility.',
@@ -408,10 +446,14 @@ const HCE_COURSES: Course[] = [
       'Use feedback and reflection to improve performance.',
     ],
     minutes: 50,
+    prerequisites: 'Courses 1 through 3.',
+    whoFor: 'Learners currently in school, returning to school, or planning prerequisite coursework.',
     lessons: [
       {
         id: 'hce-5-l1',
         title: 'Know the actual prerequisites',
+        summary: 'Build a tracker for the specific programs you may apply to, because requirements vary widely.',
+        minutes: 18,
         body: [
           'Do not assume that every program requires the same courses.',
           'Create a spreadsheet or tracker for the specific programs you may apply to, including prerequisite course, minimum grade, lab requirement, expiration rule if any, test requirement, application cycle and source link.',
@@ -420,6 +462,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-5-l2',
         title: 'Competencies are demonstrated through behavior',
+        summary: 'Competencies are shown through patterns of evidence, not claimed as labels.',
+        minutes: 17,
         body: [
           'The AAMC medical-school competency model includes areas such as commitment to learning and growth, empathy and compassion, interpersonal skills, service orientation, teamwork and collaboration, scientific inquiry, quantitative reasoning and communication.',
           'These are not simply labels to claim. Applicants demonstrate them through patterns of behavior and evidence.',
@@ -428,6 +472,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-5-l3',
         title: 'Use academic difficulty as data',
+        summary: 'Six questions to ask after a hard term, instead of concluding the career is closed.',
+        minutes: 15,
         body: [
           'A low grade or difficult term should trigger analysis, not automatic defeat.',
           'Ask: Was the course load realistic? Was there a content gap? Was the study method effective? Were work, caregiving, health or financial factors affecting performance? What support did I use? What will change next term?',
@@ -471,10 +517,14 @@ const HCE_COURSES: Course[] = [
       'Build a basic education-cost comparison.',
     ],
     minutes: 45,
+    prerequisites: 'None, though Course 3 makes the education requirements clearer first.',
+    whoFor: 'Anyone weighing the cost of a program, including learners who assume a path is out of reach financially.',
     lessons: [
       {
         id: 'hce-6-l1',
         title: 'Price is more than tuition',
+        summary: 'Total cost of attendance includes housing, transport, exams, childcare and reduced work hours.',
+        minutes: 16,
         body: [
           'Consider tuition and fees, books and supplies, housing, transportation, food, insurance, licensing exams, application fees, relocation, childcare and reduced work hours.',
           'A lower-tuition program may still be more expensive overall if relocation or living costs are high.',
@@ -483,6 +533,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-6-l2',
         title: 'Understand funding types',
+        summary: 'Scholarships, grants, work-study and loans, and where the official information actually lives.',
+        minutes: 15,
         body: [
           'Scholarships and grants generally do not need to be repaid when program terms are met. Federal Work-Study provides part-time employment for eligible students at participating schools. Loans must be repaid under their terms.',
           'Learners should review current federal aid information at StudentAid.gov and school financial-aid offices rather than relying on social-media advice.',
@@ -491,6 +543,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-6-l3',
         title: 'Compare offers, not headlines',
+        summary: 'Calculate net cost after gift aid, and never treat a projected salary as guaranteed.',
+        minutes: 14,
         body: [
           'When comparing programs, calculate estimated net cost after grants and scholarships, expected borrowing, living costs, program duration and likely additional expenses.',
           'Do not treat projected salary as guaranteed.',
@@ -536,10 +590,14 @@ const HCE_COURSES: Course[] = [
       'Use mentorship responsibly.',
     ],
     minutes: 45,
+    prerequisites: 'None.',
+    whoFor: 'Learners preparing to contact professionals, request informational interviews, or work with a mentor.',
     lessons: [
       {
         id: 'hce-7-l1',
         title: 'A professional introduction',
+        summary: 'Four elements of a professional introduction, with an example you can adapt.',
+        minutes: 15,
         body: [
           'A concise introduction can include your name; what you are studying or exploring; the area you are interested in; and why you are speaking with this person.',
           'Example: "I’m Jordan, a community-college student exploring public health and nursing. I’ve been volunteering in community outreach and I’m trying to understand how nurses move between hospital and community settings. I’d love to hear about your path."',
@@ -548,6 +606,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-7-l2',
         title: 'Ask for information before asking for opportunity',
+        summary: 'What makes a first outreach specific, respectful and easy for someone to say yes to.',
+        minutes: 15,
         body: [
           'A strong first outreach is specific, respectful and easy to answer.',
           'Explain why you chose the person, request a short amount of time, and prepare questions that cannot be answered with a quick website search.',
@@ -556,6 +616,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-7-l3',
         title: 'Mentors are guides, not decision-makers',
+        summary: 'What good mentorship supports, and what it should never replace.',
+        minutes: 15,
         body: [
           'Effective mentors support reflection, learning, networks and professional development.',
           'They should not control the learner’s decisions or become the sole source of support.',
@@ -598,10 +660,14 @@ const HCE_COURSES: Course[] = [
       'Commit to 30, 60 and 90 day actions and a review date.',
     ],
     minutes: 60,
+    prerequisites: 'All seven prior courses.',
+    whoFor: 'Learners ready to turn their research into a working plan with dated actions.',
     lessons: [
       {
         id: 'hce-8-l1',
         title: 'What the roadmap contains',
+        summary: 'The ten required elements, from career hypotheses through 30, 60 and 90 day actions.',
+        minutes: 35,
         body: [
           'Career hypotheses: two to four roles you are currently considering. Evidence: authoritative sources used to understand each role. Education and training: prerequisites, degree or certificate requirements and licensure or certification where applicable.',
           'Experience plan: shadowing, service, research, internship or project opportunities. Competency goals: three skills to develop. Academic plan: courses, milestones and support resources.',
@@ -611,6 +677,8 @@ const HCE_COURSES: Course[] = [
       {
         id: 'hce-8-l2',
         title: 'A plan you will actually revisit',
+        summary: 'Set the review date when you write the plan, and expect your hypotheses to change.',
+        minutes: 25,
         body: [
           'Set the review date when you write the roadmap, not later. A plan without a review date becomes a document you wrote once.',
           'Expect the hypotheses to change. Changing them because you learned something is the roadmap working, not the roadmap failing.',
@@ -771,16 +839,16 @@ export const PATHWAYS: Pathway[] = [
       intro:
         'The roadmap turns exploration into a concrete plan. It is scored against a 20-point rubric and needs 15 points to pass.',
       requirements: [
-        'Career hypotheses — two to four roles you are currently considering',
-        'Evidence — authoritative sources used to understand each role',
-        'Education and training — prerequisites, degree or certificate requirements, licensure or certification where applicable',
-        'Experience plan — shadowing, service, research, internship or project opportunities',
-        'Competency goals — three skills to develop',
-        'Academic plan — courses, milestones and support resources',
-        'Financial plan — estimated costs and funding research tasks',
-        'Network plan — mentors, informational interviews, professional associations or school resources',
+        'Career hypotheses, two to four roles you are currently considering',
+        'Evidence, the authoritative sources you used to understand each role',
+        'Education and training, including prerequisites, degree or certificate requirements, and licensure or certification where applicable',
+        'Experience plan covering shadowing, service, research, internship or project opportunities',
+        'Competency goals, three skills to develop',
+        'Academic plan with courses, milestones and support resources',
+        'Financial plan with estimated costs and funding research tasks',
+        'Network plan covering mentors, informational interviews, professional associations or school resources',
         '30, 60 and 90 day actions',
-        'Review date — when you will revisit the roadmap',
+        'Review date, when you will revisit the roadmap',
       ],
       rubric: [
         { label: 'Career research accuracy', max: 4 },
@@ -796,9 +864,9 @@ export const PATHWAYS: Pathway[] = [
         'Write your roadmap covering all ten required elements. This is submitted for review against the rubric above.',
     },
     sourceKey: [
-      { key: 'J1', label: 'U.S. Bureau of Labor Statistics — Occupational Outlook Handbook' },
-      { key: 'J2', label: 'AAMC — Premed Competencies for Entering Medical Students' },
-      { key: 'J3', label: 'National Association of Colleges and Employers — Career Readiness Competencies' },
+      { key: 'J1', label: 'U.S. Bureau of Labor Statistics, Occupational Outlook Handbook' },
+      { key: 'J2', label: 'AAMC Premed Competencies for Entering Medical Students' },
+      { key: 'J3', label: 'National Association of Colleges and Employers, Career Readiness Competencies' },
       { key: 'J4', label: 'U.S. Department of Education, Federal Student Aid' },
     ],
     version: '1.0',
