@@ -29,7 +29,10 @@ export interface Lesson {
   /** One line shown on the course outline, before the learner opens the module. */
   summary: string;
   minutes: number;
-  body: string[];
+  /** v1 courses. Plain paragraphs. */
+  body?: string[];
+  /** v2 courses, per the Written Guided Curriculum Standard. Typed blocks. */
+  blocks?: Block[];
 }
 
 /** Knowledge check. One correct option; `why` is shown after answering. */
@@ -80,7 +83,62 @@ export interface Activity {
   prompt: string;
 }
 
+/** How a course is delivered. Per the Master Curriculum blueprint. */
+export type Delivery = 'self-paced' | 'live' | 'blended' | 'practical' | 'practicum';
+
+export type Modality = 'virtual' | 'in-person' | 'hybrid';
+
+/**
+ * A scheduled offering. Live and blended courses are attended on a date, which
+ * matters for more than logistics: a continuing-education approval is granted
+ * for a specific course in a specific delivery mode, so changing the mode can
+ * invalidate the approval. Sessions keep that mode explicit.
+ */
+export interface Session {
+  id: string;
+  courseId: string;
+  title: string;
+  /** ISO start. */
+  startsAt: string;
+  endsAt?: string;
+  modality: Modality;
+  /** Physical address for in-person, or the platform name for virtual. */
+  location?: string;
+  /** Join link, released to registrants. Never rendered before registration. */
+  joinUrl?: string;
+  capacity?: number;
+  seatsTaken?: number;
+  /** Facilitator name, shown to learners. */
+  facilitator?: string;
+}
+
+/** Continuing education, only where HMC holds a real approval. */
+export interface CeApproval {
+  /** Board-recognized approval agency. */
+  agency: string;
+  hours: string;
+  approvedOn: string;
+  /** Boards the approval is recognized by. */
+  boards: string;
+  /** Exact approved course title. Must not be paraphrased. */
+  approvedTitle: string;
+  /** What the learner must supply for a compliant certificate. */
+  requires: string[];
+  /** Stated plainly, because delivery mode is part of what was approved. */
+  deliveryNote: string;
+}
+
 export interface Course {
+  /** 'v2' courses render through the guided-block renderer. */
+  standard?: 'v1' | 'v2';
+  delivery?: Delivery;
+  /** Populated for live and blended courses. */
+  sessions?: Session[];
+  ce?: CeApproval;
+  /** Shown only where currency materially affects the learner's action. */
+  freshness?: string;
+  /** Rendered as a Sources and further learning accordion at course end. */
+  furtherLearning?: SourceRef[];
   id: string;
   num: number;
   title: string;
@@ -116,6 +174,9 @@ export interface Capstone {
 }
 
 export interface Pathway {
+  /** Program family. Mental health education is a different lane from the
+   *  health-professions pathways and serves different users. */
+  family?: 'Health + Education Pathways' | 'Mental Health + Community Education';
   id: string;
   title: string;
   level: Level;
@@ -898,6 +959,8 @@ const HCE_PRE: Check[] = [
 ];
 
 import { CARE_NAVIGATION_COVERAGE } from './pathwayFieldBased';
+import type { Block, SourceRef } from './blocks';
+import { MENTAL_HEALTH_COURSES } from './pathwayMentalHealth';
 
 // Post-test. Parallel form to HCE_PRE, testing the same objectives with items
 // the learner has not already been shown the answers to.
@@ -1271,6 +1334,33 @@ export const PATHWAYS: Pathway[] = [
     nextReview: 'Pending governance review',
   },
 ];
+
+PATHWAYS.push({
+  family: 'Mental Health + Community Education',
+  id: 'unstoppable-mental-health',
+  title: 'Unstoppable Continuing Education and Facilitator Training',
+  level: 'Leadership',
+  status: 'in-development',
+  purpose:
+    'HMC\'s existing mental health education, migrated into the Academy so members and volunteers take one canonical training rather than separate copies. Continuing education for licensed professionals, and facilitator preparation for people who will deliver Unstoppable programming.',
+  format: 'Scheduled sessions for continuing education, blended video and written curriculum for facilitator training',
+  credentialTitle: 'HMC Unstoppable Facilitator — Completion',
+  credentialType: 'Course Completion',
+  gates: [
+    'Both community mental health worker training parts complete',
+    'Both assessments passed',
+    'Facilitator readiness sequence recorded and approved by program leadership',
+  ],
+  courses: MENTAL_HEALTH_COURSES,
+  plannedCourses: [
+    'Unstoppable: The Power of Healing and Growth (continuing education)',
+    'Community Mental Health Worker and Facilitator Training',
+    'Unstoppable Community Learning (participant facing)',
+  ],
+  version: '2.0 migration',
+  effectiveDate: 'Migrated from the Volunteer Portal training system',
+  nextReview: 'Asset inventory pending confirmation of the required follow-up sequence',
+});
 
 export const LEARNING_MODEL = ['Discover', 'Learn', 'Practice', 'Serve', 'Demonstrate', 'Advance'];
 

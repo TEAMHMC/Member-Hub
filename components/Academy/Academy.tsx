@@ -766,7 +766,10 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Course format</p>
             <dl className="space-y-3">
               {[
-                ['Delivery', 'Self-paced, text first'],
+                ['Delivery', c.delivery === 'live' ? 'Scheduled session'
+                  : c.delivery === 'blended' ? 'Video and written, self-paced'
+                  : c.delivery === 'practical' ? 'Practical, scheduled'
+                  : 'Self-paced, text first'],
                 ['Estimated time', `${c.minutes} minutes`],
                 ['Modules', `${c.lessons.length}`],
                 ['Knowledge checks', `${c.checks.length}`],
@@ -784,6 +787,70 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           <div className="lg:col-span-8 space-y-10">
+            {c.ce && (
+              <section className="rounded-2xl border border-[#233DFF]/20 bg-blue-50/40 p-7 space-y-4">
+                <div className="flex items-center gap-2 text-[#233DFF]">
+                  <Award size={17} />
+                  <h2 className="text-[10px] font-bold uppercase tracking-widest">Continuing education</h2>
+                </div>
+                <p className="text-2xl font-semibold text-zinc-900">{c.ce.hours} CE hour</p>
+                <dl className="space-y-2">
+                  {[
+                    ['Approved by', c.ce.agency],
+                    ['Recognized for', c.ce.boards],
+                    ['Approved on', c.ce.approvedOn],
+                  ].map(([k, v]) => (
+                    <div key={k} className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                      <dt className="text-[12px] text-zinc-500 shrink-0">{k}</dt>
+                      <dd className="text-[12.5px] font-medium text-zinc-800 sm:text-right sm:max-w-[62%]">{v}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <div className="space-y-2 pt-1 border-t border-[#233DFF]/15">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">To receive your certificate</p>
+                  <ul className="space-y-1">
+                    {c.ce.requires.map((r) => (
+                      <li key={r} className="text-[13px] text-zinc-700 leading-relaxed flex items-start gap-2.5">
+                        <Check size={13} strokeWidth={3} className="text-[#233DFF] mt-1 shrink-0" />{r}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <p className="text-[11.5px] text-zinc-500 leading-relaxed">{c.ce.deliveryNote}</p>
+              </section>
+            )}
+
+            {(c.delivery === 'live' || c.delivery === 'practical') && (
+              <section className="space-y-3">
+                <h2 className="text-xl font-semibold text-zinc-900">Upcoming sessions</h2>
+                {c.sessions && c.sessions.length > 0 ? (
+                  <div className="space-y-2">
+                    {c.sessions.map((sess) => (
+                      <div key={sess.id} className="rounded-2xl border border-zinc-200 bg-white p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-[15px] font-semibold text-zinc-900">{sess.title}</p>
+                          <p className="text-[12.5px] text-zinc-500 mt-1">
+                            {new Date(sess.startsAt).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' })}
+                            {' · '}
+                            {sess.modality === 'virtual' ? 'Virtual' : sess.modality === 'in-person' ? 'In person' : 'Hybrid'}
+                            {sess.location ? ` · ${sess.location}` : ''}
+                          </p>
+                        </div>
+                        <Btn className="shrink-0">Register</Btn>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-zinc-300 bg-zinc-50/60 p-6">
+                    <p className="text-[14px] text-zinc-600 leading-relaxed">
+                      No sessions are scheduled right now. This course is delivered live, so it opens when the next
+                      session is announced.
+                    </p>
+                  </div>
+                )}
+              </section>
+            )}
+
             <section className="space-y-3">
               <h2 className="text-xl font-semibold text-zinc-900">About this course</h2>
               {c.about.map((para, i) => (
