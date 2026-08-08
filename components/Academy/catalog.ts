@@ -151,6 +151,8 @@ export interface CeApproval {
 export interface Course {
   /** 'v2' courses render through the guided-block renderer. */
   standard?: 'v1' | 'v2';
+  /** Who this is written for. Drives reading level, not just tone. */
+  readingLevel?: ReadingLevel;
   delivery?: Delivery;
   /** Populated for live and blended courses. */
   sessions?: Session[];
@@ -983,7 +985,7 @@ const HCE_PRE: Check[] = [
 ];
 
 import { CARE_NAVIGATION_COVERAGE } from './pathwayFieldBased';
-import type { Block, SourceRef } from './blocks';
+import type { Block, SourceRef, ReadingLevel } from './blocks';
 import { MENTAL_HEALTH_COURSES } from './pathwayMentalHealth';
 import { STEM_CAMP } from './programStemCollab';
 

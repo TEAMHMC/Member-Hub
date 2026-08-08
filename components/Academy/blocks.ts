@@ -10,6 +10,20 @@
 // records, not learner content. The one exception the standard allows is a
 // freshness note where currency materially affects what the learner must do.
 
+/**
+ * Reading level for a course. The Academy serves adults and middle schoolers,
+ * and the same block components have to work for both. This is not decoration:
+ * it drives sentence length, vocabulary support and how much is explained
+ * before a term is used.
+ */
+export type ReadingLevel = 'adult' | 'middle-school';
+
+/** A term defined inline the first time it appears, for younger readers. */
+export interface Vocab {
+  term: string;
+  plain: string;
+}
+
 export interface SourceRef {
   /** Recognizable authority name, e.g. "U.S. Bureau of Labor Statistics". */
   name: string;
@@ -43,4 +57,8 @@ export type Block =
   | { kind: 'check'; check: KnowledgeCheck }
   | { kind: 'takeaways'; items: string[] }
   | { kind: 'steps'; title?: string; items: { label: string; text: string }[] }
-  | { kind: 'list'; title?: string; items: string[] };
+  | { kind: 'list'; title?: string; items: string[] }
+  /** Words defined in plain language. Shown as a glossary strip in the lesson. */
+  | { kind: 'vocab'; items: Vocab[] }
+  /** A short thing to do with no special equipment. Replaces kit-dependent labs. */
+  | { kind: 'activity'; title: string; text: string[]; materials?: string };
