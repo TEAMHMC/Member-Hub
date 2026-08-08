@@ -1,54 +1,46 @@
-// HMC Academy — the learning experience inside the Member Hub.
+// HMC Health + Education Pathways Academy — learner experience.
 //
-// Three views, one component: the catalog (browse), the course (syllabus), and
-// the lesson (read and complete). State lives in ./progress.ts so the view
-// layer stays presentational and progress survives a reload.
+// Views: catalog > pathway > course > lesson > assessment > capstone >
+// credential, plus a transcript. Structure and copy follow the Master
+// Curriculum + Delivery Blueprint and the Credential, Transcript + Equivalency
+// Rules (both v1.0, August 7, 2026).
+//
+// Accessibility, per the blueprint standard: text-first with no dependency on
+// video or audio, meaningful headings, keyboard-operable controls, and no
+// instruction that relies on color alone (state is always also stated in text).
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowLeft, ArrowRight, Award, BookOpen, Check, CheckCircle2, ChevronRight,
-  Clock, ExternalLink, GraduationCap, Layers, PenLine, Play, Search, Sparkles, X,
+  Award, BookOpen, Check, CheckCircle2, ChevronRight, Clock, FileText,
+  GraduationCap, Layers, ListChecks, Lock, PenLine, Play, ShieldCheck,
+  Sparkles, TrendingUp, X,
 } from 'lucide-react';
 import {
-  COURSES, PATHS, CATEGORIES, CATEGORY_ACCENT, courseById, courseMinutes,
-  type Course, type Lesson, type Category,
+  PATHWAYS, PASS_THRESHOLD, LEARNING_MODEL, LEVEL_ACCENT, pathwayById,
+  pathwayMinutes, type Check as CheckQ, type Course, type Pathway,
 } from './catalog';
 import {
-  loadState, saveState, coursePercent, isCourseComplete, lessonsDoneIn,
-  pathPercent, earnedCredits, earnedBadges, nextUp, type AcademyState,
+  loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
+  scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
+  type LearnerState,
 } from './progress';
 
 interface AcademyProps {
   userId: string;
   memberName: string;
-  /** Switch the Hub to another tab (used by lessons that hand off to Events, Snapshot, etc). */
   onNavigateTab: (tab: string) => void;
-  /** Fire-and-forget analytics signal. */
   onSignal?: (type: string, payload: Record<string, unknown>) => void;
-  /** Award Health Credits and a badge when a course is completed. */
-  onCourseComplete?: (course: Course) => void;
 }
 
 type View =
   | { name: 'catalog' }
-  | { name: 'course'; courseId: string }
-  | { name: 'lesson'; courseId: string; index: number };
-
-// ── Shared bits ──────────────────────────────────────────────────────────
-
-const Pill: React.FC<{ children: React.ReactNode; tone?: 'blue' | 'orange' | 'yellow' | 'neutral' }> = ({
-  children,
-  tone = 'neutral',
-}) => <span className={`pill pill-${tone}`}>{children}</span>;
-
-const ProgressBar: React.FC<{ percent: number; className?: string }> = ({ percent, className = '' }) => (
-  <div className={`h-1.5 w-full rounded-full bg-zinc-100 overflow-hidden ${className}`}>
-    <div
-      className="h-full rounded-full bg-[#233DFF] transition-all duration-500"
-      style={{ width: `${Math.max(percent, percent > 0 ? 4 : 0)}%` }}
-    />
-  </div>
-);
+  | { name: 'pathway'; pathwayId: string }
+  | { name: 'course'; pathwayId: string; courseId: string }
+  | { name: 'lesson'; pathwayId: string; courseId: string; index: number }
+  | { name: 'activity'; pathwayId: string; courseId: string }
+  | { name: 'test'; pathwayId: string; kind: 'pre' | 'post' }
+  | { name: 'capstone'; pathwayId: string }
+  | { name: 'transcript' };
 
 const Btn: React.FC<{
   children: React.ReactNode;
@@ -62,7 +54,7 @@ const Btn: React.FC<{
     disabled={disabled}
     className={
       variant === 'primary'
-        ? `px-8 py-3.5 bg-[#233DFF] text-white rounded-full font-bold uppercase tracking-wider text-xs transition-all hover:bg-[#1a2acc] active:scale-95 disabled:opacity-40 shadow-md shadow-[#233DFF]/20 inline-flex items-center justify-center gap-2 ${className}`
+        ? `px-8 py-3.5 bg-[#233DFF] text-white rounded-full font-bold uppercase tracking-wider text-xs transition-all hover:bg-[#1a2acc] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-[#233DFF]/20 inline-flex items-center justify-center gap-2 ${className}`
         : `px-8 py-3.5 border border-zinc-200 bg-white text-zinc-900 rounded-full font-bold uppercase tracking-wider text-xs transition-all hover:bg-zinc-50 active:scale-95 disabled:opacity-40 inline-flex items-center justify-center gap-2 ${className}`
     }
   >
@@ -70,611 +62,1012 @@ const Btn: React.FC<{
   </button>
 );
 
-const KIND_LABEL: Record<Lesson['kind'], string> = {
-  read: 'Lesson',
-  activity: 'Practice',
-  tool: 'Hands-on',
-  reflect: 'Reflection',
-};
+const Bar: React.FC<{ percent: number }> = ({ percent }) => (
+  <div className="h-1.5 w-full rounded-full bg-zinc-100 overflow-hidden">
+    <div className="h-full rounded-full bg-[#233DFF] transition-all duration-500" style={{ width: `${percent}%` }} />
+  </div>
+);
 
-// ── Component ────────────────────────────────────────────────────────────
+const Back: React.FC<{ label: string; onClick: () => void }> = ({ label, onClick }) => (
+  <button onClick={onClick} className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 font-bold text-xs uppercase tracking-widest transition-colors">
+    <ChevronRight size={16} className="rotate-180" /> {label}
+  </button>
+);
 
-const Academy: React.FC<AcademyProps> = ({
-  userId,
-  memberName,
-  onNavigateTab,
-  onSignal,
-  onCourseComplete,
-}) => {
-  const [state, setState] = useState<AcademyState>(() => loadState(userId));
+const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal }) => {
+  const [state, setState] = useState<LearnerState>(() => loadState(userId));
   const [view, setView] = useState<View>({ name: 'catalog' });
-  const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState<Category | 'All'>('All');
-  const [celebrate, setCelebrate] = useState<Course | null>(null);
+  const [showCert, setShowCert] = useState<string | null>(null);
 
   useEffect(() => saveState(userId, state), [userId, state]);
   useEffect(() => window.scrollTo({ top: 0, behavior: 'smooth' }), [view]);
 
-  const done = state.done;
+  const set = (fn: (s: LearnerState) => LearnerState) => setState((s) => fn(s));
 
-  const visibleCourses = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return COURSES.filter((c) => {
-      if (filter !== 'All' && c.category !== filter) return false;
-      if (!q) return true;
-      return (
-        c.title.toLowerCase().includes(q) ||
-        c.summary.toLowerCase().includes(q) ||
-        c.category.toLowerCase().includes(q) ||
-        c.lessons.some((l) => l.title.toLowerCase().includes(q))
-      );
-    });
-  }, [query, filter]);
-
-  const resume = useMemo(() => nextUp(state), [state]);
-  const credits = earnedCredits(state);
-  const badges = earnedBadges(state);
-  const coursesDone = Object.keys(state.completedCourses).length;
-
-  // ── Actions ────────────────────────────────────────────────────────────
-
-  const openLesson = (courseId: string, index: number) => {
-    setView({ name: 'lesson', courseId, index });
-    const lesson = courseById(courseId)?.lessons[index];
-    setState((s) => ({ ...s, last: { courseId, lessonId: lesson?.id || '' } }));
-    onSignal?.('academy_lesson_open', { courseId, lessonId: lesson?.id });
-  };
-
-  const completeLesson = (course: Course, index: number) => {
-    const lesson = course.lessons[index];
-    const alreadyDone = state.done.includes(lesson.id);
-
-    const nextDone = alreadyDone ? state.done : [...state.done, lesson.id];
-    const finishesCourse =
-      !state.completedCourses[course.id] &&
-      course.lessons.every((l) => nextDone.includes(l.id));
-
-    setState((s) => ({
-      ...s,
-      done: nextDone,
-      completedCourses: finishesCourse
-        ? { ...s.completedCourses, [course.id]: new Date().toISOString() }
-        : s.completedCourses,
-    }));
-
-    if (!alreadyDone) onSignal?.('academy_lesson_complete', { courseId: course.id, lessonId: lesson.id });
-
-    if (finishesCourse) {
-      onSignal?.('academy_course_complete', { courseId: course.id, credits: course.credits });
-      onCourseComplete?.(course);
-      setCelebrate(course);
-      setView({ name: 'course', courseId: course.id });
-      return;
+  const enroll = (p: Pathway) => {
+    if (!state.enrolled.includes(p.id)) {
+      set((s) => ({ ...s, enrolled: [...s.enrolled, p.id] }));
+      onSignal?.('academy_enroll', { pathwayId: p.id });
     }
-
-    if (index + 1 < course.lessons.length) openLesson(course.id, index + 1);
-    else setView({ name: 'course', courseId: course.id });
   };
 
-  const setNote = (lessonId: string, text: string) =>
-    setState((s) => ({ ...s, notes: { ...s.notes, [lessonId]: text } }));
-
-  /** Lesson tool links either hand off to a Hub tab or open a sibling tool. */
-  const followTool = (url: string) => {
-    if (url.startsWith('#tab:')) {
-      onNavigateTab(url.slice(5));
-      return;
-    }
-    onSignal?.('academy_tool_open', { url });
-    window.open(url, '_blank', 'noopener');
-  };
+  const completeLesson = (lessonId: string) =>
+    set((s) => (s.lessons.includes(lessonId) ? s : { ...s, lessons: [...s.lessons, lessonId] }));
 
   // ── Catalog ────────────────────────────────────────────────────────────
 
-  const CourseCard: React.FC<{ course: Course; compact?: boolean }> = ({ course, compact }) => {
-    const percent = coursePercent(course, done);
-    const complete = isCourseComplete(course, done);
-    const accent = CATEGORY_ACCENT[course.category];
-    return (
-      <button
-        onClick={() => setView({ name: 'course', courseId: course.id })}
-        className="text-left bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-6 flex flex-col gap-4 hover:border-[#233DFF]/30 hover:shadow-md transition-all group h-full"
-      >
-        <div className="flex items-start justify-between gap-3">
-          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${accent.bg} ${accent.text}`}>
-            {course.category}
-          </span>
-          {complete ? (
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-600 shrink-0">
-              <CheckCircle2 size={13} /> Complete
-            </span>
-          ) : percent > 0 ? (
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#233DFF] shrink-0">{percent}%</span>
-          ) : null}
-        </div>
-
-        <div className="space-y-2 flex-1">
-          <h3 className="text-lg font-semibold text-zinc-900 leading-snug group-hover:text-[#233DFF] transition-colors">
-            {course.title}
-          </h3>
-          {!compact && <p className="text-sm text-zinc-500 leading-relaxed">{course.summary}</p>}
-        </div>
-
-        <div className="flex items-center gap-4 text-[11px] font-semibold text-zinc-400">
-          <span className="inline-flex items-center gap-1.5"><BookOpen size={13} /> {course.lessons.length} lessons</span>
-          <span className="inline-flex items-center gap-1.5"><Clock size={13} /> {courseMinutes(course)} min</span>
-          <span className="inline-flex items-center gap-1.5 text-[#233DFF]"><Sparkles size={13} /> {course.credits}</span>
-        </div>
-
-        {percent > 0 && !complete && <ProgressBar percent={percent} />}
-      </button>
-    );
-  };
-
   const renderCatalog = () => {
-    const featured = COURSES.filter((c) => c.featured);
+    const enrolledPaths = state.enrolled.map(pathwayById).filter(Boolean) as Pathway[];
     return (
       <div className="max-w-6xl mx-auto py-8 space-y-14 animate-in fade-in duration-500">
-        {/* Hero */}
         <div className="text-center space-y-4">
-          <div className="pill pill-blue mx-auto">HMC Academy</div>
+          <div className="pill pill-blue mx-auto">HMC Health + Education Pathways Academy</div>
           <h1 className="text-5xl font-semibold tracking-tight text-zinc-900">
-            Learn how to work the system.
+            From exploration to applied experience.
           </h1>
-          <p className="text-zinc-500 max-w-xl mx-auto leading-relaxed text-lg">
-            Short, self-paced courses on wellness, coverage, and community power. Built from the
-            programs Health Matters Clinic actually runs. Free, always.
+          <p className="text-zinc-500 max-w-2xl mx-auto leading-relaxed text-lg">
+            Structured learning pathways for youth, students, aspiring health professionals,
+            community-health learners, interns, fellows, and emerging leaders. Self-paced,
+            text-first, and free.
           </p>
-        </div>
-
-        {/* Member progress strip */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: 'Courses complete', value: `${coursesDone} of ${COURSES.length}`, icon: <GraduationCap size={18} /> },
-            { label: 'Lessons complete', value: String(done.length), icon: <CheckCircle2 size={18} /> },
-            { label: 'Credits earned', value: String(credits), icon: <Sparkles size={18} /> },
-            { label: 'Badges', value: String(badges.length), icon: <Award size={18} /> },
-          ].map((s) => (
-            <div key={s.label} className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-5 space-y-2">
-              <div className="text-zinc-300">{s.icon}</div>
-              <p className="text-2xl font-semibold text-zinc-900">{s.value}</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">{s.label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Continue */}
-        {resume && (
-          <div className="bg-[#18181b] rounded-3xl p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
-            <div className="space-y-2 min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-                {done.length ? 'Pick up where you left off' : 'Start here'}
-              </p>
-              <h3 className="text-2xl font-semibold tracking-tight text-white truncate">
-                {resume.course.lessons[resume.lessonIndex].title}
-              </h3>
-              <p className="text-sm text-zinc-400">
-                {resume.course.title} · Lesson {resume.lessonIndex + 1} of {resume.course.lessons.length}
-              </p>
-            </div>
-            <div className="shrink-0">
-              <Btn onClick={() => openLesson(resume.course.id, resume.lessonIndex)}>
-                <Play size={14} /> {done.length ? 'Continue' : 'Start learning'}
-              </Btn>
-            </div>
+          <div className="flex flex-wrap justify-center gap-2 pt-2">
+            {LEARNING_MODEL.map((step, i) => (
+              <React.Fragment key={step}>
+                <span className="px-4 py-2 rounded-full bg-white border border-zinc-200 text-[11px] font-bold uppercase tracking-wider text-zinc-600">
+                  {step}
+                </span>
+                {i < LEARNING_MODEL.length - 1 && <span className="self-center text-zinc-300">›</span>}
+              </React.Fragment>
+            ))}
           </div>
+        </div>
+
+        {enrolledPaths.length > 0 && (
+          <section className="space-y-5">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Your learning</h2>
+              <button onClick={() => setView({ name: 'transcript' })} className="text-xs font-bold uppercase tracking-widest text-[#233DFF] hover:underline">
+                View transcript
+              </button>
+            </div>
+            {enrolledPaths.map((p) => {
+              const pct = pathwayPercent(p, state);
+              const { gain } = knowledgeGain(p.id, state);
+              return (
+                <div key={p.id} className="bg-[#18181b] rounded-3xl p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div className="space-y-2 min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">In progress</p>
+                    <h3 className="text-2xl font-semibold tracking-tight text-white">{p.title}</h3>
+                    <p className="text-sm text-zinc-400">
+                      {pct}% complete
+                      {gain !== null && ` · knowledge gain ${gain >= 0 ? '+' : ''}${gain} points`}
+                    </p>
+                  </div>
+                  <Btn onClick={() => setView({ name: 'pathway', pathwayId: p.id })}>
+                    <Play size={14} /> Continue
+                  </Btn>
+                </div>
+              );
+            })}
+          </section>
         )}
 
-        {/* Paths */}
         <section className="space-y-6">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Learning paths</h2>
-              <p className="text-sm text-zinc-500 mt-1">Sequenced sets of courses, built around what you are trying to do.</p>
-            </div>
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Pathways</h2>
+            <p className="text-sm text-zinc-500 mt-1">
+              Each pathway leads to a defined HMC completion record. Shared foundations carry across
+              pathways, so learning is never repeated without reason.
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {PATHS.map((path) => {
-              const percent = pathPercent(path, done);
-              const courses = path.courseIds.map(courseById).filter(Boolean) as Course[];
+            {PATHWAYS.map((p) => {
+              const accent = LEVEL_ACCENT[p.level];
+              const published = p.status === 'published';
+              const pct = pathwayPercent(p, state);
               return (
-                <div key={path.id} className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-7 space-y-5">
+                <button
+                  key={p.id}
+                  onClick={() => setView({ name: 'pathway', pathwayId: p.id })}
+                  className="text-left bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-7 space-y-4 hover:border-[#233DFF]/30 hover:shadow-md transition-all h-full flex flex-col"
+                >
                   <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1.5">
-                      <Pill tone="orange">{path.tagline}</Pill>
-                      <h3 className="text-xl font-semibold text-zinc-900">{path.title}</h3>
-                    </div>
-                    <div className="w-11 h-11 rounded-2xl bg-blue-50 flex items-center justify-center text-[#233DFF] shrink-0">
-                      <Layers size={20} />
-                    </div>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${accent.bg} ${accent.text}`}>
+                      {p.level}
+                    </span>
+                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${published ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-500'}`}>
+                      {published ? 'Open for enrollment' : 'In development'}
+                    </span>
                   </div>
-                  <p className="text-sm text-zinc-500 leading-relaxed">{path.description}</p>
-                  <div className="space-y-2">
-                    {courses.map((c) => {
-                      const cDone = isCourseComplete(c, done);
-                      return (
-                        <button
-                          key={c.id}
-                          onClick={() => setView({ name: 'course', courseId: c.id })}
-                          className="w-full flex items-center justify-between gap-3 text-left rounded-xl px-4 py-3 hover:bg-zinc-50 transition-colors"
-                        >
-                          <span className="flex items-center gap-3 min-w-0">
-                            <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border ${cDone ? 'bg-emerald-50 border-emerald-100 text-emerald-500' : 'bg-white border-zinc-200 text-zinc-300'}`}>
-                              {cDone ? <Check size={13} strokeWidth={3} /> : <span className="w-1.5 h-1.5 rounded-full bg-current" />}
-                            </span>
-                            <span className={`text-sm font-semibold truncate ${cDone ? 'text-zinc-400' : 'text-zinc-800'}`}>{c.title}</span>
-                          </span>
-                          <ChevronRight size={16} className="text-zinc-300 shrink-0" />
-                        </button>
-                      );
-                    })}
+                  <h3 className="text-xl font-semibold text-zinc-900 leading-snug">{p.title}</h3>
+                  <p className="text-sm text-zinc-500 leading-relaxed flex-1">{p.purpose}</p>
+                  <div className="flex flex-wrap items-center gap-4 text-[11px] font-semibold text-zinc-400">
+                    <span className="inline-flex items-center gap-1.5">
+                      <BookOpen size={13} /> {published ? p.courses.length : p.plannedCourses?.length || 0} courses
+                    </span>
+                    {published && (
+                      <span className="inline-flex items-center gap-1.5"><Clock size={13} /> {Math.round(pathwayMinutes(p) / 60)} hours</span>
+                    )}
+                    {p.guidedStart && (
+                      <span className="inline-flex items-center gap-1.5 text-[#FF6E40]"><Sparkles size={13} /> Guided start {p.guidedStart}</span>
+                    )}
                   </div>
-                  <div className="space-y-2 pt-1">
-                    <ProgressBar percent={percent} />
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">{percent}% complete</p>
-                  </div>
-                </div>
+                  {pct > 0 && <Bar percent={pct} />}
+                </button>
               );
             })}
           </div>
         </section>
 
-        {/* Featured */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Featured courses</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featured.map((c) => <CourseCard key={c.id} course={c} />)}
+        <section className="bg-white rounded-2xl border border-zinc-200/60 p-8 space-y-4">
+          <div className="flex items-center gap-2 text-zinc-400">
+            <ShieldCheck size={16} />
+            <h2 className="text-[10px] font-bold uppercase tracking-widest">Learning data and privacy</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-zinc-600 leading-relaxed">
+            <p>
+              The Academy records your enrollment, lesson completion, knowledge-check and assessment
+              results, applied assignment status, completion dates, and credential status. Progress is
+              reported as improvement from a baseline, not only as pass or fail.
+            </p>
+            <p>
+              Learning records are kept separately from clinical and client records. Participation in
+              Academy education does not create a clinician-patient relationship. You can request
+              correction or deletion of your learning record at any time.
+            </p>
           </div>
         </section>
-
-        {/* All courses with search + filter */}
-        <section className="space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">All courses</h2>
-            <div className="relative w-full md:w-80">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={17} />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search courses and lessons"
-                aria-label="Search courses"
-                className="w-full pl-11 pr-4 py-3 bg-white border border-zinc-200 rounded-full outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all text-sm font-medium shadow-sm"
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-            {(['All', ...CATEGORIES] as const).map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setFilter(cat as Category | 'All')}
-                className={`px-5 py-2.5 rounded-full shrink-0 font-bold uppercase tracking-wider text-[11px] transition-all ${
-                  filter === cat ? 'bg-[#233DFF] text-white shadow-md shadow-[#233DFF]/20' : 'bg-white text-zinc-500 border border-zinc-200 hover:text-zinc-900'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {visibleCourses.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-dashed border-zinc-200 py-20 text-center space-y-3">
-              <BookOpen size={40} className="mx-auto text-zinc-200" strokeWidth={1} />
-              <p className="text-sm font-semibold text-zinc-600">No courses match that search</p>
-              <button onClick={() => { setQuery(''); setFilter('All'); }} className="text-xs font-bold uppercase tracking-widest text-[#233DFF]">
-                Clear filters
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {visibleCourses.map((c) => <CourseCard key={c.id} course={c} />)}
-            </div>
-          )}
-        </section>
-
-        {/* Badges earned */}
-        {badges.length > 0 && (
-          <section className="space-y-5">
-            <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Your badges</h2>
-            <div className="flex flex-wrap gap-3">
-              {badges.map((b) => (
-                <span key={b} className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white border border-zinc-200/60 shadow-sm">
-                  <Award size={16} className="text-[#F9C74F]" />
-                  <span className="text-sm font-semibold text-zinc-800">{b}</span>
-                </span>
-              ))}
-            </div>
-          </section>
-        )}
       </div>
     );
   };
 
-  // ── Course detail ──────────────────────────────────────────────────────
+  // ── Pathway ────────────────────────────────────────────────────────────
 
-  const renderCourse = (courseId: string) => {
-    const course = courseById(courseId);
-    if (!course) return renderCatalog();
-
-    const percent = coursePercent(course, done);
-    const complete = isCourseComplete(course, done);
-    const firstUnfinished = course.lessons.findIndex((l) => !done.includes(l.id));
-    const accent = CATEGORY_ACCENT[course.category];
+  const renderPathway = (pathwayId: string) => {
+    const p = pathwayById(pathwayId);
+    if (!p) return renderCatalog();
+    const accent = LEVEL_ACCENT[p.level];
+    const registered = state.enrolled.includes(p.id);
+    const published = p.status === 'published';
+    const { gates, eligible } = evaluateGates(p, state);
+    const issued = state.credentials[p.id];
+    const pre = state.preTest[p.id];
+    const { pre: preScore, post: postScore, gain } = knowledgeGain(p.id, state);
 
     return (
       <div className="max-w-4xl mx-auto py-8 space-y-10 animate-in fade-in duration-500">
-        <button
-          onClick={() => setView({ name: 'catalog' })}
-          className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 font-bold text-xs uppercase tracking-widest transition-colors group"
-        >
-          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> All courses
-        </button>
+        <Back label="All pathways" onClick={() => setView({ name: 'catalog' })} />
 
         <div className="space-y-5">
           <div className="flex flex-wrap items-center gap-2">
             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${accent.bg} ${accent.text}`}>
-              {course.category}
+              {p.level}
             </span>
-            <Pill>{course.level}</Pill>
-            {complete && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600">
-                <CheckCircle2 size={11} /> Complete
-              </span>
-            )}
+            <span className="pill pill-neutral">Version {p.version}</span>
+            {!published && <span className="pill pill-neutral">In development</span>}
           </div>
-          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">{course.title}</h1>
-          <p className="text-lg text-zinc-500 leading-relaxed">{course.summary}</p>
-          <div className="flex flex-wrap items-center gap-5 text-[11px] font-semibold text-zinc-400">
-            <span className="inline-flex items-center gap-1.5"><BookOpen size={14} /> {course.lessons.length} lessons</span>
-            <span className="inline-flex items-center gap-1.5"><Clock size={14} /> {courseMinutes(course)} minutes total</span>
-            <span className="inline-flex items-center gap-1.5 text-[#233DFF]"><Sparkles size={14} /> {course.credits} Health Credits</span>
-            <span className="inline-flex items-center gap-1.5 text-[#8B6D00]"><Award size={14} /> {course.badge} badge</span>
-          </div>
+          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">{p.title}</h1>
+          <p className="text-lg text-zinc-500 leading-relaxed">{p.purpose}</p>
+          <p className="text-sm text-zinc-400">{p.format}</p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-7 space-y-5">
-          <div className="flex items-center justify-between gap-4">
-            <div className="space-y-1">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Your progress</p>
-              <p className="text-2xl font-semibold text-zinc-900">
-                {lessonsDoneIn(course, done)} of {course.lessons.length} lessons
-              </p>
+        {p.guidedStart && (
+          <div className="rounded-2xl border border-[#FF6E40]/25 bg-orange-50/50 p-6 space-y-1.5">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF6E40]">Next guided start</p>
+            <p className="text-lg font-semibold text-zinc-900">{p.guidedStart}</p>
+            <p className="text-sm text-zinc-600">
+              The guided start is a momentum cue, not a deadline or a live class. Register now and begin
+              immediately, or wait for the cohort to launch. The course never locks.
+            </p>
+          </div>
+        )}
+
+        {published && !registered && (
+          <div className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <p className="text-2xl font-semibold text-zinc-900">Register</p>
+              <p className="text-sm text-zinc-500 mt-1">Free. Self-paced. Start any time.</p>
             </div>
-            <Btn onClick={() => openLesson(course.id, complete ? 0 : Math.max(firstUnfinished, 0))}>
-              {complete ? 'Review course' : percent > 0 ? 'Continue' : 'Start course'} <ArrowRight size={14} />
+            <Btn onClick={() => { enroll(p); setView({ name: 'test', pathwayId: p.id, kind: 'pre' }); }}>
+              Register and start
             </Btn>
           </div>
-          <ProgressBar percent={percent} />
-        </div>
+        )}
 
-        <div className="space-y-3">
-          <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Lessons</h2>
-          {course.lessons.map((lesson, i) => {
-            const lessonDone = done.includes(lesson.id);
-            return (
-              <button
-                key={lesson.id}
-                onClick={() => openLesson(course.id, i)}
-                className={`w-full text-left flex items-center justify-between gap-4 p-5 px-6 rounded-2xl border transition-all ${
-                  lessonDone ? 'bg-zinc-50/50 border-zinc-100' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40 hover:shadow-sm'
-                }`}
-              >
-                <div className="flex items-center gap-5 min-w-0">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm border shrink-0 ${
-                    lessonDone ? 'bg-emerald-50 text-emerald-500 border-emerald-100' : 'bg-blue-50 text-[#233DFF] border-blue-100'
-                  }`}>
-                    {lessonDone ? <Check size={18} strokeWidth={3} /> : <span className="text-xs font-black">{i + 1}</span>}
-                  </div>
-                  <div className="min-w-0">
-                    <p className={`text-sm font-semibold truncate ${lessonDone ? 'text-zinc-400' : 'text-zinc-800'}`}>{lesson.title}</p>
-                    <p className="text-[11px] text-zinc-400 mt-0.5">{KIND_LABEL[lesson.kind]} · {lesson.minutes} min</p>
-                  </div>
+        {!published && (
+          <div className="bg-white rounded-2xl border border-dashed border-zinc-300 p-8 space-y-5">
+            <p className="text-sm text-zinc-600 leading-relaxed">
+              This pathway is built and under curriculum review. The course sequence below is final;
+              lesson content and assessments are in production.
+            </p>
+            <ol className="space-y-2">
+              {p.plannedCourses?.map((t, i) => (
+                <li key={t} className="flex items-start gap-4 text-sm">
+                  <span className="w-6 h-6 rounded-full bg-zinc-100 text-zinc-500 flex items-center justify-center text-[11px] font-bold shrink-0">{i + 1}</span>
+                  <span className="text-zinc-700">{t}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {registered && published && (
+          <>
+            {pre && (
+              <div className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-7 space-y-4">
+                <div className="flex items-center gap-2 text-zinc-400">
+                  <TrendingUp size={16} />
+                  <p className="text-[10px] font-bold uppercase tracking-widest">Your knowledge growth</p>
                 </div>
-                <ChevronRight size={18} className="text-zinc-300 shrink-0" />
-              </button>
-            );
-          })}
-        </div>
+                <div className="grid grid-cols-3 gap-4">
+                  {[
+                    { l: 'Baseline', v: preScore === null ? '--' : `${preScore}%` },
+                    { l: 'Post-test', v: postScore === null ? 'Not taken' : `${postScore}%` },
+                    { l: 'Gain', v: gain === null ? '--' : `${gain >= 0 ? '+' : ''}${gain} pts` },
+                  ].map((x) => (
+                    <div key={x.l}>
+                      <p className="text-2xl font-semibold text-zinc-900">{x.v}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mt-1">{x.l}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-        {complete && (
-          <div className="bg-[#18181b] rounded-3xl p-9 text-white space-y-4 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-[#233DFF]/20 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
-            <div className="relative z-10 space-y-4">
-              <Award size={32} className="text-[#F9C74F]" />
-              <div className="space-y-1.5">
-                <h3 className="text-2xl font-semibold tracking-tight">Course complete</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  {memberName}, you finished {course.title} and earned the {course.badge} badge
-                  plus {course.credits} Health Credits.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-3 pt-1">
-                <Btn onClick={() => setCelebrate(course)}>View certificate</Btn>
-                <Btn variant="secondary" onClick={() => setView({ name: 'catalog' })}>Find the next course</Btn>
-              </div>
+            <div className="space-y-3">
+              <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Courses</h2>
+              {p.courses.map((c) => {
+                const pct = coursePercent(p, c.id, state);
+                const done = isCourseComplete(p, c.id, state);
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => setView({ name: 'course', pathwayId: p.id, courseId: c.id })}
+                    className={`w-full text-left flex items-center justify-between gap-4 p-5 px-6 rounded-2xl border transition-all ${done ? 'bg-zinc-50/50 border-zinc-100' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40 hover:shadow-sm'}`}
+                  >
+                    <div className="flex items-center gap-5 min-w-0">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center border shrink-0 ${done ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-[#233DFF] border-blue-100'}`}>
+                        {done ? <Check size={18} strokeWidth={3} /> : <span className="text-xs font-black">{c.num}</span>}
+                      </div>
+                      <div className="min-w-0">
+                        <p className={`text-sm font-semibold ${done ? 'text-zinc-400' : 'text-zinc-800'}`}>{c.title}</p>
+                        <p className="text-[11px] text-zinc-400 mt-0.5">
+                          Course {c.num} of {p.courses.length} · {c.minutes} min · {done ? 'Complete' : `${pct}% complete`}
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronRight size={18} className="text-zinc-300 shrink-0" />
+                  </button>
+                );
+              })}
             </div>
+
+            {/* Assessment + capstone */}
+            <div className="space-y-3">
+              <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Assessment</h2>
+              <div className="bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-zinc-900">Pathway post-test</p>
+                  <p className="text-[12px] text-zinc-500 mt-1">
+                    {PASS_THRESHOLD}% to pass. Retries are allowed, because the purpose is mastery.
+                    {state.postAttempts[p.id] ? ` Attempts: ${state.postAttempts[p.id]}.` : ''}
+                  </p>
+                </div>
+                <Btn variant={postScore !== null && postScore >= PASS_THRESHOLD ? 'secondary' : 'primary'} onClick={() => setView({ name: 'test', pathwayId: p.id, kind: 'post' })}>
+                  {postScore === null ? 'Take post-test' : postScore >= PASS_THRESHOLD ? 'Retake' : 'Try again'}
+                </Btn>
+              </div>
+              {p.capstone && (
+                <div className="bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold text-zinc-900">{p.capstone.title}</p>
+                    <p className="text-[12px] text-zinc-500 mt-1">
+                      Scored against a 20-point rubric. {p.capstone.passing} of 20 to pass.
+                      {(state.capstone[p.id] || '').trim() ? ' Submitted for review.' : ''}
+                    </p>
+                  </div>
+                  <Btn variant="secondary" onClick={() => setView({ name: 'capstone', pathwayId: p.id })}>
+                    {(state.capstone[p.id] || '').trim() ? 'Review submission' : 'Open capstone'}
+                  </Btn>
+                </div>
+              )}
+            </div>
+
+            {/* Credential gates */}
+            <div className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-8 space-y-6">
+              <div className="space-y-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Credential</p>
+                <p className="text-xl font-semibold text-zinc-900">{p.credentialTitle}</p>
+                <p className="text-[12px] text-zinc-500">{p.credentialType}</p>
+              </div>
+              <ul className="space-y-3">
+                {gates.map((g) => (
+                  <li key={g.label} className="flex items-start gap-3">
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 border ${g.met ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-white border-zinc-200 text-zinc-300'}`}>
+                      {g.met ? <Check size={12} strokeWidth={3} /> : <Lock size={10} />}
+                    </span>
+                    <span className="text-sm text-zinc-700 leading-snug">
+                      {g.label}
+                      <span className="block text-[11px] text-zinc-400 mt-0.5">
+                        {g.met ? 'Met' : 'Not yet met'}{g.detail ? ` · ${g.detail}` : ''}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              {issued ? (
+                <Btn onClick={() => setShowCert(p.id)}>View certificate</Btn>
+              ) : (
+                <Btn
+                  disabled={!eligible}
+                  onClick={() => {
+                    const at = new Date().toISOString();
+                    set((s) => ({ ...s, credentials: { ...s.credentials, [p.id]: at } }));
+                    onSignal?.('academy_credential_issued', { pathwayId: p.id });
+                    setShowCert(p.id);
+                  }}
+                >
+                  {eligible ? 'Issue my completion record' : 'Complete all gates to unlock'}
+                </Btn>
+              )}
+              <p className="text-[11px] text-zinc-400 leading-relaxed">
+                An HMC completion record documents what HMC can substantiate. It is not licensure, board
+                certification, clinical scope, or admission eligibility.
+              </p>
+            </div>
+          </>
+        )}
+
+        {p.sourceKey && (
+          <div className="border-t border-zinc-100 pt-6 space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Authoritative sources</p>
+            <ul className="space-y-1">
+              {p.sourceKey.map((s) => (
+                <li key={s.key} className="text-[12px] text-zinc-500">[{s.key}] {s.label}</li>
+              ))}
+            </ul>
+            <p className="text-[11px] text-zinc-400 pt-2">
+              Version {p.version} · Effective {p.effectiveDate} · Next review {p.nextReview}
+            </p>
           </div>
         )}
       </div>
     );
   };
 
-  // ── Lesson ─────────────────────────────────────────────────────────────
+  // ── Course ─────────────────────────────────────────────────────────────
 
-  const renderLesson = (courseId: string, index: number) => {
-    const course = courseById(courseId);
-    if (!course) return renderCatalog();
-    const lesson = course.lessons[index];
-    if (!lesson) return renderCourse(courseId);
+  const renderCourse = (pathwayId: string, courseId: string) => {
+    const p = pathwayById(pathwayId);
+    const c = p?.courses.find((x) => x.id === courseId);
+    if (!p || !c) return renderCatalog();
+    const firstUnfinished = c.lessons.findIndex((l) => !state.lessons.includes(l.id));
+    const activityDone = !!(state.activities[c.id] || '').trim();
 
-    const lessonDone = done.includes(lesson.id);
-    const isLast = index === course.lessons.length - 1;
+    return (
+      <div className="max-w-3xl mx-auto py-8 space-y-9 animate-in fade-in duration-500">
+        <Back label={p.title} onClick={() => setView({ name: 'pathway', pathwayId })} />
+
+        <div className="space-y-4">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+            Course {c.num} of {p.courses.length} in {p.title}
+          </p>
+          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">{c.title}</h1>
+          <p className="text-lg text-zinc-600 leading-relaxed">{c.promise}</p>
+        </div>
+
+        <section className="space-y-3">
+          <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">About this course</h2>
+          {c.about.map((para, i) => (
+            <p key={i} className="text-[15px] text-zinc-600 leading-relaxed">{para}</p>
+          ))}
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Learning objectives</h2>
+          <p className="text-sm text-zinc-500">By the end of this course, you will be able to:</p>
+          <ul className="space-y-2">
+            {c.objectives.map((o) => (
+              <li key={o} className="flex items-start gap-3">
+                <Check size={15} strokeWidth={3} className="text-[#233DFF] mt-1 shrink-0" />
+                <span className="text-[15px] text-zinc-700 leading-relaxed">{o}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="bg-white rounded-2xl border border-zinc-200/60 p-7 grid grid-cols-2 md:grid-cols-4 gap-5">
+          {[
+            { l: 'Format', v: 'Self-paced' },
+            { l: 'Estimated time', v: `${c.minutes} min` },
+            { l: 'Lessons', v: String(c.lessons.length) },
+            { l: 'Knowledge checks', v: String(c.checks.length) },
+          ].map((x) => (
+            <div key={x.l}>
+              <p className="text-base font-semibold text-zinc-900">{x.v}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mt-1">{x.l}</p>
+            </div>
+          ))}
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">What you will complete</h2>
+          <div className="space-y-2">
+            {c.lessons.map((l, i) => {
+              const done = state.lessons.includes(l.id);
+              return (
+                <button
+                  key={l.id}
+                  onClick={() => setView({ name: 'lesson', pathwayId, courseId, index: i })}
+                  className={`w-full text-left flex items-center justify-between gap-4 p-4 px-5 rounded-2xl border transition-all ${done ? 'bg-zinc-50/50 border-zinc-100' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40'}`}
+                >
+                  <span className="flex items-center gap-4 min-w-0">
+                    <span className={`w-8 h-8 rounded-full flex items-center justify-center border shrink-0 ${done ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-white text-zinc-400 border-zinc-200'}`}>
+                      {done ? <Check size={14} strokeWidth={3} /> : <span className="text-[11px] font-bold">{i + 1}</span>}
+                    </span>
+                    <span className={`text-sm font-semibold truncate ${done ? 'text-zinc-400' : 'text-zinc-800'}`}>{l.title}</span>
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 shrink-0">{done ? 'Done' : 'Lesson'}</span>
+                </button>
+              );
+            })}
+            {c.activity && (
+              <button
+                onClick={() => setView({ name: 'activity', pathwayId, courseId })}
+                className={`w-full text-left flex items-center justify-between gap-4 p-4 px-5 rounded-2xl border transition-all ${activityDone ? 'bg-zinc-50/50 border-zinc-100' : 'bg-white border-zinc-200 hover:border-[#FF6E40]/40'}`}
+              >
+                <span className="flex items-center gap-4 min-w-0">
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center border shrink-0 ${activityDone ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-orange-50 text-[#FF6E40] border-orange-100'}`}>
+                    {activityDone ? <Check size={14} strokeWidth={3} /> : <PenLine size={14} />}
+                  </span>
+                  <span className={`text-sm font-semibold truncate ${activityDone ? 'text-zinc-400' : 'text-zinc-800'}`}>{c.activity.title}</span>
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 shrink-0">{activityDone ? 'Submitted' : 'Applied activity'}</span>
+              </button>
+            )}
+          </div>
+        </section>
+
+        <div className="pt-2">
+          <Btn onClick={() => setView({ name: 'lesson', pathwayId, courseId, index: Math.max(firstUnfinished, 0) })}>
+            {firstUnfinished > 0 ? 'Continue course' : 'Start course'} <ChevronRight size={14} />
+          </Btn>
+        </div>
+
+        {c.sources && (
+          <p className="text-[11px] text-zinc-400 border-t border-zinc-100 pt-5">
+            Course sources: {c.sources.map((s) => `[${s}]`).join(' ')}
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  // ── Lesson (with embedded knowledge checks on the last lesson) ──────────
+
+  const renderLesson = (pathwayId: string, courseId: string, index: number) => {
+    const p = pathwayById(pathwayId);
+    const c = p?.courses.find((x) => x.id === courseId);
+    const lesson = c?.lessons[index];
+    if (!p || !c || !lesson) return renderCatalog();
+    const isLast = index === c.lessons.length - 1;
+    const checksHere = isLast ? c.checks : [];
 
     return (
       <div className="max-w-3xl mx-auto py-8 space-y-8 animate-in fade-in duration-500">
-        <button
-          onClick={() => setView({ name: 'course', courseId })}
-          className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 font-bold text-xs uppercase tracking-widest transition-colors group"
-        >
-          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> {course.title}
-        </button>
+        <Back label={c.title} onClick={() => setView({ name: 'course', pathwayId, courseId })} />
 
         <div className="space-y-3">
-          <ProgressBar percent={Math.round(((index + (lessonDone ? 1 : 0)) / course.lessons.length) * 100)} />
+          <Bar percent={Math.round(((index + 1) / c.lessons.length) * 100)} />
           <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-            Lesson {index + 1} of {course.lessons.length} · {KIND_LABEL[lesson.kind]} · {lesson.minutes} min
+            Lesson {index + 1} of {c.lessons.length} · {c.title}
           </p>
         </div>
 
         <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 leading-tight">{lesson.title}</h1>
 
         <div className="space-y-6">
-          {lesson.body?.map((para, i) => (
+          {lesson.body.map((para, i) => (
             <p key={i} className="text-lg text-zinc-700 leading-relaxed">{para}</p>
           ))}
         </div>
 
-        {lesson.takeaways && lesson.takeaways.length > 0 && (
-          <div className="bg-blue-50/50 border border-[#233DFF]/15 rounded-2xl p-7 space-y-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#233DFF]">Key takeaways</p>
-            <ul className="space-y-3">
-              {lesson.takeaways.map((t, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <Check size={16} strokeWidth={3} className="text-[#233DFF] mt-1 shrink-0" />
-                  <span className="text-[15px] text-zinc-700 leading-relaxed">{t}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {lesson.kind === 'reflect' && lesson.prompt && (
-          <div className="bg-white border border-zinc-200 rounded-2xl p-7 space-y-4 shadow-sm">
-            <div className="flex items-center gap-2 text-[#FF6E40]">
-              <PenLine size={16} />
-              <p className="text-[10px] font-bold uppercase tracking-widest">Your turn</p>
-            </div>
-            <label htmlFor={`note-${lesson.id}`} className="block text-base font-semibold text-zinc-900 leading-snug">
-              {lesson.prompt}
-            </label>
-            <textarea
-              id={`note-${lesson.id}`}
-              value={state.notes[lesson.id] || ''}
-              onChange={(e) => setNote(lesson.id, e.target.value)}
-              rows={4}
-              placeholder="Write as much or as little as you want."
-              className="w-full p-4 border border-zinc-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all text-base leading-relaxed resize-none"
-            />
-            <p className="text-[11px] text-zinc-400">
-              This stays on your device. It is not sent to HMC and no one else can read it.
-            </p>
-          </div>
-        )}
-
-        {lesson.kind === 'tool' && lesson.tool && (
-          <button
-            onClick={() => followTool(lesson.tool!.url)}
-            className="w-full flex items-center justify-between gap-4 rounded-2xl border border-[#233DFF]/20 bg-blue-50/40 p-6 hover:border-[#233DFF]/40 transition-all text-left"
-          >
-            <div className="flex items-start gap-4 min-w-0">
-              <div className="w-11 h-11 rounded-2xl bg-white flex items-center justify-center text-[#233DFF] shrink-0 shadow-sm">
-                <ExternalLink size={19} />
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-zinc-900">{lesson.tool.label}</p>
-                <p className="text-xs text-zinc-500 mt-1 leading-relaxed">{lesson.tool.blurb}</p>
-              </div>
-            </div>
-            <ChevronRight size={18} className="text-[#233DFF] shrink-0" />
-          </button>
+        {checksHere.length > 0 && (
+          <section className="space-y-5 pt-2">
+            <h2 className="text-[10px] font-bold uppercase tracking-widest text-[#233DFF]">Knowledge check</h2>
+            {checksHere.map((q) => (
+              <QuestionCard
+                key={q.id}
+                q={q}
+                chosen={state.checks[q.id]}
+                onChoose={(i) => set((s) => ({ ...s, checks: { ...s.checks, [q.id]: i } }))}
+                reveal
+              />
+            ))}
+          </section>
         )}
 
         <div className="pt-6 border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           <button
-            onClick={() => (index > 0 ? openLesson(courseId, index - 1) : setView({ name: 'course', courseId }))}
-            className="text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors"
+            onClick={() => (index > 0 ? setView({ name: 'lesson', pathwayId, courseId, index: index - 1 }) : setView({ name: 'course', pathwayId, courseId }))}
+            className="text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-900"
           >
-            {index > 0 ? 'Previous lesson' : 'Back to syllabus'}
+            {index > 0 ? 'Previous lesson' : 'Back to course'}
           </button>
-          <Btn onClick={() => completeLesson(course, index)} className="w-full sm:w-auto">
-            {lessonDone && !isLast ? (
-              <>Next lesson <ArrowRight size={14} /></>
-            ) : isLast ? (
-              <>Finish course <Check size={14} strokeWidth={3} /></>
-            ) : (
-              <>Mark complete <ArrowRight size={14} /></>
-            )}
+          <Btn
+            className="w-full sm:w-auto"
+            onClick={() => {
+              completeLesson(lesson.id);
+              onSignal?.('academy_lesson_complete', { pathwayId, courseId, lessonId: lesson.id });
+              if (!isLast) setView({ name: 'lesson', pathwayId, courseId, index: index + 1 });
+              else if (c.activity) setView({ name: 'activity', pathwayId, courseId });
+              else setView({ name: 'course', pathwayId, courseId });
+            }}
+          >
+            {isLast ? (c.activity ? 'Continue to applied activity' : 'Finish lesson') : 'Mark complete and continue'} <ChevronRight size={14} />
           </Btn>
         </div>
       </div>
     );
   };
 
-  // ── Certificate ────────────────────────────────────────────────────────
+  // ── Applied activity ───────────────────────────────────────────────────
 
-  const renderCertificate = (course: Course) => {
-    const iso = state.completedCourses[course.id];
-    const dateLabel = iso
-      ? new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-      : new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const renderActivity = (pathwayId: string, courseId: string) => {
+    const p = pathwayById(pathwayId);
+    const c = p?.courses.find((x) => x.id === courseId);
+    if (!p || !c || !c.activity) return renderCatalog();
+    const value = state.activities[c.id] || '';
 
     return (
-      <div className="fixed inset-0 z-[100] bg-zinc-900/60 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
-        <div className="bg-white max-w-lg w-full rounded-[32px] p-10 space-y-7 animate-in zoom-in-95 duration-500 shadow-2xl relative">
-          <button
-            onClick={() => setCelebrate(null)}
-            aria-label="Close certificate"
-            className="absolute top-6 right-6 text-zinc-300 hover:text-zinc-900 transition-colors"
-          >
-            <X size={20} />
-          </button>
-
-          <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center">
-              <Award size={32} className="text-[#F9C74F]" />
-            </div>
-          </div>
-
-          <div className="text-center space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Certificate of completion</p>
-            <h2 className="text-3xl font-semibold text-zinc-900 tracking-tight">{course.title}</h2>
-            <p className="text-zinc-500 leading-relaxed">
-              Awarded to {memberName} on {dateLabel}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-3 py-5 border-y border-zinc-100">
-            {[
-              { label: 'Lessons', value: String(course.lessons.length) },
-              { label: 'Credits', value: String(course.credits) },
-              { label: 'Badge', value: course.badge },
-            ].map((s) => (
-              <div key={s.label} className="text-center space-y-1">
-                <p className="text-sm font-semibold text-zinc-900 leading-tight">{s.value}</p>
-                <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">{s.label}</p>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-[11px] text-zinc-400 text-center leading-relaxed">
-            Health Matters Clinic Academy. This certificate recognizes completion of a community
-            education course. It is not a clinical or professional credential.
+      <div className="max-w-3xl mx-auto py-8 space-y-8 animate-in fade-in duration-500">
+        <Back label={c.title} onClick={() => setView({ name: 'course', pathwayId, courseId })} />
+        <div className="space-y-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF6E40]">Applied activity</p>
+          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">{c.activity.title}</h1>
+        </div>
+        {c.activity.body.map((para, i) => (
+          <p key={i} className="text-lg text-zinc-700 leading-relaxed">{para}</p>
+        ))}
+        <div className="bg-white border border-zinc-200 rounded-2xl p-7 space-y-4 shadow-sm">
+          <label htmlFor={`act-${c.id}`} className="block text-base font-semibold text-zinc-900 leading-snug">
+            {c.activity.prompt}
+          </label>
+          <textarea
+            id={`act-${c.id}`}
+            rows={8}
+            value={value}
+            onChange={(e) => set((s) => ({ ...s, activities: { ...s.activities, [c.id]: e.target.value } }))}
+            className="w-full p-4 border border-zinc-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 text-base leading-relaxed resize-y"
+          />
+          <p className="text-[11px] text-zinc-400">
+            This becomes a portfolio artifact on your transcript. It is stored on your device and is not
+            shared unless you choose to share it.
           </p>
-
-          <Btn onClick={() => setCelebrate(null)} className="w-full">Continue</Btn>
+        </div>
+        <div className="flex justify-end">
+          <Btn
+            disabled={!value.trim()}
+            onClick={() => {
+              onSignal?.('academy_activity_submit', { pathwayId, courseId });
+              setView({ name: 'course', pathwayId, courseId });
+            }}
+          >
+            Save and return to course
+          </Btn>
         </div>
       </div>
     );
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────
+  // ── Pre / post test ────────────────────────────────────────────────────
+
+  const renderTest = (pathwayId: string, kind: 'pre' | 'post') => {
+    const p = pathwayById(pathwayId);
+    if (!p) return renderCatalog();
+    const questions = (kind === 'pre' ? p.preTest : p.postTest) || [];
+    return (
+      <TestRunner
+        pathway={p}
+        kind={kind}
+        questions={questions}
+        onCancel={() => setView({ name: 'pathway', pathwayId })}
+        onSubmit={(answers) => {
+          const score = scoreTest(questions, answers);
+          const at = new Date().toISOString();
+          set((s) => {
+            if (kind === 'pre') {
+              return { ...s, preTest: { ...s.preTest, [p.id]: { score, attempt: 1, at } } };
+            }
+            const attempt = (s.postAttempts[p.id] || 0) + 1;
+            const best = s.postTest[p.id];
+            return {
+              ...s,
+              postAttempts: { ...s.postAttempts, [p.id]: attempt },
+              postTest:
+                !best || score > best.score
+                  ? { ...s.postTest, [p.id]: { score, attempt, at } }
+                  : s.postTest,
+            };
+          });
+          onSignal?.(kind === 'pre' ? 'academy_pretest' : 'academy_posttest', { pathwayId: p.id, score });
+        }}
+        onDone={() => setView({ name: 'pathway', pathwayId })}
+      />
+    );
+  };
+
+  // ── Capstone ───────────────────────────────────────────────────────────
+
+  const renderCapstone = (pathwayId: string) => {
+    const p = pathwayById(pathwayId);
+    if (!p || !p.capstone) return renderCatalog();
+    const cap = p.capstone;
+    const value = state.capstone[p.id] || '';
+    const total = cap.rubric.reduce((n, r) => n + r.max, 0);
+
+    return (
+      <div className="max-w-3xl mx-auto py-8 space-y-8 animate-in fade-in duration-500">
+        <Back label={p.title} onClick={() => setView({ name: 'pathway', pathwayId })} />
+        <div className="space-y-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Capstone</p>
+          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">{cap.title}</h1>
+          <p className="text-lg text-zinc-600 leading-relaxed">{cap.intro}</p>
+        </div>
+
+        <section className="space-y-3">
+          <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Required elements</h2>
+          <ol className="space-y-2">
+            {cap.requirements.map((r, i) => (
+              <li key={r} className="flex items-start gap-4 text-[15px] text-zinc-700 leading-relaxed">
+                <span className="w-6 h-6 rounded-full bg-zinc-100 text-zinc-500 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">{i + 1}</span>
+                {r}
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="bg-white rounded-2xl border border-zinc-200/60 p-7 space-y-4">
+          <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Rubric — {total} points, {cap.passing} to pass</h2>
+          <ul className="divide-y divide-zinc-100">
+            {cap.rubric.map((r) => (
+              <li key={r.label} className="flex items-center justify-between py-2.5 text-sm">
+                <span className="text-zinc-700">{r.label}</span>
+                <span className="text-zinc-400 font-semibold">0 to {r.max}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <div className="bg-white border border-zinc-200 rounded-2xl p-7 space-y-4 shadow-sm">
+          <label htmlFor="capstone" className="block text-base font-semibold text-zinc-900 leading-snug">{cap.prompt}</label>
+          <textarea
+            id="capstone"
+            rows={12}
+            value={value}
+            onChange={(e) => set((s) => ({ ...s, capstone: { ...s.capstone, [p.id]: e.target.value } }))}
+            className="w-full p-4 border border-zinc-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 text-base leading-relaxed resize-y"
+          />
+        </div>
+
+        <div className="flex justify-end">
+          <Btn
+            disabled={!value.trim()}
+            onClick={() => {
+              onSignal?.('academy_capstone_submit', { pathwayId: p.id });
+              setView({ name: 'pathway', pathwayId });
+            }}
+          >
+            Submit for review
+          </Btn>
+        </div>
+      </div>
+    );
+  };
+
+  // ── Transcript ─────────────────────────────────────────────────────────
+
+  const renderTranscript = () => {
+    const paths = state.enrolled.map(pathwayById).filter(Boolean) as Pathway[];
+    return (
+      <div className="max-w-4xl mx-auto py-8 space-y-10 animate-in fade-in duration-500">
+        <Back label="Academy" onClick={() => setView({ name: 'catalog' })} />
+        <div className="space-y-2">
+          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">Learner transcript</h1>
+          <p className="text-zinc-500">{memberName} · Health Matters Clinic Academy</p>
+        </div>
+
+        {paths.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-dashed border-zinc-200 py-20 text-center">
+            <p className="text-sm text-zinc-500">No enrollments yet.</p>
+          </div>
+        ) : (
+          <>
+            <Section title="Academic learning">
+              {paths.map((p) => (
+                <Row key={p.id} left={`${p.title} (v${p.version})`} right={`${pathwayPercent(p, state)}% complete`} />
+              ))}
+            </Section>
+
+            <Section title="Assessment growth">
+              {paths.map((p) => {
+                const { pre, post, gain } = knowledgeGain(p.id, state);
+                return (
+                  <Row
+                    key={p.id}
+                    left={p.title}
+                    right={
+                      pre === null
+                        ? 'No baseline recorded'
+                        : `Baseline ${pre}% · Post ${post === null ? 'not taken' : `${post}%`}${gain === null ? '' : ` · Gain ${gain >= 0 ? '+' : ''}${gain} pts`} · ${state.postAttempts[p.id] || 0} attempts`
+                    }
+                  />
+                );
+              })}
+            </Section>
+
+            <Section title="Credentials">
+              {paths.filter((p) => state.credentials[p.id]).length === 0 ? (
+                <p className="text-sm text-zinc-400 py-2">None issued yet.</p>
+              ) : (
+                paths
+                  .filter((p) => state.credentials[p.id])
+                  .map((p) => (
+                    <Row
+                      key={p.id}
+                      left={p.credentialTitle}
+                      right={`Active · issued ${new Date(state.credentials[p.id]).toLocaleDateString('en-US')}`}
+                    />
+                  ))
+              )}
+            </Section>
+
+            <Section title="Applied learning">
+              {paths.map((p) => {
+                const artifacts = p.courses.filter((c) => (state.activities[c.id] || '').trim()).length;
+                const cap = (state.capstone[p.id] || '').trim() ? 1 : 0;
+                return <Row key={p.id} left={p.title} right={`${artifacts} applied artifacts · ${cap} capstone`} />;
+              })}
+            </Section>
+
+            <Section title="Approved hours">
+              <Row left="Training (self-paced learning recognized by HMC)" right={`${trainingHours(state)} hours`} />
+              <p className="text-[11px] text-zinc-400 pt-3 leading-relaxed">
+                Hour categories are kept distinct. Training hours are not volunteer service hours,
+                practicum hours, or continuing education credit.
+              </p>
+            </Section>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  // ── Certificate ────────────────────────────────────────────────────────
+
+  const renderCertificate = (pathwayId: string) => {
+    const p = pathwayById(pathwayId);
+    const issuedAt = state.credentials[pathwayId];
+    if (!p || !issuedAt) return null;
+    const id = credentialId(p.id, userId, issuedAt);
+    const date = new Date(issuedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+    return (
+      <div className="fixed inset-0 z-[100] bg-zinc-900/60 backdrop-blur-md flex items-center justify-center p-6 overflow-y-auto">
+        <div className="bg-white max-w-lg w-full rounded-[32px] p-10 space-y-6 shadow-2xl relative my-8">
+          <button onClick={() => setShowCert(null)} aria-label="Close certificate" className="absolute top-6 right-6 text-zinc-300 hover:text-zinc-900">
+            <X size={20} />
+          </button>
+          <div className="flex justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center">
+              <Award size={32} className="text-[#F9C74F]" />
+            </div>
+          </div>
+          <div className="text-center space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Health Matters Clinic</p>
+            <p className="text-sm text-zinc-500">This certifies that</p>
+            <p className="text-2xl font-semibold text-zinc-900">{memberName}</p>
+            <p className="text-sm text-zinc-500">has completed</p>
+            <p className="text-xl font-semibold text-zinc-900 leading-snug">{p.credentialTitle}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4 py-5 border-y border-zinc-100 text-center">
+            <div>
+              <p className="text-sm font-semibold text-zinc-900">{date}</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-400 mt-1">Issued</p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-zinc-900 font-mono">{id}</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-400 mt-1">Certificate ID</p>
+            </div>
+          </div>
+          <p className="text-[11px] text-zinc-400 text-center leading-relaxed">
+            Verify at verify.healthmatters.clinic · Issuer: Health Matters Clinic · Pathway version {p.version}
+          </p>
+          <p className="text-[11px] text-zinc-500 text-center leading-relaxed bg-zinc-50 rounded-xl p-4">
+            This is an HMC educational completion record. It is not professional certification,
+            licensure, clinical scope, or admission eligibility.
+          </p>
+          <Btn className="w-full" onClick={() => setShowCert(null)}>Close</Btn>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="w-full">
       {view.name === 'catalog' && renderCatalog()}
-      {view.name === 'course' && renderCourse(view.courseId)}
-      {view.name === 'lesson' && renderLesson(view.courseId, view.index)}
-      {celebrate && renderCertificate(celebrate)}
+      {view.name === 'pathway' && renderPathway(view.pathwayId)}
+      {view.name === 'course' && renderCourse(view.pathwayId, view.courseId)}
+      {view.name === 'lesson' && renderLesson(view.pathwayId, view.courseId, view.index)}
+      {view.name === 'activity' && renderActivity(view.pathwayId, view.courseId)}
+      {view.name === 'test' && renderTest(view.pathwayId, view.kind)}
+      {view.name === 'capstone' && renderCapstone(view.pathwayId)}
+      {view.name === 'transcript' && renderTranscript()}
+      {showCert && renderCertificate(showCert)}
+    </div>
+  );
+};
+
+// ── Small building blocks ────────────────────────────────────────────────
+
+const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
+  <section className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-7 space-y-1">
+    <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-3">{title}</h2>
+    {children}
+  </section>
+);
+
+const Row: React.FC<{ left: string; right: string }> = ({ left, right }) => (
+  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 py-2.5 border-b border-zinc-50 last:border-0">
+    <span className="text-sm text-zinc-800 font-medium">{left}</span>
+    <span className="text-[12px] text-zinc-500">{right}</span>
+  </div>
+);
+
+const QuestionCard: React.FC<{
+  q: CheckQ;
+  chosen: number | undefined;
+  onChoose: (i: number) => void;
+  reveal: boolean;
+}> = ({ q, chosen, onChoose, reveal }) => {
+  const answered = chosen !== undefined;
+  return (
+    <div className="bg-white rounded-2xl border border-zinc-200 p-6 space-y-4">
+      <p className="text-base font-semibold text-zinc-900 leading-snug">{q.q}</p>
+      <div className="space-y-2">
+        {q.options.map((opt, i) => {
+          const isChosen = chosen === i;
+          const isRight = i === q.answer;
+          const showState = reveal && answered;
+          return (
+            <button
+              key={opt}
+              onClick={() => !answered && onChoose(i)}
+              disabled={answered}
+              className={`w-full text-left p-4 rounded-xl border transition-all flex items-start gap-3 ${
+                showState && isRight
+                  ? 'border-emerald-300 bg-emerald-50/60'
+                  : showState && isChosen
+                  ? 'border-[#FF6F91] bg-pink-50/50'
+                  : isChosen
+                  ? 'border-[#233DFF] bg-blue-50/50'
+                  : 'border-zinc-200 bg-white hover:border-zinc-300'
+              } ${answered ? 'cursor-default' : ''}`}
+            >
+              <span className="text-sm text-zinc-700 leading-relaxed flex-1">{opt}</span>
+              {showState && isRight && (
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 shrink-0">Correct</span>
+              )}
+              {showState && isChosen && !isRight && (
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FF6F91] shrink-0">Your answer</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      {reveal && answered && (
+        <p className="text-[13px] text-zinc-600 leading-relaxed bg-zinc-50 rounded-xl p-4">{q.why}</p>
+      )}
+    </div>
+  );
+};
+
+/** Pre and post tests. Answers are hidden until the whole test is submitted. */
+const TestRunner: React.FC<{
+  pathway: Pathway;
+  kind: 'pre' | 'post';
+  questions: CheckQ[];
+  onSubmit: (answers: Record<string, number>) => void;
+  onCancel: () => void;
+  onDone: () => void;
+}> = ({ pathway, kind, questions, onSubmit, onCancel, onDone }) => {
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [submitted, setSubmitted] = useState(false);
+  const score = useMemo(() => scoreTest(questions, answers), [questions, answers]);
+  const allAnswered = questions.every((q) => answers[q.id] !== undefined);
+  const passed = score >= PASS_THRESHOLD;
+
+  if (submitted) {
+    return (
+      <div className="max-w-3xl mx-auto py-8 space-y-8 animate-in fade-in duration-500">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto text-[#233DFF]">
+            {kind === 'pre' ? <ListChecks size={30} /> : passed ? <CheckCircle2 size={30} /> : <TrendingUp size={30} />}
+          </div>
+          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">{score}%</h1>
+          <p className="text-lg text-zinc-600 max-w-md mx-auto leading-relaxed">
+            {kind === 'pre'
+              ? 'This is your baseline. It does not affect completion. You will take the same assessment at the end so your growth is measurable.'
+              : passed
+              ? `You met the ${PASS_THRESHOLD}% benchmark for ${pathway.title}.`
+              : `The benchmark is ${PASS_THRESHOLD}%. Review the courses and try again. Retries are unlimited, because the purpose is mastery, not selection.`}
+          </p>
+        </div>
+        <div className="space-y-4">
+          {questions.map((q) => (
+            <QuestionCard key={q.id} q={q} chosen={answers[q.id]} onChoose={() => {}} reveal />
+          ))}
+        </div>
+        <div className="flex justify-center pt-2">
+          <Btn onClick={onDone}>{kind === 'pre' ? 'Start the courses' : 'Back to pathway'}</Btn>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto py-8 space-y-8 animate-in fade-in duration-500">
+      <Back label={pathway.title} onClick={onCancel} />
+      <div className="space-y-3">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+          {kind === 'pre' ? 'Baseline check' : 'Pathway post-test'}
+        </p>
+        <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">
+          {kind === 'pre' ? 'Before you begin' : `${pathway.title} post-test`}
+        </h1>
+        <p className="text-lg text-zinc-600 leading-relaxed">
+          {kind === 'pre'
+            ? 'Answer what you can. Guessing is fine and there is no penalty. This is only used to measure how much you gain by the end.'
+            : `${questions.length} questions. ${PASS_THRESHOLD}% to pass. You may retake this as many times as you need.`}
+        </p>
+      </div>
+      <div className="space-y-4">
+        {questions.map((q, i) => (
+          <div key={q.id} className="bg-white rounded-2xl border border-zinc-200 p-6 space-y-4">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Question {i + 1} of {questions.length}</p>
+            <p className="text-base font-semibold text-zinc-900 leading-snug">{q.q}</p>
+            <div className="space-y-2">
+              {q.options.map((opt, oi) => (
+                <button
+                  key={opt}
+                  onClick={() => setAnswers((a) => ({ ...a, [q.id]: oi }))}
+                  aria-pressed={answers[q.id] === oi}
+                  className={`w-full text-left p-4 rounded-xl border transition-all flex items-center gap-3 ${
+                    answers[q.id] === oi ? 'border-[#233DFF] bg-blue-50/50' : 'border-zinc-200 bg-white hover:border-zinc-300'
+                  }`}
+                >
+                  <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${answers[q.id] === oi ? 'border-[#233DFF] bg-[#233DFF] text-white' : 'border-zinc-200'}`}>
+                    {answers[q.id] === oi && <Check size={11} strokeWidth={4} />}
+                  </span>
+                  <span className="text-sm text-zinc-700 leading-relaxed">{opt}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-zinc-100">
+        <p className="text-xs text-zinc-400 font-semibold">
+          {Object.keys(answers).length} of {questions.length} answered
+        </p>
+        <Btn
+          disabled={!allAnswered}
+          onClick={() => { onSubmit(answers); setSubmitted(true); }}
+          className="w-full sm:w-auto"
+        >
+          Submit {kind === 'pre' ? 'baseline' : 'post-test'}
+        </Btn>
+      </div>
     </div>
   );
 };

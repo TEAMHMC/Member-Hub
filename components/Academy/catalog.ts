@@ -1,559 +1,1014 @@
-// HMC Academy catalog — the learning content members see in the Member Hub.
+// HMC Health + Education Pathways Academy — learner-facing catalog.
 //
-// Content rules that apply to everything in this file:
-//  - Nothing here diagnoses, treats, or promises a clinical outcome. Lessons
-//    teach navigation, self-awareness, and how to use the HMC tools.
-//  - Crisis routing is always 988 / 911, stated plainly wherever distress
-//    could come up.
-//  - Coverage lessons describe the Medi-Cal renewal process only as far as
-//    DHCS publishes it, and always end in "confirm with the county".
+// Structure follows "HMC Health + Education Pathways Academy | Master Curriculum
+// + Delivery Blueprint" v1.0 and "HMC Academy | Credential, Transcript +
+// Equivalency Rules" v1.0 (both August 7, 2026).
 //
-// Structure mirrors a real learning platform: paths group courses, courses
-// group lessons, lessons are the unit of completion. Progress is tracked per
-// lesson id so a partially finished course resumes where the member left off.
+// Rules encoded here, not just described:
+//  - Learning model is DISCOVER > LEARN > PRACTICE > SERVE > DEMONSTRATE > ADVANCE.
+//  - Core learning is text-first and self-paced. No lesson depends on video or
+//    audio (blueprint accessibility standard).
+//  - Default knowledge benchmark is 80% on the post-test. Retries are allowed
+//    because the purpose is mastery, not selection.
+//  - Progress is reported as improvement (baseline > post > gain), not pass/fail.
+//  - Credential titles follow the naming rules exactly. "Certified", "Licensed",
+//    "Board Certified" and similar are never used. A completion is an HMC
+//    educational record, not licensure, certification, or clinical scope.
 
-export type LessonKind = 'read' | 'activity' | 'tool' | 'reflect';
+export type Level = 'Discover' | 'Foundations' | 'Applied' | 'Advanced' | 'Leadership';
+export type PathwayStatus = 'published' | 'in-development';
+export type CredentialType =
+  | 'Course Completion'
+  | 'Applied Pathway Completion'
+  | 'Competency Record'
+  | 'Fellowship / Internship Completion';
 
 export interface Lesson {
   id: string;
   title: string;
-  minutes: number;
-  kind: LessonKind;
-  /** Paragraphs of lesson copy. Rendered in order. */
-  body?: string[];
-  /** Bullet takeaways shown in a highlighted block after the body. */
-  takeaways?: string[];
-  /** For `tool` lessons: the sibling HMC tool this lesson hands off to. */
-  tool?: { label: string; url: string; blurb: string };
-  /** For `reflect` lessons: the prompt the member writes against. */
-  prompt?: string;
+  body: string[];
+}
+
+/** Knowledge check. One correct option; `why` is shown after answering. */
+export interface Check {
+  id: string;
+  q: string;
+  options: string[];
+  answer: number;
+  why: string;
+}
+
+export interface Activity {
+  title: string;
+  body: string[];
+  /** What the learner writes. Stored on device as their portfolio artifact. */
+  prompt: string;
 }
 
 export interface Course {
   id: string;
+  num: number;
   title: string;
-  summary: string;
-  category: Category;
-  level: 'Foundations' | 'Practical' | 'Advanced';
-  /** Health Credits awarded on completion. Mirrors the live credits ledger. */
-  credits: number;
-  badge: string;
-  featured?: boolean;
+  /** One-sentence promise: what the learner will be able to do. */
+  promise: string;
+  about: string[];
+  objectives: string[];
+  minutes: number;
   lessons: Lesson[];
+  checks: Check[];
+  activity?: Activity;
+  /** Source keys from the pathway source library. */
+  sources?: string[];
 }
 
-export interface Path {
+export interface Rubric {
+  label: string;
+  max: number;
+}
+
+export interface Capstone {
+  title: string;
+  intro: string;
+  requirements: string[];
+  rubric: Rubric[];
+  passing: number;
+  prompt: string;
+}
+
+export interface Pathway {
   id: string;
   title: string;
-  tagline: string;
-  description: string;
-  courseIds: string[];
+  level: Level;
+  status: PathwayStatus;
+  purpose: string;
+  format: string;
+  /** Exact credential title per the naming rules. */
+  credentialTitle: string;
+  credentialType: CredentialType;
+  /** Completion gates, shown to the learner up front. */
+  gates: string[];
+  /** Behavioral cue, not a lock. Learners may start any time. */
+  guidedStart?: string;
+  courses: Course[];
+  /** For pathways not yet published: the planned course list from the blueprint. */
+  plannedCourses?: string[];
+  preTest?: Check[];
+  postTest?: Check[];
+  capstone?: Capstone;
+  sourceKey?: { key: string; label: string }[];
+  version: string;
+  effectiveDate: string;
+  nextReview: string;
 }
 
-export type Category =
-  | 'Getting Started'
-  | 'Mental Wellness'
-  | 'Coverage & Care'
-  | 'Community Power';
+export const PASS_THRESHOLD = 80;
 
-export const CATEGORIES: Category[] = [
-  'Getting Started',
-  'Mental Wellness',
-  'Coverage & Care',
-  'Community Power',
+// ── Pathway 2: Health Careers Exploration (publication-ready v1.0) ────────
+// Lesson copy is taken from the approved Learner Course Pack. Do not reword.
+
+const HCE_COURSES: Course[] = [
+  {
+    id: 'hce-1',
+    num: 1,
+    title: 'The Health Professions Ecosystem',
+    promise: 'Map the full range of health careers and see why outcomes depend on teams, not individuals.',
+    about: [
+      'Many learners know a few visible professions but not the full system. This course maps major career families and helps learners understand that health outcomes depend on teams with different training, responsibilities, and scopes.',
+    ],
+    objectives: [
+      'Identify at least eight health-related career families.',
+      'Distinguish direct patient-care roles from population, research, technology, and operational roles.',
+      'Explain why interdisciplinary teamwork matters.',
+      'Identify three career families worth exploring further.',
+    ],
+    minutes: 55,
+    lessons: [
+      {
+        id: 'hce-1-l1',
+        title: 'Healthcare is a team sport',
+        body: [
+          'A single patient encounter may involve physicians, nurses, physician associates/assistants, pharmacists, social workers, behavioral-health professionals, medical assistants, interpreters, community health workers, laboratory professionals, imaging staff, care coordinators, administrators, and others.',
+          'Outside direct care, epidemiologists, researchers, engineers, analysts, public-health workers, educators, policy professionals, and technology teams shape how services are designed and delivered.',
+        ],
+      },
+      {
+        id: 'hce-1-l2',
+        title: 'Career families',
+        body: [
+          'Clinical medicine and advanced practice: physician, PA, advanced practice nursing, dentistry, optometry and other licensed professions.',
+          'Nursing: registered nursing, advanced practice, public-health nursing, specialty nursing and related roles.',
+          'Allied health and rehabilitation: respiratory care, physical therapy, occupational therapy, speech-language pathology, radiologic technology, sonography, and others.',
+          'Behavioral health: psychology, psychiatry, counseling, social work, marriage and family therapy, substance-use treatment and peer-support roles.',
+          'Pharmacy and laboratory science: pharmacists, pharmacy technicians, medical laboratory scientists, phlebotomy and related technical roles.',
+          'Public and community health: epidemiology, health education, community health work, health navigation, environmental health, outreach and program management.',
+          'Research and academia: laboratory research, clinical research, implementation science, health-services research, biostatistics and education.',
+          'Digital health, data and engineering: software engineering, informatics, cybersecurity, product design, biomedical engineering, AI/data science and analytics.',
+          'Administration, policy and operations: healthcare administration, quality improvement, compliance, finance, policy, supply chain, human resources and program operations.',
+        ],
+      },
+      {
+        id: 'hce-1-l3',
+        title: 'Verify the job, not the myth',
+        body: [
+          'Use BLS Occupational Outlook Handbook data as a starting point for occupation descriptions, typical entry-level education, work environment, pay and projections.',
+          'Then verify licensure, certification and accreditation requirements with the relevant state board, accreditor, professional body or educational institution. Requirements can change and may differ by state.',
+        ],
+      },
+    ],
+    checks: [
+      {
+        id: 'hce-1-c1',
+        q: 'A learner reads a salary figure for a profession on a social media post. What is the appropriate next step?',
+        options: [
+          'Treat it as accurate if the account has a large following',
+          'Check the BLS Occupational Outlook Handbook, then verify licensure with the relevant state board',
+          'Average it with two other posts',
+          'Assume it applies nationally',
+        ],
+        answer: 1,
+        why: 'BLS is the starting point for occupation data. Licensure and accreditation must be verified with the state board or accreditor, because requirements change and differ by state.',
+      },
+      {
+        id: 'hce-1-c2',
+        q: 'Which of these is a health career that does not involve direct patient care?',
+        options: ['Respiratory therapist', 'Epidemiologist', 'Physician associate', 'Registered nurse'],
+        answer: 1,
+        why: 'Epidemiology sits in the public and community health family, working at population level rather than in direct patient care.',
+      },
+    ],
+    activity: {
+      title: 'Career family sort',
+      body: [
+        'Choose 12 occupations from an HMC-provided list. Sort them into career families and write one sentence describing how each could contribute to a community-health problem such as asthma, diabetes prevention, homelessness or mental wellness.',
+      ],
+      prompt: 'List your 12 occupations, the family each belongs to, and one sentence on how each could contribute to a community health problem.',
+    },
+    sources: ['J1'],
+  },
+  {
+    id: 'hce-2',
+    num: 2,
+    title: 'Know Yourself: Interests, Values + Work Style',
+    promise: 'Choose careers to research based on the problems you want to work on, not on prestige.',
+    about: [
+      'A strong career decision considers more than prestige or salary. Learners should think about interests, values, preferred work environment, tolerance for uncertainty, educational commitment, financial realities, and the kind of problems they want to solve.',
+    ],
+    objectives: [
+      'Identify personal interests, strengths and values relevant to career exploration.',
+      'Distinguish a career preference from a fixed identity.',
+      'Compare work environments and role demands.',
+      'Select two to four careers for deeper research.',
+    ],
+    minutes: 50,
+    lessons: [
+      {
+        id: 'hce-2-l1',
+        title: 'Start with the problem you want to work on',
+        body: [
+          'Questions to consider: Do I want direct patient contact or mostly behind-the-scenes work? Do I enjoy science, technology, communication, counseling, policy, design or data?',
+          'Do I prefer highly structured environments or more flexible community settings? How much formal education or training am I prepared to pursue? What schedule, physical demands and work environment fit my life?',
+        ],
+      },
+      {
+        id: 'hce-2-l2',
+        title: 'Strengths can be developed',
+        body: [
+          'Learners often think they must already possess every quality a profession values. Career readiness is developmental.',
+          'The NACE career-readiness framework includes communication, critical thinking, teamwork, professionalism, technology, leadership, and career/self-development. These are skills that can be built through school, work, service and projects.',
+        ],
+      },
+      {
+        id: 'hce-2-l3',
+        title: 'Do not overfit one quiz',
+        body: [
+          'Interest inventories can prompt reflection, but they should not decide a career for you.',
+          'Use multiple sources of information: coursework, job descriptions, shadowing, informational interviews, mentors, volunteering, research experience and your own evolving priorities.',
+        ],
+      },
+    ],
+    checks: [
+      {
+        id: 'hce-2-c1',
+        q: 'A learner scores low on "leadership" in an online interest inventory. What does the NACE framework suggest?',
+        options: [
+          'Leadership roles should be ruled out',
+          'Career readiness is developmental, and leadership can be built through school, work, service and projects',
+          'The inventory should be retaken until the score improves',
+          'Leadership is not relevant to health careers',
+        ],
+        answer: 1,
+        why: 'Career readiness competencies are developed through experience. An inventory prompts reflection; it does not fix an identity.',
+      },
+    ],
+    activity: {
+      title: 'Fit matrix',
+      body: [
+        'Select three careers. Score each from 1 to 5 on: interest in daily work; preferred work environment; education/training fit; financial feasibility; schedule/lifestyle fit; alignment with values; opportunities to serve communities you care about.',
+        'Then write what information is still missing before making any decision.',
+      ],
+      prompt: 'Enter your three careers with their scores, then list what you still need to find out before deciding.',
+    },
+    sources: ['J3'],
+  },
+  {
+    id: 'hce-3',
+    num: 3,
+    title: 'Education, Training, Licensure + Credentials',
+    promise: 'Tell the difference between a degree, a certificate, a certification, a license, and accreditation, and verify the real requirements for a career you care about.',
+    about: [
+      'Health careers vary widely in educational requirements. Some require short-term certificates; others require associate, bachelor’s, graduate, professional or doctoral education; some require supervised hours, national exams, state licensure, continuing education or recurring certification.',
+    ],
+    objectives: [
+      'Distinguish degree, certificate, certification, licensure and accreditation.',
+      'Research the current requirements for a chosen profession.',
+      'Identify prerequisite courses or experiences when applicable.',
+      'Recognize why requirements must be verified with authoritative sources.',
+    ],
+    minutes: 60,
+    lessons: [
+      {
+        id: 'hce-3-l1',
+        title: 'Five terms that are not interchangeable',
+        body: [
+          'Degree: an academic credential awarded by an educational institution.',
+          'Certificate of completion: documentation that a learner completed a particular program. Meaning varies by program.',
+          'Professional certification: a credential granted by an authorized certifying organization after meeting specified requirements. Not every certificate of completion is a professional certification.',
+          'Licensure: legal authorization from a governmental licensing authority to practice a regulated profession within the jurisdiction and scope allowed.',
+          'Accreditation: external review of an institution or program against established standards by a recognized accrediting body.',
+        ],
+      },
+      {
+        id: 'hce-3-l2',
+        title: 'Build a requirements chain',
+        body: [
+          'For each target career, research: typical entry education from BLS; required degree or program accreditation, if applicable; state licensure or registration requirements, if applicable; national certification requirements, if applicable.',
+          'Then: supervised clinical or practical hours, if applicable; continuing education or renewal requirements, if applicable; and program-specific admissions prerequisites.',
+        ],
+      },
+      {
+        id: 'hce-3-l3',
+        title: 'One path does not fit every career',
+        body: [
+          'The AAMC premed competencies are useful for learners considering medical school, but they are not universal requirements for every health profession. For medicine, AAMC describes professional, thinking/reasoning and science competencies that medical schools may consider in holistic review.',
+          'Learners pursuing nursing, pharmacy, public health, CHW work, physical therapy, counseling or other fields should use the standards relevant to that field.',
+        ],
+      },
+    ],
+    checks: [
+      {
+        id: 'hce-3-c1',
+        q: 'What is the difference between a certificate of completion and a professional certification?',
+        options: [
+          'They are the same thing',
+          'A certificate of completion documents that a learner finished a program; a professional certification is granted by an authorized certifying organization after meeting specified requirements',
+          'A certification is always shorter',
+          'A certificate of completion always allows practice',
+        ],
+        answer: 1,
+        why: 'Not every certificate of completion is a professional certification. This distinction matters because only some credentials carry authority to practice.',
+      },
+      {
+        id: 'hce-3-c2',
+        q: 'Which body grants legal authorization to practice a regulated profession?',
+        options: ['An accreditor', 'A professional association', 'A governmental licensing authority', 'The employing hospital'],
+        answer: 2,
+        why: 'Licensure comes from a governmental licensing authority and is limited to that jurisdiction and the scope it allows.',
+      },
+    ],
+    activity: {
+      title: 'Verify a path',
+      body: [
+        'Choose one profession. Produce a one-page verified pathway with citations to: BLS; the relevant state board or official licensing source, if regulated; an accrediting or professional authority, when relevant; and two educational programs showing admissions requirements.',
+        'Flag any differences across programs.',
+      ],
+      prompt: 'Name the profession, then list each requirement with the authoritative source you verified it against. Note any differences you found between programs.',
+    },
+    sources: ['J1', 'J2'],
+  },
+  {
+    id: 'hce-4',
+    num: 4,
+    title: 'Building Experience That Actually Teaches You Something',
+    promise: 'Choose and describe experiences by what you learned, not by how many hours you logged.',
+    about: [
+      'Experience should help learners understand the work, build transferable skills, test career assumptions, and demonstrate growth. This course distinguishes observation from applied service and teaches learners to describe what they learned rather than simply collecting hours.',
+    ],
+    objectives: [
+      'Identify meaningful ways to explore a health career.',
+      'Distinguish volunteering, shadowing, research, internships, employment and service learning.',
+      'Choose experiences aligned to learning goals.',
+      'Document skills and reflection ethically.',
+    ],
+    minutes: 50,
+    lessons: [
+      {
+        id: 'hce-4-l1',
+        title: 'Experience types',
+        body: [
+          'Shadowing: observing professionals to understand workflow and role. Usually limited in scope and highly dependent on privacy and site rules.',
+          'Volunteering and service: contributing to an organization’s mission within an assigned role.',
+          'Research: participating in inquiry, data, laboratory, evaluation or community-engaged research under appropriate oversight.',
+          'Internship or fellowship: a structured learning placement with goals, supervision and defined work. Classification and compensation rules depend on context.',
+          'Employment: paid work governed by employment law and job requirements.',
+          'Service learning: structured learning connected to real community or organizational needs with reflection and educational objectives.',
+        ],
+      },
+      {
+        id: 'hce-4-l2',
+        title: 'Hours are not the learning outcome',
+        body: [
+          '"Completed 100 hours" tells a reviewer how long you were present, not what you learned.',
+          'Strong reflection describes what you did; what problem the work addressed; what skill you practiced; what you observed about the system or profession; how the experience changed your understanding; and what you would do next.',
+        ],
+      },
+      {
+        id: 'hce-4-l3',
+        title: 'Respect the role',
+        body: [
+          'Students should never exaggerate what they did. "Observed wound-care workflow" is different from "performed wound care." "Supported resource navigation" is different from "managed a case."',
+          'Accurate descriptions protect participants and your credibility.',
+        ],
+      },
+    ],
+    checks: [
+      {
+        id: 'hce-4-c1',
+        q: 'A student observed a nurse changing a dressing. How should this appear on their record?',
+        options: [
+          'Performed wound care',
+          'Assisted with wound care',
+          'Observed wound-care workflow',
+          'Managed wound care for a patient',
+        ],
+        answer: 2,
+        why: 'Accurate description protects participants and the learner’s credibility. Observation is not performance or assistance.',
+      },
+    ],
+    activity: {
+      title: 'Experience plan',
+      body: [
+        'Choose one target career and design a three-part exploration plan: one informational interview; one observational or educational experience; one applied service, research or project experience.',
+        'For each, state what you hope to learn and what evidence of growth you could ethically document.',
+      ],
+      prompt: 'Describe your three experiences, what you hope to learn from each, and what evidence of growth you could ethically document.',
+    },
+  },
+  {
+    id: 'hce-5',
+    num: 5,
+    title: 'Academic Readiness + Competency Development',
+    promise: 'Build a realistic academic plan against the actual prerequisites of the programs you may apply to.',
+    about: [
+      'Different health-professions programs evaluate academic performance, prerequisite preparation, competencies and experiences differently. This course teaches learners to build a realistic academic-development plan rather than rely on generic advice.',
+    ],
+    objectives: [
+      'Identify current academic strengths and gaps.',
+      'Build a prerequisite-tracking system.',
+      'Connect academic work to transferable competencies.',
+      'Use feedback and reflection to improve performance.',
+    ],
+    minutes: 50,
+    lessons: [
+      {
+        id: 'hce-5-l1',
+        title: 'Know the actual prerequisites',
+        body: [
+          'Do not assume that every program requires the same courses.',
+          'Create a spreadsheet or tracker for the specific programs you may apply to, including prerequisite course, minimum grade, lab requirement, expiration rule if any, test requirement, application cycle and source link.',
+        ],
+      },
+      {
+        id: 'hce-5-l2',
+        title: 'Competencies are demonstrated through behavior',
+        body: [
+          'The AAMC medical-school competency model includes areas such as commitment to learning and growth, empathy and compassion, interpersonal skills, service orientation, teamwork and collaboration, scientific inquiry, quantitative reasoning and communication.',
+          'These are not simply labels to claim. Applicants demonstrate them through patterns of behavior and evidence.',
+        ],
+      },
+      {
+        id: 'hce-5-l3',
+        title: 'Use academic difficulty as data',
+        body: [
+          'A low grade or difficult term should trigger analysis, not automatic defeat.',
+          'Ask: Was the course load realistic? Was there a content gap? Was the study method effective? Were work, caregiving, health or financial factors affecting performance? What support did I use? What will change next term?',
+        ],
+      },
+    ],
+    checks: [
+      {
+        id: 'hce-5-c1',
+        q: 'A learner had a difficult term. According to this course, what is the right response?',
+        options: [
+          'Conclude the career is not a fit',
+          'Analyze course load, content gaps, study method, outside factors and support used, then decide what changes next term',
+          'Retake every course immediately',
+          'Avoid mentioning it anywhere',
+        ],
+        answer: 1,
+        why: 'Academic difficulty is data. The course teaches structured analysis rather than automatic defeat.',
+      },
+    ],
+    activity: {
+      title: '90-day academic plan',
+      body: ['Create one academic goal, two specific actions, one support or resource, one measure of progress and a review date.'],
+      prompt: 'Write your goal, two actions, the support you will use, how you will measure progress, and your review date.',
+    },
+    sources: ['J2'],
+  },
+  {
+    id: 'hce-6',
+    num: 6,
+    title: 'Paying for the Path: Financial Aid + Cost Planning',
+    promise: 'Estimate the real cost of a program and compare offers on net cost rather than headline tuition.',
+    about: [
+      'Education decisions should include the full cost of attendance, likely financing options, opportunity cost, and the learner’s financial circumstances.',
+      'Federal Student Aid is the controlling source for federal aid terminology and processes. Specific amounts, deadlines and program rules should be checked at the time of application.',
+    ],
+    objectives: [
+      'Distinguish scholarships, grants, work-study and loans.',
+      'Estimate total cost rather than tuition alone.',
+      'Identify official sources for federal student aid.',
+      'Build a basic education-cost comparison.',
+    ],
+    minutes: 45,
+    lessons: [
+      {
+        id: 'hce-6-l1',
+        title: 'Price is more than tuition',
+        body: [
+          'Consider tuition and fees, books and supplies, housing, transportation, food, insurance, licensing exams, application fees, relocation, childcare and reduced work hours.',
+          'A lower-tuition program may still be more expensive overall if relocation or living costs are high.',
+        ],
+      },
+      {
+        id: 'hce-6-l2',
+        title: 'Understand funding types',
+        body: [
+          'Scholarships and grants generally do not need to be repaid when program terms are met. Federal Work-Study provides part-time employment for eligible students at participating schools. Loans must be repaid under their terms.',
+          'Learners should review current federal aid information at StudentAid.gov and school financial-aid offices rather than relying on social-media advice.',
+        ],
+      },
+      {
+        id: 'hce-6-l3',
+        title: 'Compare offers, not headlines',
+        body: [
+          'When comparing programs, calculate estimated net cost after grants and scholarships, expected borrowing, living costs, program duration and likely additional expenses.',
+          'Do not treat projected salary as guaranteed.',
+        ],
+      },
+    ],
+    checks: [
+      {
+        id: 'hce-6-c1',
+        q: 'Program A has lower tuition than Program B but requires relocating to a high-cost city. What should the learner compare?',
+        options: [
+          'Tuition alone, since it is the largest line item',
+          'Estimated net cost after gift aid, plus living costs, borrowing, duration and additional expenses',
+          'Projected starting salary only',
+          'Whichever program has the better reputation',
+        ],
+        answer: 1,
+        why: 'A lower-tuition program can cost more overall. Compare net cost and total cost of attendance, and do not treat projected salary as guaranteed.',
+      },
+    ],
+    activity: {
+      title: 'Cost comparison',
+      body: [
+        'Using fictional program data, compare two programs and calculate: total estimated annual cost; gift aid; estimated out-of-pocket or borrowed amount; duration; and one nonfinancial factor that matters.',
+      ],
+      prompt: 'Lay out both programs with total annual cost, gift aid, amount borrowed, duration, and the nonfinancial factor you weighed.',
+    },
+    sources: ['J4'],
+  },
+  {
+    id: 'hce-7',
+    num: 7,
+    title: 'Professional Communication, Networking + Mentorship',
+    promise: 'Introduce yourself professionally and request an informational conversation that someone will actually say yes to.',
+    about: [
+      'Professional relationships can expand access to information, feedback, opportunity and belonging. Networking is not collecting contacts; it is building respectful relationships over time.',
+      'Mentorship works best when expectations, goals and boundaries are clear.',
+    ],
+    objectives: [
+      'Introduce yourself professionally.',
+      'Request an informational conversation appropriately.',
+      'Prepare thoughtful questions.',
+      'Use mentorship responsibly.',
+    ],
+    minutes: 45,
+    lessons: [
+      {
+        id: 'hce-7-l1',
+        title: 'A professional introduction',
+        body: [
+          'A concise introduction can include your name; what you are studying or exploring; the area you are interested in; and why you are speaking with this person.',
+          'Example: "I’m Jordan, a community-college student exploring public health and nursing. I’ve been volunteering in community outreach and I’m trying to understand how nurses move between hospital and community settings. I’d love to hear about your path."',
+        ],
+      },
+      {
+        id: 'hce-7-l2',
+        title: 'Ask for information before asking for opportunity',
+        body: [
+          'A strong first outreach is specific, respectful and easy to answer.',
+          'Explain why you chose the person, request a short amount of time, and prepare questions that cannot be answered with a quick website search.',
+        ],
+      },
+      {
+        id: 'hce-7-l3',
+        title: 'Mentors are guides, not decision-makers',
+        body: [
+          'Effective mentors support reflection, learning, networks and professional development.',
+          'They should not control the learner’s decisions or become the sole source of support.',
+        ],
+      },
+    ],
+    checks: [
+      {
+        id: 'hce-7-c1',
+        q: 'What makes a first outreach message more likely to get a reply?',
+        options: [
+          'Asking directly for a job or placement',
+          'Being specific about why you chose the person, requesting a short amount of time, and asking questions a website cannot answer',
+          'Sending the same message to as many people as possible',
+          'Attaching a full resume with no message',
+        ],
+        answer: 1,
+        why: 'Ask for information before asking for opportunity. Specific, respectful and easy to answer is the standard.',
+      },
+    ],
+    activity: {
+      title: 'Skills check: professional outreach',
+      body: [
+        'Draft: a 50-word professional introduction; a short informational-interview email; five questions for a professional in a target field; and one follow-up thank-you message.',
+      ],
+      prompt: 'Write your introduction, your outreach email, your five questions, and your thank-you message.',
+    },
+  },
+  {
+    id: 'hce-8',
+    num: 8,
+    title: 'Build Your Personal Health-Career Roadmap',
+    promise: 'Turn everything you researched into a working plan with 30, 60 and 90 day actions.',
+    about: [
+      'The final course turns exploration into a concrete plan. The roadmap is not a permanent contract; it is a working document that should change as the learner gains information and experience.',
+    ],
+    objectives: [
+      'Assemble career hypotheses supported by authoritative evidence.',
+      'State education, experience, competency, academic, financial and network plans.',
+      'Commit to 30, 60 and 90 day actions and a review date.',
+    ],
+    minutes: 60,
+    lessons: [
+      {
+        id: 'hce-8-l1',
+        title: 'What the roadmap contains',
+        body: [
+          'Career hypotheses: two to four roles you are currently considering. Evidence: authoritative sources used to understand each role. Education and training: prerequisites, degree or certificate requirements and licensure or certification where applicable.',
+          'Experience plan: shadowing, service, research, internship or project opportunities. Competency goals: three skills to develop. Academic plan: courses, milestones and support resources.',
+          'Financial plan: estimated costs and funding research tasks. Network plan: mentors, informational interviews, professional associations or school resources. Then 30, 60 and 90 day actions, and a review date.',
+        ],
+      },
+      {
+        id: 'hce-8-l2',
+        title: 'A plan you will actually revisit',
+        body: [
+          'Set the review date when you write the roadmap, not later. A plan without a review date becomes a document you wrote once.',
+          'Expect the hypotheses to change. Changing them because you learned something is the roadmap working, not the roadmap failing.',
+        ],
+      },
+    ],
+    checks: [
+      {
+        id: 'hce-8-c1',
+        q: 'A learner changes two of their career hypotheses after an informational interview. What does this mean?',
+        options: [
+          'The roadmap failed and should be restarted',
+          'The roadmap is working as intended, because it is a working document that changes as the learner gains information',
+          'The learner should not have done the interview',
+          'The roadmap should be locked after the first version',
+        ],
+        answer: 1,
+        why: 'The roadmap is explicitly not a permanent contract. Revising it on new information is the intended behavior.',
+      },
+    ],
+    activity: {
+      title: 'Capstone: your health-career roadmap',
+      body: [
+        'Assemble the ten required elements into one document. This is the artifact reviewed against the capstone rubric.',
+      ],
+      prompt: 'Draft your roadmap here: career hypotheses, evidence, education and training, experience plan, competency goals, academic plan, financial plan, network plan, 30/60/90 day actions, and review date.',
+    },
+  },
 ];
 
-// ── Courses ──────────────────────────────────────────────────────────────
+const HCE_PRE_POST: Check[] = [
+  {
+    id: 'hce-t1',
+    q: 'Which source is the appropriate starting point for occupation descriptions, typical entry education and pay?',
+    options: ['A social media career account', 'BLS Occupational Outlook Handbook', 'A program brochure', 'A salary aggregator site'],
+    answer: 1,
+    why: 'BLS is the starting point. Licensure and accreditation are then verified with the relevant board or accreditor.',
+  },
+  {
+    id: 'hce-t2',
+    q: 'Licensure is granted by:',
+    options: ['An accrediting body', 'A professional association', 'A governmental licensing authority', 'The educational program'],
+    answer: 2,
+    why: 'Licensure is legal authorization from a governmental licensing authority, limited to that jurisdiction and scope.',
+  },
+  {
+    id: 'hce-t3',
+    q: 'Which statement about the AAMC premed competencies is correct?',
+    options: [
+      'They are universal requirements for every health profession',
+      'They are relevant to learners considering medical school, and other fields use their own standards',
+      'They replace state licensure',
+      'They are required for community health work',
+    ],
+    answer: 1,
+    why: 'One path does not fit every career. Nursing, pharmacy, public health, CHW work and others use the standards relevant to that field.',
+  },
+  {
+    id: 'hce-t4',
+    q: 'A learner writes "Completed 120 hours" on an application. What is the weakness?',
+    options: [
+      'The number is too low',
+      'It states presence, not what was learned or what skill was practiced',
+      'Hours should never be mentioned',
+      'It should be rounded',
+    ],
+    answer: 1,
+    why: 'Hours are not the learning outcome. Strong reflection describes the work, the problem, the skill practiced, and what changed.',
+  },
+  {
+    id: 'hce-t5',
+    q: 'Which funding type generally does not need to be repaid when program terms are met?',
+    options: ['Federal loans', 'Grants and scholarships', 'Private loans', 'Income share agreements'],
+    answer: 1,
+    why: 'Scholarships and grants generally do not require repayment when program terms are met. Loans must be repaid under their terms.',
+  },
+  {
+    id: 'hce-t6',
+    q: 'Total cost of attendance includes:',
+    options: [
+      'Tuition only',
+      'Tuition and fees only',
+      'Tuition, fees, books, housing, transportation, food, insurance, exams, application fees and other living costs',
+      'Tuition minus projected salary',
+    ],
+    answer: 2,
+    why: 'Price is more than tuition. A lower-tuition program can cost more overall once living and relocation costs are included.',
+  },
+  {
+    id: 'hce-t7',
+    q: 'Which description accurately reflects observing a procedure?',
+    options: ['Performed the procedure', 'Assisted with the procedure', 'Observed the workflow', 'Managed the case'],
+    answer: 2,
+    why: 'Accurate description protects participants and the learner’s credibility.',
+  },
+  {
+    id: 'hce-t8',
+    q: 'A mentor tells a learner which program to attend. According to this pathway, what is the issue?',
+    options: [
+      'Nothing, that is the mentor’s role',
+      'Mentors guide reflection, learning and networks; they should not control the learner’s decisions or be the sole source of support',
+      'The learner should find a more senior mentor',
+      'The learner should follow the advice without question',
+    ],
+    answer: 1,
+    why: 'Mentors are guides, not decision-makers.',
+  },
+  {
+    id: 'hce-t9',
+    q: 'Epidemiology, health informatics and healthcare administration are examples of:',
+    options: [
+      'Roles that require a medical degree',
+      'Health careers outside direct patient care',
+      'Roles unavailable to community college students',
+      'Non-health careers',
+    ],
+    answer: 1,
+    why: 'Health careers extend well beyond direct patient care into population health, data, technology, policy and operations.',
+  },
+  {
+    id: 'hce-t10',
+    q: 'What is the correct characterization of an HMC Academy pathway completion?',
+    options: [
+      'A professional certification',
+      'A state license',
+      'An HMC educational completion record, not professional certification or admission eligibility',
+      'Proof of clinical scope',
+    ],
+    answer: 2,
+    why: 'HMC credential rules are explicit: course completion is not licensure, board certification, clinical scope, or admission eligibility.',
+  },
+];
 
-export const COURSES: Course[] = [
+// ── The catalog ──────────────────────────────────────────────────────────
+
+export const PATHWAYS: Pathway[] = [
   {
-    id: 'hmc-101',
-    title: 'Member Hub 101',
-    summary:
-      'What Health Matters Clinic is, what your membership actually gets you, and how to move through the Hub without getting lost.',
-    category: 'Getting Started',
+    id: 'health-careers-exploration',
+    title: 'Health Careers Exploration',
+    level: 'Discover',
+    status: 'published',
+    purpose:
+      'Understand the health-professions ecosystem, connect interests and strengths to possible career families, verify education and licensure requirements, build meaningful experience, strengthen professional skills, and leave with an individualized next-step plan.',
+    format: 'Self-paced | 8 courses | Approximately 8 to 12 hours | Optional career panels and mentor sessions | Final personal pathway plan',
+    credentialTitle: 'HMC Health Careers Exploration — Pathway Completion',
+    credentialType: 'Course Completion',
+    gates: [
+      'Complete all 8 courses and their required activities',
+      'Score 80% or higher on the pathway post-test',
+      'Submit a career roadmap meeting the capstone threshold of 15 of 20',
+    ],
+    guidedStart: 'September 1, 12:00 PM PT',
+    courses: HCE_COURSES,
+    preTest: HCE_PRE_POST,
+    postTest: HCE_PRE_POST,
+    capstone: {
+      title: 'Personal Health-Career Roadmap',
+      intro:
+        'The roadmap turns exploration into a concrete plan. It is scored against a 20-point rubric and needs 15 points to pass.',
+      requirements: [
+        'Career hypotheses — two to four roles you are currently considering',
+        'Evidence — authoritative sources used to understand each role',
+        'Education and training — prerequisites, degree or certificate requirements, licensure or certification where applicable',
+        'Experience plan — shadowing, service, research, internship or project opportunities',
+        'Competency goals — three skills to develop',
+        'Academic plan — courses, milestones and support resources',
+        'Financial plan — estimated costs and funding research tasks',
+        'Network plan — mentors, informational interviews, professional associations or school resources',
+        '30, 60 and 90 day actions',
+        'Review date — when you will revisit the roadmap',
+      ],
+      rubric: [
+        { label: 'Career research accuracy', max: 4 },
+        { label: 'Use of authoritative sources', max: 3 },
+        { label: 'Education and licensure verification', max: 3 },
+        { label: 'Experience and competency plan', max: 3 },
+        { label: 'Financial realism', max: 2 },
+        { label: 'Networking and mentorship plan', max: 2 },
+        { label: 'Actionability', max: 3 },
+      ],
+      passing: 15,
+      prompt:
+        'Write your roadmap covering all ten required elements. This is submitted for review against the rubric above.',
+    },
+    sourceKey: [
+      { key: 'J1', label: 'U.S. Bureau of Labor Statistics — Occupational Outlook Handbook' },
+      { key: 'J2', label: 'AAMC — Premed Competencies for Entering Medical Students' },
+      { key: 'J3', label: 'National Association of Colleges and Employers — Career Readiness Competencies' },
+      { key: 'J4', label: 'U.S. Department of Education, Federal Student Aid' },
+    ],
+    version: '1.0',
+    effectiveDate: 'August 7, 2026',
+    nextReview: 'August 2027, or sooner if authoritative requirements change',
+  },
+  {
+    id: 'youth-steam',
+    title: 'Youth Mentorship + STEAM',
+    level: 'Discover',
+    status: 'in-development',
+    purpose:
+      'Help young people explore health, science, technology, community problem-solving, and health careers through projects and mentoring.',
+    format: 'Self-paced with mentor sessions | 8 courses | Capstone project',
+    credentialTitle: 'HMC Youth Mentorship + STEAM — Pathway Completion',
+    credentialType: 'Course Completion',
+    gates: [
+      '8 courses complete',
+      'Post-test 80% or higher',
+      'Capstone at or above threshold',
+      'Youth account, consent and safeguarding requirements satisfied',
+    ],
+    plannedCourses: [
+      'Health Starts Here',
+      'Inside the Human Body',
+      'Mind + Brain',
+      'Data Can Tell a Story',
+      'Technology + Health',
+      'Designing for People',
+      'Meet the People Behind Healthcare',
+      'Build Something That Matters — Capstone',
+    ],
+    courses: [],
+    version: '0.9 draft',
+    effectiveDate: 'In development',
+    nextReview: 'Pending curriculum review',
+  },
+  {
+    id: 'field-based-community-health',
+    title: 'Field-Based Community Health',
     level: 'Foundations',
-    credits: 50,
-    badge: 'Hub Navigator',
-    featured: true,
-    lessons: [
-      {
-        id: 'hmc-101-1',
-        title: 'What Health Matters Clinic is',
-        minutes: 4,
-        kind: 'read',
-        body: [
-          'Health Matters Clinic is a Los Angeles nonprofit that brings preventive health to the places people already are. There is no waiting room. The work happens at pop-up clinics, health fairs, street outreach, and community events across LA County.',
-          'What that means in practice: free screenings, a real person to talk to about what you are dealing with, and a path to the services you qualify for. Services are offered regardless of insurance status, immigration status, gender identity, housing status, or ability to pay.',
-          'HMC provides screenings, health education, and navigation. A screening is a snapshot, not a diagnosis. If something on a screening needs attention, the job of the team is to get you connected to a provider who can evaluate it properly.',
-        ],
-        takeaways: [
-          'HMC is mobile and community-based, not a walk-in building.',
-          'Screenings identify things worth checking. They are not diagnoses.',
-          'Cost, coverage, and status are not barriers to being served.',
-        ],
-      },
-      {
-        id: 'hmc-101-2',
-        title: 'How the Hub is organized',
-        minutes: 3,
-        kind: 'read',
-        body: [
-          'The Hub has five places you will actually use. Home shows your next step, chosen for you based on what you have told us. Snapshot is the wellbeing self-check. Playbook is the plan built from that self-check. Events lists what is happening near you. Resources searches the directory of vetted LA County services.',
-          'The Academy, where you are now, is the part that explains the rest. Courses are short on purpose. Most lessons run under five minutes, and your place is saved when you leave.',
-          'Nothing in the Hub requires you to finish anything in order. If the only thing you do today is find one event near you, that is a complete visit.',
-        ],
-        takeaways: [
-          'Home always shows one clear next step.',
-          'Your Playbook is generated from your own Snapshot answers.',
-          'Lesson progress saves automatically. Leave and come back.',
-        ],
-      },
-      {
-        id: 'hmc-101-3',
-        title: 'Your privacy, in plain language',
-        minutes: 4,
-        kind: 'read',
-        body: [
-          'You control what you share. The Snapshot asks about housing, food, emotional health, care access, and transportation because those five things predict health outcomes more than almost anything measured in a clinic. You can skip any of them.',
-          'HMC does not sell member information. Nothing you enter in the Hub is shared with a landlord, an employer, an insurer, or any immigration authority. Screening results are discussed with you privately, never announced in a public space.',
-          'When you ask to be connected to support, a referral is created and a real HMC team member sees your name, contact details, and the reason you asked. That is the only time a staff person receives your information, and it only happens when you tap the button that says so.',
-        ],
-        takeaways: [
-          'Every question in the Snapshot can be skipped.',
-          'A referral is only created when you explicitly ask for one.',
-          'Information is never shared with immigration, employers, or landlords.',
-        ],
-      },
-      {
-        id: 'hmc-101-4',
-        title: 'Take your Wellbeing Snapshot',
-        minutes: 5,
-        kind: 'tool',
-        body: [
-          'The Snapshot is five questions about the parts of life that shape health. It takes about three minutes and it is the input that builds your Playbook.',
-          'Answer honestly rather than optimistically. The plan is only as useful as what you put into it, and nothing you select here triggers a call to anyone.',
-        ],
-        tool: {
-          label: 'Open my Snapshot',
-          url: '#tab:check-yourself',
-          blurb: 'Five questions. About three minutes. Builds your Playbook.',
-        },
-      },
+    status: 'in-development',
+    purpose:
+      'Build readiness for community health, outreach, navigation, prevention, street-medicine support, and field-based service.',
+    format: 'Self-paced core plus required practicals and supervised practicum | 15 courses',
+    credentialTitle: 'HMC Field-Based Community Health — Applied Pathway Completion',
+    credentialType: 'Applied Pathway Completion',
+    gates: [
+      'Shared Foundations or approved equivalency',
+      '8 pathway courses',
+      'Post-test 80% or higher',
+      'Integrated case lab pass',
+      'All role-required practicals',
+      'Assigned practicum or service requirement',
+      'Supervisor readiness sign-off',
     ],
+    plannedCourses: [
+      'Community Health + Health Equity',
+      'Social Determinants of Health',
+      'Communication + Active Listening',
+      'Cultural Humility + Trauma-Informed Engagement',
+      'Professional Boundaries + Ethics + Privacy',
+      'Field Safety + Infection Prevention',
+      'Mental Health + Substance Use Awareness',
+      'Harm Reduction Foundations',
+      'Care Navigation + Resource Coordination',
+      'Motivational Interviewing Foundations',
+      'De-escalation + Conflict Response',
+      'Data Collection + Documentation',
+      'Applied Community Health Case Lab',
+      'Field Readiness Assessment',
+      'Practicum / Supervised Service',
+    ],
+    courses: [],
+    version: '0.9 draft',
+    effectiveDate: 'In development',
+    nextReview: 'First build priority per the program catalog',
   },
   {
-    id: 'credits-101',
-    title: 'Health Credits, Explained',
-    summary:
-      'How Health Credits are earned, what they recognize, and why HMC rewards showing up for your own health.',
-    category: 'Getting Started',
-    level: 'Foundations',
-    credits: 25,
-    badge: 'Credit Holder',
-    lessons: [
-      {
-        id: 'credits-101-1',
-        title: 'What a Health Credit is',
-        minutes: 3,
-        kind: 'read',
-        body: [
-          'Health Credits are HMC recognition for the work of taking care of yourself and your community. You earn them by completing a Snapshot, finishing an Academy course, attending an event, or volunteering at one.',
-          'Credits are not currency and they are not insurance. They are a record that you showed up. Your balance is visible on your profile and it follows your member account across the HMC tools.',
-        ],
-        takeaways: [
-          'Credits are earned through participation, not purchased.',
-          'Your balance lives on your profile and updates automatically.',
-        ],
-      },
-      {
-        id: 'credits-101-2',
-        title: 'Volunteering as a pathway',
-        minutes: 4,
-        kind: 'read',
-        body: [
-          'HMC treats volunteering as a health behavior, not just a donation of time. People who volunteer report lower isolation and stronger social connection, and social connection is one of the strongest predictors of long-term health.',
-          'There is a practical side too. Volunteering at an HMC event puts you next to people whose job is navigation. Many members first learned they qualified for coverage while working a check-in table.',
-          'If you want to move from member to volunteer, the volunteer portal handles applications, training, and shift signup. It is a separate system with its own account.',
-        ],
-        takeaways: [
-          'Volunteering counts toward credits and toward connection.',
-          'The volunteer portal is a separate signup from your member account.',
-        ],
-      },
+    id: 'clinical-exposure-simulation',
+    title: 'Clinical Exposure + Simulation',
+    level: 'Applied',
+    status: 'in-development',
+    purpose:
+      'Give eligible health-professions learners structured exposure to clinical communication, team-based care, simulation, community-centered care, and field workflows without exceeding learner scope.',
+    format: 'Self-paced core plus scheduled simulation and practical competency review | 15 courses',
+    credentialTitle: 'HMC Clinical + Community Health Experience — Pathway Completion',
+    credentialType: 'Applied Pathway Completion',
+    gates: [
+      'Shared Foundations or approved equivalency',
+      '8 pathway courses',
+      'Post-test 80% or higher',
+      'Required simulations',
+      'Assigned practical competency review',
+      'Reflection and debrief',
     ],
+    plannedCourses: [
+      'Community-Centered Clinical Care',
+      'Healthcare Team Roles + Scope',
+      'Medical Terminology Foundations',
+      'Patient Communication + Interviewing',
+      'Vitals + Screening Concepts',
+      'Infection Prevention + PPE',
+      'Clinical Documentation + Scribing Concepts',
+      'Social Needs in Clinical Care',
+      'Trauma-Informed Clinical Encounters',
+      'Referral + Follow-Up Planning',
+      'Simulation Case 1 — Chronic Disease + Access Barriers',
+      'Simulation Case 2 — Mental Health / Substance Use + Safety',
+      'Simulation Case 3 — Unhoused Patient + Continuity of Care',
+      'Debrief + Reflection',
+      'Practical / Simulation Competency Review',
+    ],
+    courses: [],
+    version: '0.9 draft',
+    effectiveDate: 'In development',
+    nextReview: 'Pending clinical governance review',
   },
   {
-    id: 'wellness-foundations',
-    title: 'Unstoppable: Wellness Foundations',
-    summary:
-      'The core of the HMC Unstoppable curriculum. Stress, nervous system basics, and the daily practices that hold up when life does not cooperate.',
-    category: 'Mental Wellness',
-    level: 'Foundations',
-    credits: 100,
-    badge: 'Unstoppable Foundations',
-    featured: true,
-    lessons: [
-      {
-        id: 'wf-1',
-        title: 'Stress is information, not failure',
-        minutes: 5,
-        kind: 'read',
-        body: [
-          'Stress is your body allocating resources to a threat. The heart rate climbs, breathing shortens, attention narrows. That response is doing its job. The problem is not that it turns on, it is that for a lot of people in Los Angeles it never fully turns off.',
-          'Chronic activation is what wears things down over time. It shows up as sleep that does not restore, a short fuse, a stomach that will not settle, and a sense of running on a system that has no idle.',
-          'The reframe that makes the rest of this course usable: the goal is not to eliminate stress. The goal is to get better at coming back down. Recovery is the trainable skill.',
-        ],
-        takeaways: [
-          'The stress response is functional. Staying in it is the problem.',
-          'Recovery, not elimination, is the skill worth building.',
-        ],
-      },
-      {
-        id: 'wf-2',
-        title: 'The two-minute reset',
-        minutes: 4,
-        kind: 'activity',
-        body: [
-          'Slow exhales are the fastest lever most people have on their own nervous system. A longer out-breath than in-breath shifts the body toward the recovery side of the system, and it works in a parking lot, a bus seat, or a bathroom stall.',
-          'Try it now. Breathe in through the nose for a count of four. Breathe out through the mouth for a count of six. Repeat for two minutes. If counting makes you tense, drop the count and just make the exhale longer than the inhale.',
-          'Two notes. If you feel lightheaded, stop and breathe normally. And if slowing down makes you feel more anxious rather than less, that is common for people carrying trauma. Move instead: walk, stretch, push against a wall. The point is discharge, not stillness.',
-        ],
-        takeaways: [
-          'Longer exhale than inhale. That is the whole mechanic.',
-          'If stillness increases anxiety, use movement instead.',
-        ],
-      },
-      {
-        id: 'wf-3',
-        title: 'Sleep is the multiplier',
-        minutes: 5,
-        kind: 'read',
-        body: [
-          'Nothing else in this course works well on four hours of sleep. Sleep is when memory consolidates, when the immune system does maintenance, and when emotional regulation gets restocked. Short sleep makes every other stressor land harder.',
-          'The three changes with the best return: a consistent wake time, light in your eyes early in the day, and a wind-down that does not involve a bright screen in the last half hour. Consistent wake time matters more than consistent bedtime because it is the one you can actually control.',
-          'If you sleep in an environment you do not control, a shared room, a shelter, a car, standard sleep advice can feel useless. Focus on what is portable: an eye mask, earplugs, a fixed wake time, and getting outside in the morning light.',
-        ],
-        takeaways: [
-          'Fix the wake time first. Bedtime follows.',
-          'Morning light is the cheapest sleep intervention there is.',
-          'Portable fixes matter more than ideal conditions.',
-        ],
-      },
-      {
-        id: 'wf-4',
-        title: 'Naming what you are carrying',
-        minutes: 4,
-        kind: 'reflect',
-        body: [
-          'Putting a specific name to a feeling reduces its intensity. Vague dread is harder to work with than "I am worried about rent on the fifth". Specificity turns a mood into a problem, and problems have handles.',
-          'Write one sentence below. No one else reads it. It stays on this device.',
-        ],
-        prompt:
-          'What is the heaviest thing you are carrying this week, in one sentence?',
-      },
-      {
-        id: 'wf-5',
-        title: 'Where to go when it is more than a bad week',
-        minutes: 3,
-        kind: 'read',
-        body: [
-          'Self-management has a ceiling. If low mood, anxiety, or hopelessness has lasted more than two weeks and is interfering with sleep, work, or relationships, that is the point to bring in a person rather than a practice.',
-          'Check Yourself is a free, private mental health self-check that gives you plain-language results you can hand to a provider. It uses standard screening questions and takes about three minutes.',
-          'If you are thinking about hurting yourself, do not work through a course. Call or text 988 for the Suicide and Crisis Lifeline, any time, free, in English or Spanish. If someone is in immediate danger, call 911.',
-        ],
-        takeaways: [
-          'Two weeks of interference is the signal to involve a person.',
-          '988 is free, 24/7, call or text, English or Spanish.',
-        ],
-      },
-    ],
-  },
-  {
-    id: 'calm-practice',
-    title: 'Building a Calm Practice',
-    summary:
-      'A short, practical course on making recovery a habit, using the Calm Kit coaching tool as your daily anchor.',
-    category: 'Mental Wellness',
-    level: 'Practical',
-    credits: 75,
-    badge: 'Daily Practice',
-    lessons: [
-      {
-        id: 'cp-1',
-        title: 'Why small and daily beats big and rare',
-        minutes: 4,
-        kind: 'read',
-        body: [
-          'A ninety-minute practice you do twice a year changes nothing. Four minutes you actually do most days changes your baseline. Consistency is the active ingredient, and consistency is mostly a design problem rather than a willpower problem.',
-          'Design it so the practice attaches to something already in your day. After you park. Before you unlock your phone in the morning. While the coffee is going. Habits that hang off an existing anchor survive; habits that need a new slot in the day usually do not.',
-        ],
-        takeaways: [
-          'Attach the practice to something you already do.',
-          'Four minutes most days beats ninety minutes twice a year.',
-        ],
-      },
-      {
-        id: 'cp-2',
-        title: 'Run a session in Calm Kit',
-        minutes: 6,
-        kind: 'tool',
-        body: [
-          'Calm Kit is the HMC coaching tool. It runs guided sessions you can do anywhere, and it is built to work on a phone with a weak connection.',
-          'Do one session now, then come back and finish the course. Pick the shortest one available. The goal today is to have done it once, not to have done it well.',
-        ],
-        tool: {
-          label: 'Open Calm Kit',
-          url: 'https://calmkit.healthmatters.clinic',
-          blurb: 'Guided coaching sessions. Works on a phone, offline-friendly.',
-        },
-      },
-      {
-        id: 'cp-3',
-        title: 'When you miss a day',
-        minutes: 3,
-        kind: 'read',
-        body: [
-          'You will miss days. The people who keep a practice are not the ones who never miss, they are the ones who treat a miss as neutral information rather than proof of a character flaw.',
-          'The rule that works: never miss twice. One skipped day is a day. Two becomes a pattern, and patterns are what you are actually managing.',
-        ],
-        takeaways: ['Never miss twice. That is the entire maintenance rule.'],
-      },
-    ],
-  },
-  {
-    id: 'keep-la-covered',
-    title: 'Keep LA Covered: Medi-Cal Renewal',
-    summary:
-      'How Medi-Cal renewal works, what causes people to lose coverage they still qualify for, and how to fix it if it already happened.',
-    category: 'Coverage & Care',
-    level: 'Practical',
-    credits: 100,
-    badge: 'Coverage Ready',
-    featured: true,
-    lessons: [
-      {
-        id: 'klc-1',
-        title: 'Renewal is annual, and it is mostly paperwork',
-        minutes: 5,
-        kind: 'read',
-        body: [
-          'Medi-Cal is not permanent once granted. Every member goes through a renewal, also called redetermination, on a yearly cycle. The county checks whether you still qualify based on income and household information.',
-          'Many people are renewed automatically when the county can confirm eligibility from data it already has. If it cannot, you get a renewal packet in the mail with a deadline, and it has to come back completed.',
-          'The single biggest reason people lose coverage they still qualify for is not income. It is mail. A packet goes to an old address, no one responds, and the case closes for a procedural reason rather than an eligibility one.',
-        ],
-        takeaways: [
-          'Renewal happens once a year, every year.',
-          'Most coverage losses are procedural, not eligibility-based.',
-        ],
-      },
-      {
-        id: 'klc-2',
-        title: 'The address problem',
-        minutes: 4,
-        kind: 'read',
-        body: [
-          'If the county does not have your current address, phone number, and email, the renewal system cannot reach you. For anyone who has moved, been between housing, or is staying with family, this is the highest-value thing to fix.',
-          'In Los Angeles County, contact information for Medi-Cal is updated through the Department of Public Social Services. You can update it by phone, online through the state benefits portal, or in person at a DPSS office. Do it before the renewal packet is due, not after.',
-          'If you are unhoused or your housing is unstable, ask about a mailing address alternative when you call. Case workers have options for this, and using one is far better than missing the packet.',
-        ],
-        takeaways: [
-          'Updating your address is the highest-leverage 10 minutes available.',
-          'Ask about mailing alternatives if your housing is unstable.',
-        ],
-      },
-      {
-        id: 'klc-3',
-        title: 'If your coverage already ended',
-        minutes: 5,
-        kind: 'read',
-        body: [
-          'Losing coverage for a procedural reason is often reversible. California allows a window after a case closes during which you can return the requested information and have coverage restored without starting a brand new application. Call the county as soon as you notice, and ask specifically whether your case can be reopened.',
-          'If you no longer qualify for Medi-Cal, you are usually eligible for a special enrollment period through Covered California, which is the state marketplace where plans are sold with income-based subsidies.',
-          'Do not assume you are ineligible because of immigration status. California has expanded full-scope Medi-Cal to income-eligible residents across age groups regardless of immigration status. Enrolling in Medi-Cal is not a public charge concern. Verify the current rules with the county rather than with rumor.',
-        ],
-        takeaways: [
-          'Ask directly whether the case can be reopened, not just refiled.',
-          'Losing Medi-Cal opens a Covered California enrollment window.',
-          'Immigration status is not automatically disqualifying in California.',
-        ],
-      },
-      {
-        id: 'klc-4',
-        title: 'Find help near you',
-        minutes: 3,
-        kind: 'tool',
-        body: [
-          'You do not have to do this alone. The Resource Directory lists LA County organizations that provide free enrollment help, including community clinics and certified enrollment counselors.',
-          'Search the directory for enrollment help, then call before you go so you know what documents to bring.',
-        ],
-        tool: {
-          label: 'Search the Resource Directory',
-          url: 'https://www.healthmatters.clinic/resources/resourcedirectory?q=medi-cal%20enrollment',
-          blurb: 'Vetted LA County organizations offering free enrollment help.',
-        },
-      },
-    ],
-  },
-  {
-    id: 'appointment-ready',
-    title: 'Getting What You Need From a Provider',
-    summary:
-      'How to prepare for a medical appointment so the short time you get actually produces something useful.',
-    category: 'Coverage & Care',
-    level: 'Practical',
-    credits: 75,
-    badge: 'Prepared Patient',
-    lessons: [
-      {
-        id: 'ar-1',
-        title: 'The three-question method',
-        minutes: 4,
-        kind: 'read',
-        body: [
-          'Most primary care visits run about fifteen minutes, and a lot of that is administrative. Walking in with written questions is the difference between leaving informed and leaving confused.',
-          'Three questions cover almost every situation. What is my main problem? What do I need to do about it? Why is it important that I do this?',
-          'Write them down before you go and hand the paper over if talking is hard. Nothing about that is unusual and clinicians generally welcome it.',
-        ],
-        takeaways: [
-          'What is my main problem, what do I do, and why does it matter.',
-          'Bring the questions written down. Hand them over if needed.',
-        ],
-      },
-      {
-        id: 'ar-2',
-        title: 'Say it back',
-        minutes: 3,
-        kind: 'read',
-        body: [
-          'Before you leave, repeat the plan in your own words. "So I take this twice a day with food, and I come back in three weeks if the swelling has not gone down." This catches misunderstandings while you can still fix them.',
-          'If you did not follow something, say you did not follow it. Asking a clinician to say it again in plainer language is a normal request, not a burden.',
-        ],
-        takeaways: ['Repeat the plan out loud before you leave the room.'],
-      },
-      {
-        id: 'ar-3',
-        title: 'Bring your Snapshot',
-        minutes: 3,
-        kind: 'read',
-        body: [
-          'Your Wellbeing Snapshot covers housing, food, transportation, care access, and emotional health. Those are the things that determine whether a treatment plan is realistic for you, and they are the things most likely to go unmentioned in a fifteen-minute visit.',
-          'If transportation is the reason you miss appointments, that is medically relevant information, not an excuse. Say it. Many systems have solutions for it that patients never learn about because no one asks.',
-        ],
-        takeaways: [
-          'Barriers to following a plan are clinically relevant. Say them out loud.',
-        ],
-      },
-    ],
-  },
-  {
-    id: 'community-power',
-    title: 'Take Action LA: Community Advocate',
-    summary:
-      'How local health decisions get made in LA County, and how a member becomes someone with a say in them.',
-    category: 'Community Power',
+    id: 'internships-fellowships',
+    title: 'Internships + Fellowships',
     level: 'Advanced',
-    credits: 125,
-    badge: 'Community Advocate',
-    lessons: [
-      {
-        id: 'cpw-1',
-        title: 'Who decides what in LA County health',
-        minutes: 5,
-        kind: 'read',
-        body: [
-          'Los Angeles County health services are shaped by a small number of bodies that most residents never interact with. The Board of Supervisors sets county budget priorities. The Department of Public Health and the Department of Health Services run programs. The Department of Mental Health funds and oversees behavioral health services, including the prevention and early intervention work that funds community programs like this one.',
-          'These bodies hold public meetings with public comment periods. Comment slots are short, usually one to two minutes, and they are chronically underused by the people most affected by the decisions being made.',
-        ],
-        takeaways: [
-          'Public comment is a real, underused channel.',
-          'County departments, not the state, run most of what you touch locally.',
-        ],
-      },
-      {
-        id: 'cpw-2',
-        title: 'What a two-minute comment should contain',
-        minutes: 4,
-        kind: 'read',
-        body: [
-          'An effective comment does three things in order. It names who you are and where you live. It tells one specific story rather than a general complaint. It ends with a specific ask.',
-          'Specific beats comprehensive. "I waited six weeks for an appointment at the clinic on Vermont and I want that wait reported publicly every quarter" lands harder than a broad statement about access being difficult.',
-          'Write it out and read it. Nobody expects performance. They expect a resident who showed up.',
-        ],
-        takeaways: [
-          'Who you are, one specific story, one specific ask.',
-          'Reading from a page is completely normal.',
-        ],
-      },
-      {
-        id: 'cpw-3',
-        title: 'Show up with HMC',
-        minutes: 3,
-        kind: 'tool',
-        body: [
-          'The fastest way in is to attend something. HMC runs health fairs, wellness meetups, and street outreach across LA County, and the calendar is public.',
-          'Find one event, put it in your calendar, and bring one person with you.',
-        ],
-        tool: {
-          label: 'Browse upcoming events',
-          url: '#tab:events',
-          blurb: 'Health fairs, wellness meetups, and outreach across LA County.',
-        },
-      },
+    status: 'in-development',
+    purpose:
+      'Provide sustained, supervised, project-based professional experience tied to learning objectives and portfolio outcomes.',
+    format: 'Term-based placement with supervisor, learning agreement, midpoint review and capstone | 11 core courses',
+    credentialTitle: 'HMC [Concentration] Internship / Fellowship — Completion',
+    credentialType: 'Fellowship / Internship Completion',
+    gates: [
+      'Professional core complete',
+      'Learning agreement',
+      'Required project or placement work',
+      'Midpoint review',
+      'Capstone at threshold',
+      'Final supervisor evaluation',
+      'Approved portfolio artifact',
     ],
+    plannedCourses: [
+      'Professional Orientation + Expectations',
+      'Project Planning + Milestones',
+      'Research + Evidence Use',
+      'Communication + Documentation',
+      'Team Collaboration',
+      'Ethics, Confidentiality + Organizational Responsibility',
+      'Professional Feedback + Growth',
+      'Portfolio + Impact Documentation',
+      'Midpoint Review',
+      'Capstone Presentation',
+      'Final Evaluation + Career Reflection',
+    ],
+    courses: [],
+    version: '0.9 draft',
+    effectiveDate: 'In development',
+    nextReview: 'Pending placement agreements',
+  },
+  {
+    id: 'mentor-leader',
+    title: 'Mentor + Leader',
+    level: 'Leadership',
+    status: 'in-development',
+    purpose:
+      'Prepare experienced participants and professionals to mentor, facilitate, lead teams, and support learner development.',
+    format: 'Self-paced core plus mentor practice case | 12 courses',
+    credentialTitle: 'HMC Mentor + Peer Leader — Pathway Completion',
+    credentialType: 'Course Completion',
+    gates: [
+      '8 courses complete',
+      'Post-test 80% or higher',
+      'Mentor practice case pass',
+      'Readiness acknowledgement',
+      'Additional eligibility checks if the assignment involves minors, supervision, or sensitive access',
+    ],
+    plannedCourses: [
+      'The Role of a Mentor',
+      'Building Trust + Psychological Safety',
+      'Coaching vs Advising vs Supervising',
+      'Goal Setting + Development Planning',
+      'Giving Effective Feedback',
+      'Inclusive Mentorship',
+      'Facilitating Groups + Learning',
+      'Recognizing Risk + Escalating Concerns',
+      'Supporting Reflection + Portfolio Development',
+      'Peer Leadership + Team Coordination',
+      'Mentor Practice Case',
+      'Mentor / Leader Readiness Review',
+    ],
+    courses: [],
+    version: '0.9 draft',
+    effectiveDate: 'In development',
+    nextReview: 'Pending governance review',
   },
 ];
 
-// ── Paths ────────────────────────────────────────────────────────────────
+export const LEARNING_MODEL = ['Discover', 'Learn', 'Practice', 'Serve', 'Demonstrate', 'Advance'];
 
-export const PATHS: Path[] = [
-  {
-    id: 'path-new-member',
-    title: 'New Member Basecamp',
-    tagline: 'Start here',
-    description:
-      'The 20 minutes that make everything else in the Hub make sense. What HMC is, how your information is handled, and how to get your first plan.',
-    courseIds: ['hmc-101', 'credits-101'],
-  },
-  {
-    id: 'path-wellness',
-    title: 'Unstoppable Wellness',
-    tagline: 'Mental health, practically',
-    description:
-      'The HMC Unstoppable curriculum, adapted for self-paced learning. Stress, sleep, daily practice, and knowing when to bring in a person.',
-    courseIds: ['wellness-foundations', 'calm-practice'],
-  },
-  {
-    id: 'path-coverage',
-    title: 'Coverage and Care Navigator',
-    tagline: 'Keep what you qualify for',
-    description:
-      'Keep your Medi-Cal, get it back if it lapsed, and make the appointments you do get actually count.',
-    courseIds: ['keep-la-covered', 'appointment-ready'],
-  },
-  {
-    id: 'path-advocate',
-    title: 'Community Advocate',
-    tagline: 'From served to serving',
-    description:
-      'For members who want a say in how health works in their neighborhood, not just access to it.',
-    courseIds: ['community-power', 'credits-101'],
-  },
-];
-
-// ── Helpers ──────────────────────────────────────────────────────────────
-
-export const courseById = (id: string): Course | undefined =>
-  COURSES.find((c) => c.id === id);
-
-export const courseMinutes = (c: Course): number =>
-  c.lessons.reduce((sum, l) => sum + l.minutes, 0);
-
-export const totalLessons = (c: Course): number => c.lessons.length;
-
-export const CATEGORY_ACCENT: Record<Category, { text: string; bg: string; ring: string }> = {
-  'Getting Started': { text: 'text-[#233DFF]', bg: 'bg-blue-50', ring: 'ring-[#233DFF]/15' },
-  'Mental Wellness': { text: 'text-[#FF6F91]', bg: 'bg-pink-50', ring: 'ring-[#FF6F91]/15' },
-  'Coverage & Care': { text: 'text-[#FF6E40]', bg: 'bg-orange-50', ring: 'ring-[#FF6E40]/15' },
-  'Community Power': { text: 'text-[#8B6D00]', bg: 'bg-amber-50', ring: 'ring-amber-300/20' },
+export const LEVEL_ACCENT: Record<Level, { text: string; bg: string }> = {
+  Discover: { text: 'text-[#233DFF]', bg: 'bg-blue-50' },
+  Foundations: { text: 'text-[#FF6E40]', bg: 'bg-orange-50' },
+  Applied: { text: 'text-[#FF6F91]', bg: 'bg-pink-50' },
+  Advanced: { text: 'text-[#8B6D00]', bg: 'bg-amber-50' },
+  Leadership: { text: 'text-emerald-700', bg: 'bg-emerald-50' },
 };
+
+export const pathwayById = (id: string) => PATHWAYS.find((p) => p.id === id);
+
+export const courseById = (pathwayId: string, courseId: string) =>
+  pathwayById(pathwayId)?.courses.find((c) => c.id === courseId);
+
+export const pathwayMinutes = (p: Pathway) =>
+  p.courses.reduce((n, c) => n + c.minutes, 0);
+
+export const pathwayLessonIds = (p: Pathway) =>
+  p.courses.flatMap((c) => c.lessons.map((l) => l.id));

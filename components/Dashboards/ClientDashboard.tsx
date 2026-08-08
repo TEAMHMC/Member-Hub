@@ -5,7 +5,6 @@ import { buildPlanFromScores } from '../../services/plan';
 import { context as ctxApi, client as clientApi, referrals as referralsApi, sunny as sunnyApi, toolLink, TOOLS, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
 import { useEvents } from '../../services/hooks';
 import Academy from '../Academy/Academy';
-import type { Course } from '../Academy/catalog';
 import {
   Brain, Calendar, MapPin, Clock, ShieldCheck, GraduationCap,
   ArrowLeft, Users, Activity,
@@ -742,23 +741,12 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     </div>
   );
 
-  // Finishing a course awards the badge and Health Credits on the member record.
-  // The Academy owns lesson progress; the Hub owns the member's standing.
-  const handleCourseComplete = (course: Course) => {
-    onUpdateUser?.({
-      badges: Array.from(new Set([...(user.badges || []), course.badge])),
-      wellnessPoints: (user.wellnessPoints || 0) + course.credits,
-      xp: (user.xp || 0) + course.credits,
-    });
-  };
-
   const renderAcademy = () => (
     <Academy
       userId={user.id}
       memberName={`${user.firstName} ${user.lastName}`.trim() || 'Member'}
       onNavigateTab={(tab) => { setActiveTab(tab); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
       onSignal={(type, payload) => ctxApi.event(type, payload)}
-      onCourseComplete={handleCourseComplete}
     />
   );
 
