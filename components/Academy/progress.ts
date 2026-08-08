@@ -155,7 +155,18 @@ export function evaluateGates(p: Pathway, s: LearnerState): {
   // portal records separately. Submission is what the learner controls.
   const capstoneMet = p.capstone ? capstoneText.length > 0 : true;
 
-  const gates: GateStatus[] = [
+  // A pathway still in curriculum review cannot issue a credential, no matter
+  // how much of the published content a learner has finished. Stated as its own
+  // gate so the learner sees why rather than finding a dead button.
+  const gates: GateStatus[] = [];
+  if (p.status !== 'published') {
+    gates.push({
+      label: 'Pathway published and open for credentialing',
+      met: false,
+      detail: `${p.courses.length} of ${p.plannedCourses?.length ?? 0} courses released so far`,
+    });
+  }
+  gates.push(
     {
       label: `Complete all ${p.courses.length} courses and their required activities`,
       met: coursesDone,
@@ -165,8 +176,8 @@ export function evaluateGates(p: Pathway, s: LearnerState): {
       label: `Score ${PASS_THRESHOLD}% or higher on the pathway post-test`,
       met: postMet,
       detail: post === null ? 'Not yet attempted' : `Best score ${post}%`,
-    },
-  ];
+    }
+  );
 
   if (p.capstone) {
     gates.push({

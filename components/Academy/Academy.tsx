@@ -481,6 +481,9 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     const accent = LEVEL_ACCENT[p.level];
     const registered = state.enrolled.includes(p.id);
     const published = p.status === 'published';
+    // A pathway can be mid-build: some courses released, credential not yet open.
+    const hasCourses = p.courses.length > 0;
+    const releasedTitles = new Set(p.courses.map((c) => c.title));
     const { gates, eligible } = evaluateGates(p, state);
     const issued = state.credentials[p.id];
     const pre = state.preTest[p.id];
@@ -514,13 +517,21 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           </div>
         )}
 
-        {published && !registered && (
+        {hasCourses && !registered && (
           <div className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <p className="text-2xl font-semibold text-zinc-900">Register</p>
-              <p className="text-sm text-zinc-500 mt-1">Free. Self-paced. Start any time.</p>
+              <p className="text-sm text-zinc-500 mt-1">
+                {published
+                  ? 'Free. Self-paced. Start any time.'
+                  : `Free. ${p.courses.length} of ${p.plannedCourses?.length ?? 0} courses are released. The completion record opens when the pathway is published.`}
+              </p>
             </div>
-            <Btn onClick={() => { enroll(p); setView({ name: 'test', pathwayId: p.id, kind: 'pre' }); }}>
+            <Btn onClick={() => {
+                enroll(p);
+                // Only pathways with a published baseline check start on one.
+                if (p.preTest?.length) setView({ name: 'test', pathwayId: p.id, kind: 'pre' });
+              }}>
               Register and start
             </Btn>
           </div>
@@ -529,23 +540,27 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
         {!published && (
           <div className="bg-white rounded-2xl border border-dashed border-zinc-300 p-8 space-y-5">
             <p className="text-sm text-zinc-600 leading-relaxed">
-              This pathway is built and under curriculum review. The course sequence below is final;
-              lesson content and assessments are in production.
+              This pathway is under curriculum review. The course sequence below is final. Released
+              courses can be taken now; the rest are in production.
             </p>
             <ol className="space-y-2">
-              {p.plannedCourses?.map((t, i) => (
-                <li key={t} className="flex items-start gap-4 text-sm">
-                  <span className="w-6 h-6 rounded-full bg-zinc-100 text-zinc-500 flex items-center justify-center text-[11px] font-bold shrink-0">{i + 1}</span>
-                  <span className="text-zinc-700">{t}</span>
-                </li>
-              ))}
+              {p.plannedCourses?.map((t, i) => {
+                const out = releasedTitles.has(t);
+                return (
+                  <li key={t} className="flex items-start gap-4 text-sm">
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${out ? 'bg-emerald-50 text-emerald-600' : 'bg-zinc-100 text-zinc-500'}`}>{i + 1}</span>
+                    <span className={out ? 'text-zinc-900 font-semibold' : 'text-zinc-700'}>{t}</span>
+                    {out && <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">Released</span>}
+                  </li>
+                );
+              })}
             </ol>
           </div>
         )}
 
-        {registered && published && (
+        {registered && hasCourses && (
           <>
-            {pre && (
+            {pre && p.postTest && (
               <div className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-7 space-y-4">
                 <div className="flex items-center gap-2 text-zinc-400">
                   <TrendingUp size={16} />
@@ -595,6 +610,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             </div>
 
             {/* Assessment + capstone */}
+            {p.postTest && (
             <div className="space-y-3">
               <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Assessment</h2>
               <div className="bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -624,6 +640,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                 </div>
               )}
             </div>
+            )}
 
             {/* Credential gates */}
             <div className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-8 space-y-6">
@@ -716,7 +733,11 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                   {pct === 0 ? 'Start course' : pct === 100 ? 'Review course' : 'Continue course'}
                 </Btn>
               ) : (
-                <Btn onClick={() => { enroll(p); setView({ name: 'test', pathwayId: p.id, kind: 'pre' }); }}>
+                <Btn onClick={() => {
+                enroll(p);
+                // Only pathways with a published baseline check start on one.
+                if (p.preTest?.length) setView({ name: 'test', pathwayId: p.id, kind: 'pre' });
+              }}>
                   Register, free
                 </Btn>
               )}
@@ -1317,7 +1338,7 @@ const TestRunner: React.FC<{
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const score = useMemo(() => scoreTest(questions, answers), [questions, answers]);
-  const allAnswered = questions.every((q) => answers[q.id] !== undefined);
+  const allAnswered = questions.length > 0 && questions.every((q) => answers[q.id] !== undefined);
   const passed = score >= PASS_THRESHOLD;
 
   if (submitted) {

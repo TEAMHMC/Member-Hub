@@ -812,6 +812,8 @@ const HCE_PRE_POST: Check[] = [
   },
 ];
 
+import { CARE_NAVIGATION_COVERAGE } from './pathwayFieldBased';
+
 // ── The catalog ──────────────────────────────────────────────────────────
 
 export const PATHWAYS: Pathway[] = [
@@ -940,10 +942,15 @@ export const PATHWAYS: Pathway[] = [
       'Field Readiness Assessment',
       'Practicum / Supervised Service',
     ],
-    courses: [],
-    version: '0.9 draft',
-    effectiveDate: 'In development',
-    nextReview: 'First build priority per the program catalog',
+    courses: [CARE_NAVIGATION_COVERAGE],
+    sourceKey: [
+      { key: 'DHCS', label: 'California Department of Health Care Services, Medi-Cal Changes' },
+      { key: 'DPSS', label: 'Los Angeles County Department of Public Social Services, Work Requirements' },
+      { key: 'CoveredCA', label: 'Covered California, Find an Enroller' },
+    ],
+    version: '1.0 partial',
+    effectiveDate: 'Coverage content verified August 3, 2026',
+    nextReview: 'Before each renewal season and before any large outreach push',
   },
   {
     id: 'clinical-exposure-simulation',
