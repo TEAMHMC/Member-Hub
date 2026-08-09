@@ -68,6 +68,8 @@ export interface ArtifactField {
 export interface Artifact {
   id: string;
   title: string;
+  /** Realistic minutes to actually produce this. Counts toward course time. */
+  minutes?: number;
   /** One line explaining why this piece matters to the final roadmap. */
   purpose: string;
   fields: ArtifactField[];
@@ -234,139 +236,7 @@ export const PASS_THRESHOLD = 80;
 // Lesson copy is taken from the approved Learner Course Pack. Do not reword.
 
 const HCE_COURSES: Course[] = [
-  {
-    id: 'hce-1',
-    num: 1,
-    title: 'The Health Professions Ecosystem',
-    promise: 'Map the full range of health careers and see why outcomes depend on teams, not individuals.',
-    about: [
-      'Many learners know a few visible professions but not the full system. This course maps major career families and helps learners understand that health outcomes depend on teams with different training, responsibilities, and scopes.',
-    ],
-    objectives: [
-      'Identify at least eight health-related career families.',
-      'Distinguish direct patient-care roles from population, research, technology, and operational roles.',
-      'Explain why interdisciplinary teamwork matters.',
-      'Identify three career families worth exploring further.',
-    ],
-    minutes: 55,
-    prerequisites: 'None. This is the entry point to the pathway.',
-    whoFor: 'Anyone curious about health careers, including learners with no prior exposure to the field.',
-    lessons: [
-      {
-        id: 'hce-1-l1',
-        title: 'Healthcare is a team sport',
-        summary: 'See how many roles touch a single patient encounter, and how many shape care without ever meeting a patient.',
-        minutes: 18,
-        body: [
-          'A single patient encounter may involve physicians, nurses, physician associates/assistants, pharmacists, social workers, behavioral-health professionals, medical assistants, interpreters, community health workers, laboratory professionals, imaging staff, care coordinators, administrators, and others.',
-          'Outside direct care, epidemiologists, researchers, engineers, analysts, public-health workers, educators, policy professionals, and technology teams shape how services are designed and delivered.',
-        ],
-      },
-      {
-        id: 'hce-1-l2',
-        title: 'Career families',
-        summary: 'Nine career families spanning clinical care, allied health, behavioral health, public health, research, technology and operations.',
-        minutes: 22,
-        body: [
-          'Clinical medicine and advanced practice: physician, PA, advanced practice nursing, dentistry, optometry and other licensed professions.',
-          'Nursing: registered nursing, advanced practice, public-health nursing, specialty nursing and related roles.',
-          'Allied health and rehabilitation: respiratory care, physical therapy, occupational therapy, speech-language pathology, radiologic technology, sonography, and others.',
-          'Behavioral health: psychology, psychiatry, counseling, social work, marriage and family therapy, substance-use treatment and peer-support roles.',
-          'Pharmacy and laboratory science: pharmacists, pharmacy technicians, medical laboratory scientists, phlebotomy and related technical roles.',
-          'Public and community health: epidemiology, health education, community health work, health navigation, environmental health, outreach and program management.',
-          'Research and academia: laboratory research, clinical research, implementation science, health-services research, biostatistics and education.',
-          'Digital health, data and engineering: software engineering, informatics, cybersecurity, product design, biomedical engineering, AI/data science and analytics.',
-          'Administration, policy and operations: healthcare administration, quality improvement, compliance, finance, policy, supply chain, human resources and program operations.',
-        ],
-      },
-      {
-        id: 'hce-1-l3',
-        title: 'Verify the job, not the myth',
-        summary: 'Use BLS as a starting point, then verify licensure with the board that actually grants it.',
-        minutes: 15,
-        body: [
-          'Use BLS Occupational Outlook Handbook data as a starting point for occupation descriptions, typical entry-level education, work environment, pay and projections.',
-          'Then verify licensure, certification and accreditation requirements with the relevant state board, accreditor, professional body or educational institution. Requirements can change and may differ by state.',
-        ],
-      },
-    ],
-    checks: [
-      {
-        id: 'hce-1-c1',
-        q: 'A learner reads a salary figure for a profession on a social media post. What is the appropriate next step?',
-        options: [
-          'Treat it as accurate if the account has a large following',
-          'Check the BLS Occupational Outlook Handbook, then verify licensure with the relevant state board',
-          'Average it with two other posts',
-          'Assume it applies nationally',
-        ],
-        answer: 1,
-        why: 'BLS is the starting point for occupation data. Licensure and accreditation must be verified with the state board or accreditor, because requirements change and differ by state.',
-      },
-      {
-        id: 'hce-1-c2',
-        q: 'Which of these is a health career that does not involve direct patient care?',
-        options: ['Respiratory therapist', 'Epidemiologist', 'Physician associate', 'Registered nurse'],
-        answer: 1,
-        why: 'Epidemiology sits in the public and community health family, working at population level rather than in direct patient care.',
-      },
-    ],
-    activity: {
-      title: 'Career family sort',
-      body: [
-        'Choose 12 occupations from an HMC-provided list. Sort them into career families and write one sentence describing how each could contribute to a community-health problem such as asthma, diabetes prevention, homelessness or mental wellness.',
-      ],
-      prompt: 'List your 12 occupations, the family each belongs to, and one sentence on how each could contribute to a community health problem.',
-    },
-    artifact: {
-      id: 'career-hypotheses',
-      title: 'Career hypotheses',
-      purpose:
-        'The three roles you are currently considering, and what you still need to verify about each. Course 8 builds your roadmap on top of this.',
-      reference: {
-        title: 'Occupations to classify. Choose 12 of these 18.',
-        items: [
-          'Registered nurse',
-          'Physician associate',
-          'Respiratory therapist',
-          'Community health worker',
-          'Epidemiologist',
-          'Medical laboratory scientist',
-          'Licensed clinical social worker',
-          'Health informatics analyst',
-          'Occupational therapist',
-          'Pharmacy technician',
-          'Substance use counselor',
-          'Radiologic technologist',
-          'Public health educator',
-          'Care coordinator',
-          'Speech-language pathologist',
-          'Biomedical engineer',
-          'Healthcare compliance officer',
-          'Medical interpreter',
-        ],
-      },
-      fields: [
-        {
-          id: 'sort',
-          label: 'Your 12 occupations, sorted into career families',
-          help: 'List each occupation with the family it belongs to, and one sentence on how it could contribute to a community health problem such as asthma, diabetes prevention, homelessness or mental wellness.',
-          multiline: true,
-          placeholder: 'Respiratory therapist. Allied health and rehabilitation. Could run asthma education at a school clinic so families manage triggers before an ER visit.',
-        },
-        {
-          id: 'hypothesis',
-          label: 'Career hypothesis',
-          help: 'For each: what interests you about it, what you are currently assuming, and what you still need to verify.',
-          multiline: true,
-          repeat: 3,
-          repeatLabel: 'Hypothesis',
-          placeholder: 'Interested in: ...\nCurrently assuming: ...\nStill need to verify: ...',
-        },
-      ],
-    },
-    sources: ['J1'],
-  },
+  COURSE_1_V2,
   {
     id: 'hce-2',
     num: 2,
@@ -885,8 +755,8 @@ const HCE_PRE: Check[] = [
   {
     id: 'hce-t1',
     q: 'Which source is the appropriate starting point for occupation descriptions, typical entry education and pay?',
-    options: ['A social media career account', 'BLS Occupational Outlook Handbook', 'A program brochure', 'A salary aggregator site'],
-    answer: 1,
+    options: ['BLS Occupational Outlook Handbook', 'A social media career account', 'A program brochure', 'A salary aggregator site'],
+    answer: 0,
     why: 'BLS is the starting point. Licensure and accreditation are then verified with the relevant board or accreditor.',
   },
   {
@@ -901,11 +771,11 @@ const HCE_PRE: Check[] = [
     q: 'Which statement about the AAMC premed competencies is correct?',
     options: [
       'They are universal requirements for every health profession',
-      'They are relevant to learners considering medical school, and other fields use their own standards',
-      'They replace state licensure',
       'They are required for community health work',
+      'They replace state licensure',
+      'They are relevant to learners considering medical school, and other fields use their own standards',
     ],
-    answer: 1,
+    answer: 3,
     why: 'One path does not fit every career. Nursing, pharmacy, public health, CHW work and others use the standards relevant to that field.',
   },
   {
@@ -923,8 +793,8 @@ const HCE_PRE: Check[] = [
   {
     id: 'hce-t5',
     q: 'Which funding type generally does not need to be repaid when program terms are met?',
-    options: ['Federal loans', 'Grants and scholarships', 'Private loans', 'Income share agreements'],
-    answer: 1,
+    options: ['Grants and scholarships', 'Federal loans', 'Private loans', 'Income share agreements'],
+    answer: 0,
     why: 'Scholarships and grants generally do not require repayment when program terms are met. Loans must be repaid under their terms.',
   },
   {
@@ -942,8 +812,8 @@ const HCE_PRE: Check[] = [
   {
     id: 'hce-t7',
     q: 'Which description accurately reflects observing a procedure?',
-    options: ['Performed the procedure', 'Assisted with the procedure', 'Observed the workflow', 'Managed the case'],
-    answer: 2,
+    options: ['Performed the procedure', 'Assisted with the procedure', 'Managed the case', 'Observed the workflow'],
+    answer: 3,
     why: 'Accurate description protects participants and the learner’s credibility.',
   },
   {
@@ -963,23 +833,23 @@ const HCE_PRE: Check[] = [
     q: 'Epidemiology, health informatics and healthcare administration are examples of:',
     options: [
       'Roles that require a medical degree',
-      'Health careers outside direct patient care',
-      'Roles unavailable to community college students',
       'Non-health careers',
+      'Roles unavailable to community college students',
+      'Health careers outside direct patient care',
     ],
-    answer: 1,
+    answer: 3,
     why: 'Health careers extend well beyond direct patient care into population health, data, technology, policy and operations.',
   },
   {
     id: 'hce-t10',
     q: 'What is the correct characterization of an HMC Academy pathway completion?',
     options: [
-      'A professional certification',
-      'A state license',
       'An HMC educational completion record, not professional certification or admission eligibility',
+      'A state license',
+      'A professional certification',
       'Proof of clinical scope',
     ],
-    answer: 2,
+    answer: 0,
     why: 'HMC credential rules are explicit: course completion is not licensure, board certification, clinical scope, or admission eligibility.',
   },
 ];
@@ -988,6 +858,7 @@ import { CARE_NAVIGATION_COVERAGE } from './pathwayFieldBased';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
 import { MENTAL_HEALTH_COURSES } from './pathwayMentalHealth';
 import { STEM_CAMP } from './programStemCollab';
+import { COURSE_1_V2 } from './course1V2';
 
 // Post-test. Parallel form to HCE_PRE, testing the same objectives with items
 // the learner has not already been shown the answers to.
