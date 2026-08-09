@@ -23,6 +23,9 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+      # Curriculum integrity and types must pass before anything deploys.
+      # These gates exist because content defects reached production before.
+      - run: npm test
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

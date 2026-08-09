@@ -20,6 +20,7 @@ import {
   pathwayMinutes, type Check as CheckQ, type Course, type Pathway,
 } from './catalog';
 import { CAMP_WEEKS, CAMP_TEMPLATE } from './programStemCollab';
+import type { Block, KnowledgeCheck } from './blocks';
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
@@ -79,6 +80,232 @@ const Back: React.FC<{ label: string; onClick: () => void }> = ({ label, onClick
     <ChevronRight size={16} className="rotate-180" /> {label}
   </button>
 );
+
+
+// ── v2 guided-block renderer ─────────────────────────────────────────────
+// One component per block kind from the Written Guided Curriculum Standard.
+// Every callout states its purpose in text as well as colour, so meaning never
+// depends on colour alone.
+
+const BlockCallout: React.FC<{ label: string; tone: 'blue' | 'orange' | 'zinc' | 'amber'; children: React.ReactNode }> = ({ label, tone, children }) => {
+  const t = tone === 'blue' ? 'border-[#233DFF]/20 bg-blue-50/40' + '|' + 'text-[#233DFF]'
+    : tone === 'orange' ? 'border-[#FF6E40]/25 bg-orange-50/50' + '|' + 'text-[#FF6E40]'
+    : tone === 'amber' ? 'border-amber-300/40 bg-amber-50/50' + '|' + 'text-[#8B6D00]'
+    : 'border-zinc-200 bg-zinc-50/70' + '|' + 'text-zinc-400';
+  const [box, lab] = t.split('|');
+  return (
+    <section className={`rounded-2xl border p-6 space-y-3 ${box}`}>
+      <p className={`text-[10px] font-bold uppercase tracking-widest ${lab}`}>{label}</p>
+      {children}
+    </section>
+  );
+};
+
+const CheckBlock: React.FC<{
+  check: KnowledgeCheck;
+  chosen?: number;
+  onChoose: (i: number) => void;
+}> = ({ check, chosen, onChoose }) => {
+  const answered = chosen !== undefined;
+  return (
+    <section className="rounded-2xl border border-[#233DFF]/20 bg-white p-6 space-y-4">
+      <p className="text-[10px] font-bold uppercase tracking-widest text-[#233DFF]">Knowledge check</p>
+      <p className="text-base font-semibold text-zinc-900 leading-snug">{check.q}</p>
+      <div className="space-y-2">
+        {check.options.map((opt, i) => {
+          const isRight = i === check.answer;
+          const isChosen = chosen === i;
+          return (
+            <button
+              key={opt}
+              onClick={() => !answered && onChoose(i)}
+              disabled={answered}
+              className={`w-full text-left p-4 rounded-xl border transition-all flex items-start gap-3 ${
+                answered && isRight ? 'border-emerald-300 bg-emerald-50/60'
+                : answered && isChosen ? 'border-[#FF6F91] bg-pink-50/50'
+                : 'border-zinc-200 bg-white hover:border-zinc-300'
+              } ${answered ? 'cursor-default' : ''}`}
+            >
+              <span className="text-sm text-zinc-700 leading-relaxed flex-1">{opt}</span>
+              {answered && isRight && <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 shrink-0">Correct</span>}
+              {answered && isChosen && !isRight && <span className="text-[10px] font-bold uppercase tracking-wider text-[#FF6F91] shrink-0">Your answer</span>}
+            </button>
+          );
+        })}
+      </div>
+      {answered && (
+        <div className="space-y-2 bg-zinc-50 rounded-xl p-4">
+          <p className="text-[13px] text-zinc-700 leading-relaxed">{check.rationale}</p>
+          {check.distractors && <p className="text-[13px] text-zinc-500 leading-relaxed">{check.distractors}</p>}
+          {check.source && <p className="text-[11px] text-zinc-400">Source: {check.source}</p>}
+        </div>
+      )}
+    </section>
+  );
+};
+
+const BlockView: React.FC<{
+  block: Block;
+  checks: Record<string, number>;
+  onCheck: (id: string, i: number) => void;
+}> = ({ block, checks, onCheck }) => {
+  const P = ({ items }: { items: string[] }) => (
+    <>{items.map((t, i) => <p key={i} className="text-[16px] text-zinc-700 leading-relaxed">{t}</p>)}</>
+  );
+
+  switch (block.kind) {
+    case 'prose':
+      return <div className="space-y-4"><P items={block.text} /></div>;
+    case 'why':
+      return <BlockCallout label="Why this matters" tone="blue"><P items={block.text} /></BlockCallout>;
+    case 'case':
+      return (
+        <BlockCallout label={block.scenario ? 'Instructional scenario' : 'Case'} tone="amber">
+          <h3 className="text-xl font-semibold text-zinc-900">{block.title}</h3>
+          <P items={block.text} />
+        </BlockCallout>
+      );
+    case 'concept':
+      return (
+        <section className="space-y-3">
+          <h3 className="text-xl font-semibold text-zinc-900">{block.title}</h3>
+          <P items={block.text} />
+        </section>
+      );
+    case 'example':
+      return (
+        <BlockCallout label="Worked example" tone="zinc">
+          <h3 className="text-lg font-semibold text-zinc-900">{block.title}</h3>
+          <P items={block.text} />
+        </BlockCallout>
+      );
+    case 'fieldnote':
+      return (
+        <BlockCallout label="Field note" tone="orange">
+          <h3 className="text-lg font-semibold text-zinc-900">{block.title}</h3>
+          <P items={block.text} />
+        </BlockCallout>
+      );
+    case 'tryit':
+      return (
+        <BlockCallout label="Try it" tone="orange">
+          <h3 className="text-lg font-semibold text-zinc-900">{block.title}</h3>
+          <P items={block.text} />
+        </BlockCallout>
+      );
+    case 'reflect':
+      return (
+        <BlockCallout label="Reflect" tone="zinc">
+          <h3 className="text-lg font-semibold text-zinc-900">{block.title}</h3>
+          <ul className="space-y-2">
+            {block.prompts.map((p) => (
+              <li key={p} className="text-[15px] text-zinc-700 leading-relaxed flex items-start gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 shrink-0 mt-2.5" />{p}
+              </li>
+            ))}
+          </ul>
+        </BlockCallout>
+      );
+    case 'source':
+      return (
+        <section className="border-l-2 border-zinc-200 pl-5 space-y-1.5">
+          <p className="text-[15px] text-zinc-600 leading-relaxed">{block.text}</p>
+          {block.ref && (
+            <p className="text-[12px] text-zinc-400">
+              {block.ref.url
+                ? <a href={block.ref.url} target="_blank" rel="noreferrer" className="underline hover:text-[#233DFF]">{block.ref.name}</a>
+                : block.ref.name}
+            </p>
+          )}
+        </section>
+      );
+    case 'myths':
+      return (
+        <section className="space-y-3">
+          {block.items.map((m) => (
+            <div key={m.myth} className="rounded-2xl border border-zinc-200 overflow-hidden">
+              <div className="p-4 bg-zinc-50 border-b border-zinc-200">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Myth</p>
+                <p className="text-[15px] text-zinc-600 leading-relaxed">{m.myth}</p>
+              </div>
+              <div className="p-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#233DFF] mb-1">Reality</p>
+                <p className="text-[15px] text-zinc-800 leading-relaxed">{m.reality}</p>
+              </div>
+            </div>
+          ))}
+        </section>
+      );
+    case 'steps':
+      return (
+        <section className="space-y-3">
+          {block.title && <h3 className="text-xl font-semibold text-zinc-900">{block.title}</h3>}
+          <ol className="space-y-3">
+            {block.items.map((it, i) => (
+              <li key={it.label} className="flex items-start gap-4">
+                <span className="w-7 h-7 rounded-full bg-blue-50 text-[#233DFF] flex items-center justify-center text-[12px] font-bold shrink-0 mt-0.5">{i + 1}</span>
+                <span className="min-w-0">
+                  <span className="block text-[15px] font-semibold text-zinc-900">{it.label}</span>
+                  <span className="block text-[15px] text-zinc-700 leading-relaxed mt-0.5">{it.text}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      );
+    case 'vocab':
+      return (
+        <BlockCallout label="Words to know" tone="zinc">
+          <dl className="space-y-2.5">
+            {block.items.map((v) => (
+              <div key={v.term}>
+                <dt className="text-[15px] font-semibold text-zinc-900">{v.term}</dt>
+                <dd className="text-[15px] text-zinc-600 leading-relaxed">{v.plain}</dd>
+              </div>
+            ))}
+          </dl>
+        </BlockCallout>
+      );
+    case 'activity':
+      return (
+        <BlockCallout label="Try it" tone="orange">
+          <h3 className="text-lg font-semibold text-zinc-900">{block.title}</h3>
+          {block.materials && <p className="text-[12px] font-bold uppercase tracking-wider text-zinc-400">{block.materials}</p>}
+          <P items={block.text} />
+        </BlockCallout>
+      );
+    case 'takeaways':
+      return (
+        <BlockCallout label="Key takeaways" tone="blue">
+          <ul className="space-y-2.5">
+            {block.items.map((t) => (
+              <li key={t} className="flex items-start gap-3">
+                <Check size={15} strokeWidth={3} className="text-[#233DFF] mt-1 shrink-0" />
+                <span className="text-[15px] text-zinc-800 leading-relaxed">{t}</span>
+              </li>
+            ))}
+          </ul>
+        </BlockCallout>
+      );
+    case 'list':
+      return (
+        <section className="space-y-2">
+          {block.title && <h3 className="text-lg font-semibold text-zinc-900">{block.title}</h3>}
+          <ul className="space-y-1.5">
+            {block.items.map((i) => (
+              <li key={i} className="text-[15px] text-zinc-700 leading-relaxed flex items-start gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 shrink-0 mt-2.5" />{i}
+              </li>
+            ))}
+          </ul>
+        </section>
+      );
+    case 'check':
+      return <CheckBlock check={block.check} chosen={checks[block.check.id]} onChoose={(i) => onCheck(block.check.id, i)} />;
+    default:
+      return null;
+  }
+};
 
 const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal, initialView = 'catalog' }) => {
   const [state, setState] = useState<LearnerState>(() => loadState(userId));
@@ -1011,7 +1238,10 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                       {isArtifactComplete(c, state) ? <Check size={18} strokeWidth={3} /> : <FileText size={17} />}
                     </span>
                     <span className="min-w-0 flex-1 space-y-1.5">
-                      <span className="block text-[15px] font-semibold text-zinc-900 leading-snug">{c.artifact.title}</span>
+                      <span className="block text-[15px] font-semibold text-zinc-900 leading-snug">
+                        {c.artifact.title}
+                        {c.artifact.minutes ? <span className="font-normal text-zinc-400"> · {c.artifact.minutes} min</span> : null}
+                      </span>
                       <span className="block text-[13px] text-zinc-500 leading-relaxed">{c.artifact.purpose}</span>
                       <span className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 pt-0.5">
                         Carried forward to your roadmap{isArtifactComplete(c, state) ? ' · Complete' : ''}
@@ -1098,7 +1328,10 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     const lesson = c?.lessons[index];
     if (!p || !c || !lesson) return renderCatalog();
     const isLast = index === c.lessons.length - 1;
-    const checksHere = isLast ? c.checks : [];
+    // v2 courses embed their checks in the lesson blocks where they belong, so
+    // the end-of-course block would repeat them.
+    const inlineChecks = c.lessons.some((l) => l.blocks?.some((b) => b.kind === 'check'));
+    const checksHere = isLast && !inlineChecks ? c.checks : [];
 
     return (
       <div className="max-w-3xl mx-auto py-8 space-y-8 animate-in fade-in duration-500">
@@ -1113,11 +1346,26 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
         <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 leading-tight">{lesson.title}</h1>
 
-        <div className="space-y-6">
-          {lesson.body.map((para, i) => (
-            <p key={i} className="text-lg text-zinc-700 leading-relaxed">{para}</p>
-          ))}
-        </div>
+        {/* v2 courses carry typed blocks; v1 courses carry plain paragraphs.
+            Both are optional on the model, so neither is assumed to exist. */}
+        {lesson.blocks?.length ? (
+          <div className="space-y-8">
+            {lesson.blocks.map((b, i) => (
+              <BlockView
+                key={i}
+                block={b}
+                checks={state.checks}
+                onCheck={(id, choice) => set((st) => ({ ...st, checks: { ...st.checks, [id]: choice } }))}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {(lesson.body || []).map((para, i) => (
+              <p key={i} className="text-lg text-zinc-700 leading-relaxed">{para}</p>
+            ))}
+          </div>
+        )}
 
         {checksHere.length > 0 && (
           <section className="space-y-5 pt-2">
@@ -1147,11 +1395,12 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               completeLesson(lesson.id);
               onSignal?.('academy_lesson_complete', { pathwayId, courseId, lessonId: lesson.id });
               if (!isLast) setView({ name: 'lesson', pathwayId, courseId, index: index + 1 });
+              else if (c.artifact) setView({ name: 'artifact', pathwayId, courseId });
               else if (c.activity) setView({ name: 'activity', pathwayId, courseId });
               else setView({ name: 'course', pathwayId, courseId });
             }}
           >
-            {isLast ? (c.activity ? 'Continue to applied activity' : 'Finish lesson') : 'Mark complete and continue'} <ChevronRight size={14} />
+            {isLast ? (c.artifact || c.activity ? 'Continue to applied activity' : 'Finish lesson') : 'Mark complete and continue'} <ChevronRight size={14} />
           </Btn>
         </div>
       </div>
@@ -1671,17 +1920,21 @@ const TestRunner: React.FC<{
           <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">{score}%</h1>
           <p className="text-lg text-zinc-600 max-w-md mx-auto leading-relaxed">
             {kind === 'pre'
-              ? 'This is your baseline. It does not affect completion. You will take the same assessment at the end so your growth is measurable.'
+              ? 'This is your baseline. It does not affect completion, and answers are not shown, because knowing them now would teach the content before the courses do. The final assessment is a parallel form: same objectives and difficulty, different questions, so the change from here is a real measure of what you learned.'
               : passed
               ? `You met the ${PASS_THRESHOLD}% benchmark for ${pathway.title}.`
               : `The benchmark is ${PASS_THRESHOLD}%. Review the courses and try again. Retries are unlimited, because the purpose is mastery, not selection.`}
           </p>
         </div>
-        <div className="space-y-4">
-          {questions.map((q) => (
-            <QuestionCard key={q.id} q={q} chosen={answers[q.id]} onChoose={() => {}} reveal />
-          ))}
-        </div>
+        {/* A baseline that reveals its answer key stops being a baseline. Item
+            review is shown only for the post-test, where teaching is the point. */}
+        {kind === 'post' && (
+          <div className="space-y-4">
+            {questions.map((q) => (
+              <QuestionCard key={q.id} q={q} chosen={answers[q.id]} onChoose={() => {}} reveal />
+            ))}
+          </div>
+        )}
         <div className="flex justify-center pt-2">
           <Btn onClick={onDone}>{kind === 'pre' ? 'Start the courses' : 'Back to pathway'}</Btn>
         </div>
