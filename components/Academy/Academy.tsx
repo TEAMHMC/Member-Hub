@@ -771,7 +771,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               <p className="text-sm text-zinc-500 mt-1">
                 {published
                   ? 'Free. Self-paced. Start any time.'
-                  : `Free. ${p.courses.length} of ${p.plannedCourses?.length ?? 0} courses are released. The completion record opens when the pathway is published.`}
+                  : `Free. ${p.plannedCourses?.filter((t) => releasedTitles.has(t)).length ?? p.courses.length} of ${p.plannedCourses?.length ?? 0} courses are released. The completion record opens when the pathway is published.`}
               </p>
             </div>
             <Btn onClick={() => {

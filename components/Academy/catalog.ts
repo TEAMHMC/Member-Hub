@@ -574,8 +574,9 @@ export const PATHWAYS: Pathway[] = [
       'Build Something That Matters — Capstone',
     ],
     // The self-paced eight-course sequence above is separate from the delivered
-    // camp below. The camp is site-based with physical kits and partner
-    // instructors; collapsing them would misrepresent both.
+    // camp below, and is not counted as released by it. The camp is a site-based
+    // program run with partner instructors over six weeks; its written
+    // curriculum needs only paper and pencil, so no site is blocked by kits.
     courses: [STEM_CAMP],
     version: '0.9 draft',
     effectiveDate: 'In development',

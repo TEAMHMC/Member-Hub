@@ -131,6 +131,8 @@ export const CAMP_TEMPLATE = {
  * words the first time it appears, and questions the student can actually
  * answer from what they just read.
  */
+import { WEEK2_BLOCKS, WEEK3_BLOCKS, WEEK4_BLOCKS, WEEK5_BLOCKS, WEEK6_BLOCKS } from './stemWeeks2to6';
+
 const WEEK1_BLOCKS: Block[] = [
   {
     kind: 'why',
@@ -272,7 +274,10 @@ export const STEM_CAMP: Course = {
     'Connect STEM content to community health topics students recognize, such as virus transmission, handwashing and chronic disease.',
     'Support pathways into STEM careers by putting students in front of health professionals and engineers who reflect their community.',
   ],
-  minutes: 0,
+  // Six weekly sessions of written instruction at 45 minutes each. Site
+  // delivery adds the daily athletic and character block, which is scheduled
+  // locally and is not part of this figure.
+  minutes: 270,
   prerequisites:
     'Coordinator or instructor role. Youth safeguarding requirements must be satisfied before working with participants.',
   whoFor:
@@ -313,6 +318,46 @@ export const STEM_CAMP: Course = {
         'How to tell when a chemical reaction is happening, and how health professionals use careful observation to figure out what is going on.',
       minutes: 45,
       blocks: WEEK1_BLOCKS,
+    },
+    {
+      id: 'stem-w2',
+      title: 'Week 2: Biology and Health Information Technology',
+      summary:
+        'How living things grow, and what happens to the record of your care after someone writes it down.',
+      minutes: 45,
+      blocks: WEEK2_BLOCKS,
+    },
+    {
+      id: 'stem-w3',
+      title: 'Week 3: Physics and the Internet of Medical Things',
+      summary:
+        'Forces that push and pull, and the connected devices that measure a body and send what they find.',
+      minutes: 45,
+      blocks: WEEK3_BLOCKS,
+    },
+    {
+      id: 'stem-w4',
+      title: 'Week 4: Electricity, Magnetism and Engineering',
+      summary:
+        'Circuits and conductors, and how a diagnosis is actually reached by narrowing rather than guessing.',
+      minutes: 45,
+      blocks: WEEK4_BLOCKS,
+    },
+    {
+      id: 'stem-w5',
+      title: 'Week 5: Water, Electrolytes and Product Design',
+      summary:
+        'How your body holds its water and salt in balance, and how to design something a real person would use.',
+      minutes: 45,
+      blocks: WEEK5_BLOCKS,
+    },
+    {
+      id: 'stem-w6',
+      title: 'Week 6: Innovation, Inventions and Careers',
+      summary:
+        'Build your own rough version, test it with people, and meet the jobs these six weeks connect to.',
+      minutes: 45,
+      blocks: WEEK6_BLOCKS,
     },
   ],
   checks: [],
