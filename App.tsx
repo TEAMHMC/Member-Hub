@@ -9,11 +9,30 @@ import Sidebar from './components/Layout/Sidebar';
 import Footer from './components/Layout/Footer';
 import { context as ctxApi, client as clientApi } from './services/api';
 import SunnyNavigator from './components/Navigator/SunnyNavigator';
+import TrainingRegistration from './components/Academy/TrainingRegistration';
+import { PATHWAYS } from './components/Academy/catalog';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [view, setView] = useState<'loading' | 'login' | 'portal'>('loading');
   const [visitorId, setVisitorId] = useState<string | null>(null);
+
+  // Public training deep link, e.g. hub.healthmatters.clinic/?training=unstoppable-ce
+  // Someone arriving from the Unstoppable site to register for a live training has
+  // no Hub account yet. Sending them to a sign-in wall first loses them, so the
+  // registration is taken on arrival and the account is created immediately after.
+  const [deepLinkCourseId] = useState<string | null>(() => {
+    try {
+      return new URLSearchParams(window.location.search).get('training');
+    } catch {
+      return null;
+    }
+  });
+  const deepLinkCourse = React.useMemo(
+    () => (deepLinkCourseId ? PATHWAYS.flatMap((p) => p.courses).find((c) => c.id === deepLinkCourseId) : undefined),
+    [deepLinkCourseId],
+  );
+  const [deepLinkDone, setDeepLinkDone] = useState(false);
 
   // Establish the shared first-party visitor identity (hmc_vid) on load so
   // signals are captured before and after sign-in, and the same visitorId is
@@ -135,6 +154,23 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[#f5f3ef]">
       {view === 'login' && <Login onLogin={handleLogin} />}
+
+      {/* Registration is shown over the sign-in screen for an unauthenticated
+          deep link, so the learner completes what they came for first. On a
+          valid deep link with an unknown course id, nothing is shown and the
+          normal sign-in stands rather than a broken modal. */}
+      {view === 'login' && deepLinkCourse && !deepLinkDone && (
+        <TrainingRegistration
+          course={deepLinkCourse}
+          member={null}
+          onClose={() => setDeepLinkDone(true)}
+          onAccountCreated={(email, firstName, lastName) => {
+            handleLogin({ email, firstName, lastName, badges: ['Academy Learner'] }, UserRole.CLIENT);
+            setActiveTab('academy');
+            setDeepLinkDone(true);
+          }}
+        />
+      )}
       {view === 'portal' && currentUser && (
         <>
           <Sidebar

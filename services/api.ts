@@ -131,6 +131,65 @@ export const referrals = {
     }),
 };
 
+// ── Academy training registration ────────────────────────────────────────
+//
+// Two paths, deliberately not one:
+//
+//   rsvp()             a session with a real date exists. Goes through the same
+//                      public RSVP endpoint the Event Finder uses, so attendance,
+//                      check-in tokens and confirmation email all behave exactly
+//                      as they do for every other HMC event.
+//
+//   registerInterest() no date is scheduled yet. Unstoppable is delivered live
+//                      and announced, so without this a learner who wants in has
+//                      nowhere to go and the Register button is a dead end.
+//
+// CE registrants supply the license details the LACDMH-approved certificate has
+// to carry. Collecting them here means staff are not re-keying them at issuance.
+export interface CeProfile {
+  nameOnLicense?: string;
+  licenseType?: string;
+  licenseNumber?: string;
+  accommodations?: string;
+}
+
+export interface TrainingRegistrationInput {
+  courseId: string;
+  courseTitle: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  modality?: 'virtual' | 'in-person' | 'either';
+  ceProfile?: CeProfile;
+  source?: string;
+}
+
+export const training = {
+  registerInterest: (input: TrainingRegistrationInput) =>
+    req<{ success: boolean; alreadyRegistered?: boolean; suppressed?: boolean }>(
+      '/api/public/training-interest',
+      { method: 'POST', body: JSON.stringify({ ...input, source: input.source || 'member-hub-academy' }) },
+    ),
+
+  rsvp: (input: TrainingRegistrationInput & { eventId: string; eventDate?: string }) =>
+    req<{ success: boolean; suppressed?: boolean }>('/api/public/rsvp', {
+      method: 'POST',
+      body: JSON.stringify({
+        eventId: input.eventId,
+        eventTitle: input.courseTitle,
+        eventDate: input.eventDate || '',
+        firstName: input.firstName,
+        lastName: input.lastName,
+        email: input.email,
+        phone: input.phone || '',
+        contactPreference: 'email',
+        source: input.source || 'member-hub-academy',
+        ceProfile: input.ceProfile,
+      }),
+    }),
+};
+
 // ── Client passwordless identity ─────────────────────────────────────────
 export const client = {
   requestLink: (email: string) =>
