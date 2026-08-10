@@ -17,10 +17,11 @@ import {
 } from 'lucide-react';
 import {
   PATHWAYS, PASS_THRESHOLD, LEARNING_MODEL, LEVEL_ACCENT, pathwayById,
-  pathwayMinutes, type Check as CheckQ, type Course, type Pathway,
+  pathwayMinutes, type Check as CheckQ, type Course, type Pathway, type Session,
 } from './catalog';
 import { CAMP_WEEKS, CAMP_TEMPLATE } from './programStemCollab';
 import type { Block, KnowledgeCheck } from './blocks';
+import TrainingRegistration from './TrainingRegistration';
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
@@ -35,6 +36,8 @@ interface AcademyProps {
   onSignal?: (type: string, payload: Record<string, unknown>) => void;
   /** Lets the Hub deep-link a sub-page of the Academy, e.g. straight to credentials. */
   initialView?: 'catalog' | 'credentials' | 'transcript';
+  /** Signed-in member, used to prefill training registration. */
+  member?: { firstName?: string; lastName?: string; email?: string; phone?: string } | null;
 }
 
 type View =
@@ -307,10 +310,12 @@ const BlockView: React.FC<{
   }
 };
 
-const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal, initialView = 'catalog' }) => {
+const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal, initialView = 'catalog', member = null }) => {
   const [state, setState] = useState<LearnerState>(() => loadState(userId));
   const [view, setView] = useState<View>({ name: initialView } as View);
   const [showCert, setShowCert] = useState<string | null>(null);
+  // Which course the learner is registering for, plus the session if one exists.
+  const [registering, setRegistering] = useState<{ course: Course; session?: Session } | null>(null);
 
   // Braces matter here. An arrow with an expression body returns that
   // expression, and React treats a non-undefined effect return as a cleanup
@@ -1158,7 +1163,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                             {sess.location ? ` · ${sess.location}` : ''}
                           </p>
                         </div>
-                        <Btn className="shrink-0">Register</Btn>
+                        <Btn className="shrink-0" onClick={() => setRegistering({ course: c, session: sess })}>Register</Btn>
                       </div>
                     ))}
                   </div>
@@ -1166,8 +1171,11 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                   <div className="rounded-2xl border border-dashed border-zinc-300 bg-zinc-50/60 p-6">
                     <p className="text-[14px] text-zinc-600 leading-relaxed">
                       No sessions are scheduled right now. This course is delivered live, so it opens when the next
-                      session is announced.
+                      session is announced. Register your interest and we will email you the moment a date is set.
                     </p>
+                    <Btn className="mt-4" onClick={() => setRegistering({ course: c })}>
+                      Register your interest <ChevronRight size={14} />
+                    </Btn>
                   </div>
                 )}
               </section>
@@ -1827,6 +1835,15 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
       {view.name === 'credentials' && renderCredentials()}
       {view.name === 'transcript' && renderTranscript()}
       {showCert && renderCertificate(showCert)}
+      {registering && (
+        <TrainingRegistration
+          course={registering.course}
+          session={registering.session}
+          member={member}
+          onClose={() => setRegistering(null)}
+          onAccountCreated={() => onSignal?.('academy_account_created', { courseId: registering.course.id })}
+        />
+      )}
     </div>
   );
 };

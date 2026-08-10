@@ -796,6 +796,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       initialView={academyView}
       userId={user.id}
       memberName={`${user.firstName} ${user.lastName}`.trim() || 'Member'}
+      member={{ firstName: user.firstName, lastName: user.lastName, email: user.email, phone: user.phone }}
       onNavigateTab={(tab) => { setActiveTab(tab); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
       onSignal={(type, payload) => ctxApi.event(type, payload)}
     />
