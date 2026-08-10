@@ -32,7 +32,10 @@ export const CARE_NAVIGATION_COVERAGE: Course = {
     'Explain the community engagement requirement honestly, including what HMC cannot promise.',
     'Hand off to the correct qualified professional for the situation in front of you.',
   ],
-  minutes: 130,
+  // 46 minutes of reading and knowledge checks at roughly 62 words per minute,
+  // plus 22 for the applied conversation. The previous 130 was not backed by the
+  // content and is exactly the overstatement the guided standard exists to stop.
+  minutes: 68,
   prerequisites: 'None for the knowledge content. Field application requires an approved HMC role and supervision.',
   whoFor:
     'Community health workers, promotoras, navigators, outreach volunteers, and anyone staffing an HMC table where a coverage conversation can happen.',
@@ -41,7 +44,7 @@ export const CARE_NAVIGATION_COVERAGE: Course = {
       id: "fbch-cov-l1",
       title: "Why This Module Exists",
       summary: "Why a ninety second conversation at a table can be the reason someone keeps their coverage.",
-      minutes: 10,
+      minutes: 4,
       body: [
         "Medi-Cal is changing in ways that will cause people to lose coverage if nobody tells them what is coming. Most people will find out through a letter they did not open or a deadline they did not know about.",
         "HMC volunteers are already in front of these community members at pop-ups, health fairs, and street medicine shifts. A ninety second conversation at a table can be the reason someone keeps their health coverage.",
@@ -52,7 +55,7 @@ export const CARE_NAVIGATION_COVERAGE: Course = {
       id: "fbch-cov-l2",
       title: "What Is Actually Changing",
       summary: "The three changes that matter, with the exact dates. Getting a date wrong makes someone act too late.",
-      minutes: 22,
+      minutes: 6,
       body: [
         "Three changes matter for the people we serve. Learn the dates. Getting a date wrong can cause someone to act too late.",
         "CHANGE 1: RENEWALS TWICE A YEAR\nDHCS states: \"Starting March 1, 2027, some Medi-Cal members will have their eligibility checked twice a year.\" This applies to adults ages 19 to 64 who are covered through the ACA expansion. DHCS warns: \"If you miss deadlines, you could lose your Medi-Cal coverage.\"",
@@ -68,7 +71,7 @@ export const CARE_NAVIGATION_COVERAGE: Course = {
       id: "fbch-cov-l3",
       title: "Your Role and Its Hard Limit",
       summary: "The hard limit on your role. Read this section twice.",
-      minutes: 18,
+      minutes: 4,
       body: [
         "READ THIS SECTION TWICE. It is the most important part of this module.",
         "YOU ARE NOT:\n- A Certified Enrollment Counselor\n- A county eligibility worker\n- An immigration advisor\n- A benefits attorney",
@@ -82,7 +85,7 @@ export const CARE_NAVIGATION_COVERAGE: Course = {
       id: "fbch-cov-l4",
       title: "The Conversation: Three Paths",
       summary: "One opening question and three branching paths, with the wording to use.",
-      minutes: 20,
+      minutes: 7,
       body: [
         "This is the branching flow. It starts from one question you can ask naturally at any table or shift.",
         "OPENING QUESTION\n\"Do you have health coverage right now, like Medi-Cal?\"",
@@ -103,7 +106,7 @@ export const CARE_NAVIGATION_COVERAGE: Course = {
       id: "fbch-cov-l5",
       title: "The 80 Hour Requirement and HMC Volunteering",
       summary: "Volunteering counts as a qualifying activity, and why you must not promise the county will accept it.",
-      minutes: 16,
+      minutes: 4,
       body: [
         "This is the part volunteers get wrong most often, so be precise.",
         "WHAT IS TRUE:\nDHCS lists \"Volunteer or do community service for at least 80 hours a month\" as one of the qualifying activities. Community service is a recognized way to meet the requirement. Activities can also be combined to reach the 80 hour total.",
@@ -119,7 +122,7 @@ export const CARE_NAVIGATION_COVERAGE: Course = {
       id: "fbch-cov-l6",
       title: "Who to Connect People To",
       summary: "The five qualified professionals to hand off to, all free to the member.",
-      minutes: 14,
+      minutes: 4,
       body: [
         "These are qualified professionals. Every one of these services is free to the member. Verified August 3, 2026.",
         "LOS ANGELES COUNTY DPSS (county eligibility, renewals, address changes)\nPhone: (866) 613-3777\nOnline: BenefitsCal.com\nIn person: any DPSS district office\nUse for: updating an address, renewal questions, application status, questions about whether the work requirement applies to them.",
@@ -134,7 +137,7 @@ export const CARE_NAVIGATION_COVERAGE: Course = {
       id: "fbch-cov-l7",
       title: "What Never to Say",
       summary: "The phrases that cause real harm, each paired with what to say instead.",
-      minutes: 14,
+      minutes: 4,
       body: [
         "These are the phrases that create real harm. Learn to catch yourself.",
         "NEVER SAY: \"You qualify for Medi-Cal.\"\nSAY INSTEAD: \"You may be eligible. A certified counselor can confirm that for free.\"",
@@ -150,7 +153,7 @@ export const CARE_NAVIGATION_COVERAGE: Course = {
       id: "fbch-cov-l8",
       title: "Bilingual Scripts",
       summary: "Scripts in English and Spanish, written to be accurate and non-alarming.",
-      minutes: 16,
+      minutes: 13,
       body: [
         "Use these close to word for word. They are written to be accurate and non-alarming.",
         "ENGLISH, OPENING\n\"Hi, we are with Health Matters Clinic. Medi-Cal has some changes coming in 2027 and a lot of people have not heard about them yet. Do you have Medi-Cal or any health coverage right now?\"",
