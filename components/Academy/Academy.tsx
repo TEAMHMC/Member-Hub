@@ -22,6 +22,7 @@ import {
 import { CAMP_WEEKS, CAMP_TEMPLATE } from './programStemCollab';
 import type { Block, KnowledgeCheck } from './blocks';
 import TrainingRegistration from './TrainingRegistration';
+import { training as trainingApi, type ScheduledSession } from '../../services/api';
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
@@ -316,6 +317,24 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
   const [showCert, setShowCert] = useState<string | null>(null);
   // Which course the learner is registering for, plus the session if one exists.
   const [registering, setRegistering] = useState<{ course: Course; session?: Session } | null>(null);
+
+  // Guided cohort dates, scheduled as events in the volunteer portal. Fetched once and
+  // grouped by course so a self-paced course can also show real start dates.
+  const [scheduled, setScheduled] = useState<Record<string, ScheduledSession[]>>({});
+  useEffect(() => {
+    let cancelled = false;
+    trainingApi.sessions()
+      .then((r) => {
+        if (cancelled) return;
+        const byCourse: Record<string, ScheduledSession[]> = {};
+        for (const s of r.sessions || []) {
+          (byCourse[s.courseId] ||= []).push(s);
+        }
+        setScheduled(byCourse);
+      })
+      .catch(() => { /* the catalog still renders without dates */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // Braces matter here. An arrow with an expression body returns that
   // expression, and React treats a non-undefined effect return as a cleanup
@@ -1147,12 +1166,37 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               </section>
             )}
 
-            {(c.delivery === 'live' || c.delivery === 'practical') && (
+            {(() => {
+              // Catalog sessions and portal-scheduled cohorts are the same thing to a
+              // learner, so they render as one list. A self-paced course shows the
+              // section only once a real cohort date exists — otherwise "no sessions
+              // scheduled" would read as a problem on a course that never needed one.
+              const portalSessions = (scheduled[c.id] || []).map((s) => ({
+                id: s.id,
+                courseId: c.id,
+                title: s.title,
+                startsAt: s.startsAt,
+                modality: (s.modality === 'virtual' ? 'virtual' : 'in-person') as Session['modality'],
+                location: s.location,
+              })) as Session[];
+              const allSessions = [...(c.sessions || []), ...portalSessions]
+                .sort((a, b) => String(a.startsAt).localeCompare(String(b.startsAt)));
+              const isLive = c.delivery === 'live' || c.delivery === 'practical';
+              if (!isLive && allSessions.length === 0) return null;
+              return (
               <section className="space-y-3">
-                <h2 className="text-xl font-semibold text-zinc-900">Upcoming sessions</h2>
-                {c.sessions && c.sessions.length > 0 ? (
+                <h2 className="text-xl font-semibold text-zinc-900">
+                  {isLive ? 'Upcoming sessions' : 'Guided cohorts'}
+                </h2>
+                {!isLive && (
+                  <p className="text-[13px] text-zinc-500 leading-relaxed">
+                    This course is self-paced, so you can start any time. These are guided
+                    cohorts that move through it together with a coordinator.
+                  </p>
+                )}
+                {allSessions.length > 0 ? (
                   <div className="space-y-2">
-                    {c.sessions.map((sess) => (
+                    {allSessions.map((sess) => (
                       <div key={sess.id} className="rounded-2xl border border-zinc-200 bg-white p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="min-w-0">
                           <p className="text-[15px] font-semibold text-zinc-900">{sess.title}</p>
@@ -1179,7 +1223,8 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                   </div>
                 )}
               </section>
-            )}
+              );
+            })()}
 
             <section className="space-y-3">
               <h2 className="text-xl font-semibold text-zinc-900">About this course</h2>

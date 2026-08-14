@@ -165,7 +165,28 @@ export interface TrainingRegistrationInput {
   source?: string;
 }
 
+/** A guided cohort date for a course, scheduled in the volunteer portal. */
+export interface ScheduledSession {
+  id: string;
+  courseId: string;
+  title: string;
+  startsAt: string;
+  modality: 'virtual' | 'in_person';
+  location?: string;
+  seatsTotal?: number | null;
+  seatsFilled?: number;
+}
+
 export const training = {
+  // Cohort dates live on events in the volunteer portal rather than in this
+  // catalog. Hardcoding them here meant scheduling a session required a code
+  // change and a deploy, so every course shipped with an empty list and the
+  // Academy always read "no sessions are scheduled".
+  sessions: (courseId?: string) =>
+    req<{ sessions: ScheduledSession[] }>(
+      `/api/public/academy-sessions${courseId ? `?courseId=${encodeURIComponent(courseId)}` : ''}`,
+    ),
+
   registerInterest: (input: TrainingRegistrationInput) =>
     req<{ success: boolean; alreadyRegistered?: boolean; suppressed?: boolean }>(
       '/api/public/training-interest',
