@@ -1,0 +1,89 @@
+{
+  "generatedAt": "2026-08-15T00:45:30.095Z",
+  "courses": [
+    {
+      "id": "hce-1",
+      "title": "The Health Professions Ecosystem",
+      "pathwayId": "health-careers-exploration",
+      "pathwayTitle": "Health Careers Exploration",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "hce-2",
+      "title": "Know Yourself: Interests, Values + Work Style",
+      "pathwayId": "health-careers-exploration",
+      "pathwayTitle": "Health Careers Exploration",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "hce-3",
+      "title": "Education, Training, Licensure + Credentials",
+      "pathwayId": "health-careers-exploration",
+      "pathwayTitle": "Health Careers Exploration",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "hce-4",
+      "title": "Building Experience That Actually Teaches You Something",
+      "pathwayId": "health-careers-exploration",
+      "pathwayTitle": "Health Careers Exploration",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "hce-5",
+      "title": "Academic Readiness + Competency Development",
+      "pathwayId": "health-careers-exploration",
+      "pathwayTitle": "Health Careers Exploration",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "hce-6",
+      "title": "Paying for the Path: Financial Aid + Cost Planning",
+      "pathwayId": "health-careers-exploration",
+      "pathwayTitle": "Health Careers Exploration",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "hce-7",
+      "title": "Professional Communication, Networking + Mentorship",
+      "pathwayId": "health-careers-exploration",
+      "pathwayTitle": "Health Careers Exploration",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "hce-8",
+      "title": "Build Your Personal Health-Career Roadmap",
+      "pathwayId": "health-careers-exploration",
+      "pathwayTitle": "Health Careers Exploration",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "stem-collab-camp",
+      "title": "STEM Collaborative Summer Camp",
+      "pathwayId": "youth-steam",
+      "pathwayTitle": "Youth Mentorship + STEAM",
+      "delivery": "practical"
+    },
+    {
+      "id": "fbch-coverage",
+      "title": "Care Navigation and Coverage",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "unstoppable-ce",
+      "title": "Unstoppable: The Power of Healing and Growth",
+      "pathwayId": "unstoppable-mental-health",
+      "pathwayTitle": "Unstoppable Continuing Education and Facilitator Training",
+      "delivery": "live"
+    },
+    {
+      "id": "cmhw-facilitator",
+      "title": "Community Mental Health Worker and Facilitator Training",
+      "pathwayId": "unstoppable-mental-health",
+      "pathwayTitle": "Unstoppable Continuing Education and Facilitator Training",
+      "delivery": "blended"
+    }
+  ]
+}

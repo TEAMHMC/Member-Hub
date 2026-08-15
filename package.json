@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run generate:courses && vite build",
     "preview": "vite preview",
     "test:curriculum": "tsx tests/curriculum.test.ts",
-    "test": "npm run test:curriculum && tsc --noEmit"
+    "test": "npm run test:curriculum && tsc --noEmit",
+    "generate:courses": "tsx scripts/generate-course-manifest.ts"
   },
   "dependencies": {
     "lucide-react": "^0.562.0",
