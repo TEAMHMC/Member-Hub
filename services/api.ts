@@ -165,6 +165,39 @@ export interface TrainingRegistrationInput {
   source?: string;
 }
 
+// ── CHW certificate program ──────────────────────────────────────────────
+//
+// Academy progress used to live only in this browser's localStorage. That is fine for
+// a self-guided catalog and disqualifying for a certificate: clearing a browser erased
+// the record, and there was no server-side evidence that anyone completed anything.
+// DHCS expects a supervising provider to retain the syllabus, the hours and the
+// materials, so course completion is now written through to the portal and localStorage
+// becomes a cache rather than the record.
+
+export interface ChwGate { id: string; label: string; met: boolean; detail?: string }
+
+export interface ChwEnrollment {
+  enrolled: boolean;
+  enrollment?: { id: string; mode: 'cohort' | 'self_paced'; cohortId?: string | null; specialtyTrackId?: string | null; completedCourseIds?: string[] };
+  hours?: { instruction: number; fieldwork: number; specialty: number; total: number };
+  gates?: ChwGate[];
+  competenciesCovered?: string[];
+  missingCompetencies?: { id: string; num: number; label: string }[];
+  eligibleForCertificate?: boolean;
+}
+
+export const chw = {
+  program: () => req<any>('/api/chw/program'),
+  myEnrollment: () => req<ChwEnrollment>('/api/chw/my-enrollment'),
+  cohorts: () => req<{ cohorts: any[] }>('/api/chw/cohorts'),
+  enroll: (input: { cohortId?: string; mode?: 'cohort' | 'self_paced'; specialtyTrackId?: string }) =>
+    req<{ success: boolean; enrollmentId: string }>('/api/chw/enroll', { method: 'POST', body: JSON.stringify(input) }),
+  // Best-effort: a sync failure must never lose the learner's place in the browser.
+  recordProgress: (input: { courseId?: string; completed?: boolean; lessonIds?: string[]; specialtyTrackId?: string }) =>
+    req<ChwEnrollment>('/api/chw/progress', { method: 'POST', body: JSON.stringify(input) }),
+  transcript: (enrollmentId: string) => req<any>(`/api/chw/transcript/${encodeURIComponent(enrollmentId)}`),
+};
+
 /** A guided cohort date for a course, scheduled in the volunteer portal. */
 export interface ScheduledSession {
   id: string;

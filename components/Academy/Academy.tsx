@@ -9,7 +9,7 @@
 // video or audio, meaningful headings, keyboard-operable controls, and no
 // instruction that relies on color alone (state is always also stated in text).
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Award, BookOpen, Check, CheckCircle2, ChevronRight, Clock, FileText,
   GraduationCap, Layers, ListChecks, Lock, PenLine, Play, ShieldCheck,
@@ -22,7 +22,7 @@ import {
 import { CAMP_WEEKS, CAMP_TEMPLATE } from './programStemCollab';
 import type { Block, KnowledgeCheck } from './blocks';
 import TrainingRegistration from './TrainingRegistration';
-import { training as trainingApi, type ScheduledSession } from '../../services/api';
+import { training as trainingApi, chw as trainingApi_chw, type ScheduledSession } from '../../services/api';
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
@@ -342,6 +342,27 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
   useEffect(() => {
     saveState(userId, state);
   }, [userId, state]);
+
+  // Write course completions through to the portal. localStorage stays as the fast local
+  // cache, but the server holds the record a certificate and an audit rest on — clearing
+  // a browser must not erase someone's training history.
+  const syncedCourses = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const done: string[] = [];
+    for (const p of PATHWAYS) {
+      for (const c of p.courses) {
+        if (isCourseComplete(p, c.id, state) && !syncedCourses.current.has(c.id)) done.push(c.id);
+      }
+    }
+    if (done.length === 0) return;
+    done.forEach((id) => syncedCourses.current.add(id));
+    // Best effort: a sync failure must never block the learner or lose their place.
+    done.forEach((courseId) => {
+      trainingApi_chw.recordProgress({ courseId, completed: true }).catch(() => {
+        syncedCourses.current.delete(courseId);
+      });
+    });
+  }, [state]);
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [view]);
