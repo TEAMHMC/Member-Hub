@@ -8,6 +8,27 @@ interface LoginProps {
   onLogin: (userData: Partial<User>, role?: UserRole) => void;
 }
 
+// Member accounts are invitation-only for now. The sign-in step below emails a
+// code to any address that asks for one, which is right at launch and wrong
+// before it, so an invitation code has to be cleared first.
+//
+// This is a launch control, not a security boundary: the codes ship in this
+// bundle and anyone reading it can find them. The durable fix is an allowlist on
+// /api/client/auth/request-link in the portal, so an uninvited address gets no
+// code at all. Until that ships this stops the public creating accounts.
+// Set VITE_INVITE_ONLY=false to open the Hub, VITE_INVITE_CODES to rotate codes.
+const INVITE_ONLY = String((import.meta as any).env?.VITE_INVITE_ONLY ?? 'true') !== 'false';
+const INVITE_CODES: string[] = String((import.meta as any).env?.VITE_INVITE_CODES || 'HMC-MEMBER-2026')
+  .split(',')
+  .map((c) => c.trim().toLowerCase())
+  .filter(Boolean);
+const INVITE_CLEARED_KEY = 'hmc.inviteCleared';
+// Storage throws in some private modes, and a member who cleared the gate should
+// not be sent back to it by a failed read.
+const inviteAlreadyCleared = (): boolean => {
+  try { return sessionStorage.getItem(INVITE_CLEARED_KEY) === '1'; } catch { return false; }
+};
+
 // Passwordless email magic-link, wired to the live backend
 // (/api/client/auth/request-link + verify-link). SMS/phone sign-in turns on
 // once the Twilio client pipeline (HIPAA BAA + A2P campaign) is live.
@@ -18,13 +39,29 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [zipCode, setZipCode] = useState('');
-  const [step, setStep] = useState<'email' | 'code' | 'onboarding'>('email');
+  const [invite, setInvite] = useState('');
+  const [step, setStep] = useState<'invite' | 'email' | 'code' | 'onboarding'>(
+    INVITE_ONLY && !inviteAlreadyCleared() ? 'invite' : 'email',
+  );
   const [consentData, setConsentData] = useState(false);
   const [consentSms, setConsentSms] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
+  const handleInviteSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const given = invite.trim().toLowerCase();
+    if (!given) return;
+    if (!INVITE_CODES.includes(given)) {
+      setErr('That invitation code was not recognized. Check the message we sent you, or request an invitation below.');
+      return;
+    }
+    try { sessionStorage.setItem(INVITE_CLEARED_KEY, '1'); } catch { /* private mode: they re-enter it next visit */ }
+    setErr(null);
+    setStep('email');
+  };
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +130,42 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             Free screenings, community events, help with food, housing and care, and self-paced
             courses that open doors into health careers. All in one place, at no cost.
           </p>
+          {step === 'invite' && (
+            <p className="text-[11px] font-bold uppercase tracking-widest text-[#233DFF]">
+              Member access is by invitation
+            </p>
+          )}
         </div>
+
+        {step === 'invite' && (
+          <form onSubmit={handleInviteSubmit} className="space-y-6">
+            <div className="space-y-1">
+              <label className={labelStyle}>INVITATION CODE</label>
+              <input
+                type="text"
+                placeholder="HMC-0000-0000"
+                className={`${inputStyle} tracking-widest uppercase`}
+                value={invite}
+                onChange={(e) => { setInvite(e.target.value); if (err) setErr(null); }}
+                autoComplete="off"
+                autoCapitalize="characters"
+                spellCheck={false}
+                required
+                autoFocus
+              />
+            </div>
+            {err ? <p className="text-xs font-medium text-[#FF6F91] ml-1">{err}</p> : null}
+            <button type="submit" className={buttonStyle} disabled={!invite.trim()}>
+              Continue <ArrowRight size={18} />
+            </button>
+            <a
+              href="https://www.healthmatters.clinic/contact-us"
+              className="block w-full text-center text-xs text-zinc-400 underline"
+            >
+              Request an invitation
+            </a>
+          </form>
+        )}
 
         {step === 'email' && (
           <form onSubmit={handleEmailSubmit} className="space-y-6">
