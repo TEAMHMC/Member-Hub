@@ -488,8 +488,14 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                   <h3 className="text-xl font-semibold text-zinc-900 leading-snug">{p.title}</h3>
                   <p className="text-sm text-zinc-500 leading-relaxed flex-1">{p.purpose}</p>
                   <div className="flex flex-wrap items-center gap-4 text-[11px] font-semibold text-zinc-400">
+                    {/* Released courses only. Counting the planned list advertised
+                        work that has not been written yet, which reads as a half-built
+                        catalogue rather than a catalogue that is still growing. */}
                     <span className="inline-flex items-center gap-1.5">
-                      <BookOpen size={13} /> {published ? p.courses.length : p.plannedCourses?.length || 0} courses
+                      <BookOpen size={13} />
+                      {p.courses.length > 0
+                        ? `${p.courses.length} ${p.courses.length === 1 ? 'course' : 'courses'} available`
+                        : 'Courses available soon'}
                     </span>
                     {published && (
                       <span className="inline-flex items-center gap-1.5"><Clock size={13} /> {Math.round(pathwayMinutes(p) / 60)} hours</span>
@@ -770,7 +776,6 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     const published = p.status === 'published';
     // A pathway can be mid-build: some courses released, credential not yet open.
     const hasCourses = p.courses.length > 0;
-    const releasedTitles = new Set(p.courses.map((c) => c.title));
     const { gates, eligible } = evaluateGates(p, state);
     const issued = state.credentials[p.id];
     const pre = state.preTest[p.id];
@@ -811,7 +816,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               <p className="text-sm text-zinc-500 mt-1">
                 {published
                   ? 'Free. Self-paced. Start any time.'
-                  : `Free. ${p.plannedCourses?.filter((t) => releasedTitles.has(t)).length ?? p.courses.length} of ${p.plannedCourses?.length ?? 0} courses are released. The completion record opens when the pathway is published.`}
+                  : 'Free. Start the courses that are open now. More are added as they are released, and the completion record opens when the pathway is published.'}
               </p>
             </div>
             <Btn onClick={() => {
@@ -824,24 +829,31 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           </div>
         )}
 
+        {/* A pathway still in development lists what a learner can open today and
+            nothing else. It used to print the whole planned sequence with the unwritten
+            courses greyed out, which showed people the shape of work in progress and
+            made a growing pathway look like an unfinished one. plannedCourses stays in
+            the catalogue as the internal blueprint; it is no longer rendered. */}
         {!published && (
           <div className="bg-white rounded-2xl border border-dashed border-zinc-300 p-8 space-y-5">
             <p className="text-sm text-zinc-600 leading-relaxed">
-              This pathway is under curriculum review. The course sequence below is final. Released
-              courses can be taken now; the rest are in production.
+              This pathway is under curriculum review. The courses below are open now. More are
+              released as curriculum review completes them.
             </p>
-            <ol className="space-y-2">
-              {p.plannedCourses?.map((t, i) => {
-                const out = releasedTitles.has(t);
-                return (
-                  <li key={t} className="flex items-start gap-4 text-sm">
-                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${out ? 'bg-emerald-50 text-emerald-600' : 'bg-zinc-100 text-zinc-500'}`}>{i + 1}</span>
-                    <span className={out ? 'text-zinc-900 font-semibold' : 'text-zinc-700'}>{t}</span>
-                    {out && <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">Released</span>}
+            {p.courses.length > 0 && (
+              <ol className="space-y-2">
+                {p.courses.map((c, i) => (
+                  <li key={c.id} className="flex items-start gap-4 text-sm">
+                    <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 bg-emerald-50 text-emerald-600">{i + 1}</span>
+                    <span className="text-zinc-900 font-semibold">{c.title}</span>
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">Available</span>
                   </li>
-                );
-              })}
-            </ol>
+                ))}
+              </ol>
+            )}
+            <p className="text-sm text-zinc-500">
+              {p.courses.length > 0 ? 'More courses available soon.' : 'Courses available soon.'}
+            </p>
           </div>
         )}
 
