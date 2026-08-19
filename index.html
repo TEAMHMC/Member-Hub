@@ -35,10 +35,16 @@
 <body class="bg-[#f5f3ef] text-slate-900">
   <div id="root"></div>
 <!-- Shared HMC button system: one definition of a button across every HMC
-     surface. The script writes each label to a data attribute that the
-     stylesheet renders as the hover roll-up. Attribute-only, so it never
-     mutates DOM that React owns. -->
-<link rel="stylesheet" href="https://unstoppable.healthmatters.clinic/assets/site/hmc-buttons-1.0.2.css">
+     surface. Shape, fill and the dot come from the stylesheet; the script only
+     stops a button that ships its own dot from drawing a second one.
+     Attribute-only, so it never mutates DOM that React owns.
+
+     The versions are deliberately offset. CSS and JS are published separately,
+     and the highest that exist are CSS 1.0.3 (which fixes the dot vanishing for
+     the length of the hover) and JS 1.0.2. Both were pointing at 1.0.5, which
+     404s for CSS and JS alike, so every button on this surface lost its pill,
+     its fill and its dot. Verify a version resolves before bumping it. -->
+<link rel="stylesheet" href="https://unstoppable.healthmatters.clinic/assets/site/hmc-buttons-1.0.3.css">
 <script defer src="https://unstoppable.healthmatters.clinic/assets/site/hmc-buttons-1.0.2.js"></script>
 <script type="module" src="/index.tsx"></script>
 </body>
