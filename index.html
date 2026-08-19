@@ -39,13 +39,13 @@
      stops a button that ships its own dot from drawing a second one.
      Attribute-only, so it never mutates DOM that React owns.
 
-     The versions are deliberately offset. CSS and JS are published separately,
-     and the highest that exist are CSS 1.0.3 (which fixes the dot vanishing for
-     the length of the hover) and JS 1.0.2. Both were pointing at 1.0.5, which
-     404s for CSS and JS alike, so every button on this surface lost its pill,
-     its fill and its dot. Verify a version resolves before bumping it. -->
-<link rel="stylesheet" href="https://unstoppable.healthmatters.clinic/assets/site/hmc-buttons-1.0.3.css">
-<script defer src="https://unstoppable.healthmatters.clinic/assets/site/hmc-buttons-1.0.2.js"></script>
+     Keep the two versions matched. They are published as a pair from the
+     Unstoppable repo, which serves them to this surface, and both 1.0.5 files
+     are live. A version that has not been published yet 404s and takes the pill,
+     the fill and the dot with it, so check that a version resolves before
+     bumping to it. -->
+<link rel="stylesheet" href="https://unstoppable.healthmatters.clinic/assets/site/hmc-buttons-1.0.5.css">
+<script defer src="https://unstoppable.healthmatters.clinic/assets/site/hmc-buttons-1.0.5.js"></script>
 <script type="module" src="/index.tsx"></script>
 </body>
 </html>
