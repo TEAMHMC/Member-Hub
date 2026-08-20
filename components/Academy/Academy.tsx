@@ -10,14 +10,19 @@
 // instruction that relies on color alone (state is always also stated in text).
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Award, Check, CheckCircle2, ChevronRight, FileText, GraduationCap, ListChecks, Lock, PenLine, Play, ShieldCheck, TrendingUp, X } from 'lucide-react';
 import {
-  Award, BookOpen, Check, CheckCircle2, ChevronRight, Clock, FileText,
-  GraduationCap, Layers, ListChecks, Lock, PenLine, Play, ShieldCheck,
-  Sparkles, TrendingUp, X,
-} from 'lucide-react';
-import {
-  PATHWAYS, PASS_THRESHOLD, LEARNING_MODEL, LEVEL_ACCENT, pathwayById,
-  pathwayMinutes, type Check as CheckQ, type Course, type Pathway, type Session,
+  PATHWAYS,
+  PASS_THRESHOLD,
+  LEARNING_MODEL,
+  LEVEL_ACCENT,
+  pathwayById,
+  pathwayMinutes,
+  type Check as CheckQ,
+  type Course,
+  type Pathway,
+  type Session,
+  pathwayLessonIds,
 } from './catalog';
 import { CAMP_WEEKS, CAMP_TEMPLATE } from './programStemCollab';
 import type { Block, KnowledgeCheck } from './blocks';
@@ -314,6 +319,30 @@ const BlockView: React.FC<{
 const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal, initialView = 'catalog', member = null }) => {
   const [state, setState] = useState<LearnerState>(() => loadState(userId));
   const [view, setView] = useState<View>({ name: initialView } as View);
+
+  /**
+   * What the public should see per pathway, set by an admin in the portal.
+   * 'open' is the default when nothing is set, and a failed fetch leaves the map
+   * empty, so a bad minute on that endpoint can never hide a real pathway.
+   *
+   *   open      enrollable now
+   *   upcoming  save-my-spot, with the admin's cohort label
+   *   past      delivered, not enrollable
+   *   hidden    not rendered
+   */
+  type Visibility = { state: 'open' | 'upcoming' | 'past' | 'hidden'; cohortLabel?: string };
+  const [visibility, setVisibility] = useState<Record<string, Visibility>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('https://volunteer.healthmatters.clinic/api/public/academy-visibility')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled && d?.overrides) setVisibility(d.overrides); })
+      .catch(() => { /* defaults apply */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  const vis = (id: string): Visibility => visibility[id] || { state: 'open' };
   const [showCert, setShowCert] = useState<string | null>(null);
   // Which course the learner is registering for, plus the session if one exists.
   const [registering, setRegistering] = useState<{ course: Course; session?: Session } | null>(null);
@@ -466,46 +495,81 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               pathways, so learning is never repeated without reason.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {PATHWAYS.map((p) => {
-              const accent = LEVEL_ACCENT[p.level];
-              const published = p.status === 'published';
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {PATHWAYS.filter((p) => vis(p.id).state !== 'hidden').map((p, idx) => {
+              const v = vis(p.id);
               const pct = pathwayPercent(p, state);
+              const lessons = pathwayLessonIds(p).length;
+              const hours = Math.round(pathwayMinutes(p) / 60);
+              const enrollable = v.state === 'open' && p.courses.length > 0;
+              // A cover per pathway, cycled so the catalog reads as a set rather
+              // than a wall of identical tiles.
+              const covers = [
+                'from-[#1b1f5c] via-[#233DFF] to-[#3a2a7a]',
+                'from-[#0f3b34] via-[#12715f] to-[#1b8f6a]',
+                'from-[#4a2c0a] via-[#a4620d] to-[#d08a1a]',
+                'from-[#26262b] via-[#43434d] to-[#5b5b68]',
+              ];
+              const cover = covers[idx % covers.length];
+              const badge =
+                v.state === 'past' ? { text: 'Past cohort', cls: 'bg-white/90 text-zinc-700' }
+                : v.state === 'upcoming' ? { text: v.cohortLabel || 'Upcoming', cls: 'bg-white/90 text-[#8a4b08]' }
+                : p.courses.length > 0 ? { text: 'Open now', cls: 'bg-white/95 text-zinc-900' }
+                : { text: 'In curriculum review', cls: 'bg-white/80 text-zinc-600' };
+
               return (
-                <button
-                  key={p.id}
-                  onClick={() => setView({ name: 'pathway', pathwayId: p.id })}
-                  className="text-left bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-7 space-y-4 hover:border-[#233DFF]/30 hover:shadow-md transition-all h-full flex flex-col"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${accent.bg} ${accent.text}`}>
-                      {p.level}
+                <article key={p.id} className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm overflow-hidden flex flex-col hover:border-[#233DFF]/40 hover:shadow-md transition-all">
+                  <div className={`bg-gradient-to-br ${cover} text-white p-6 aspect-[16/9] flex flex-col justify-between`}>
+                    <span className={`self-start text-[10px] font-bold tracking-wide px-2.5 py-1 rounded-full ${badge.cls}`}>
+                      {badge.text}
                     </span>
-                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${published ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-500'}`}>
-                      {published ? 'Open for enrollment' : 'In development'}
-                    </span>
+                    <div>
+                      <h3 className="text-xl font-semibold leading-tight">{p.title}</h3>
+                      <p className="text-[12px] text-white/85 mt-1.5">
+                        {p.courses.length > 0
+                          ? `${p.courses.length} ${p.courses.length === 1 ? 'course' : 'courses'}${lessons ? ` \u00b7 ${lessons} lessons` : ''}${hours ? ` \u00b7 about ${hours} ${hours === 1 ? 'hour' : 'hours'}` : ''}`
+                          : 'Courses available soon'}
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-zinc-900 leading-snug">{p.title}</h3>
-                  <p className="text-sm text-zinc-500 leading-relaxed flex-1">{p.purpose}</p>
-                  <div className="flex flex-wrap items-center gap-4 text-[11px] font-semibold text-zinc-400">
-                    {/* Released courses only. Counting the planned list advertised
-                        work that has not been written yet, which reads as a half-built
-                        catalogue rather than a catalogue that is still growing. */}
-                    <span className="inline-flex items-center gap-1.5">
-                      <BookOpen size={13} />
-                      {p.courses.length > 0
-                        ? `${p.courses.length} ${p.courses.length === 1 ? 'course' : 'courses'} available`
-                        : 'Courses available soon'}
-                    </span>
-                    {published && (
-                      <span className="inline-flex items-center gap-1.5"><Clock size={13} /> {Math.round(pathwayMinutes(p) / 60)} hours</span>
+
+                  <div className="p-6 flex flex-col gap-3 flex-1">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">{p.level}</p>
+                    <p className="text-sm text-zinc-600 leading-relaxed flex-1">{p.purpose}</p>
+                    {pct > 0 && <Bar percent={pct} />}
+
+                    <div className="flex flex-wrap items-center gap-2 mt-auto pt-1">
+                      {enrollable && (
+                        <Btn onClick={() => { enroll(p); setView({ name: 'pathway', pathwayId: p.id }); }}>
+                          {state.enrolled.includes(p.id) ? 'Continue' : 'Enroll'}
+                        </Btn>
+                      )}
+                      {v.state === 'upcoming' && (
+                        <Btn onClick={() => { enroll(p); setView({ name: 'pathway', pathwayId: p.id }); }}>
+                          Save my spot
+                        </Btn>
+                      )}
+                      <button
+                        onClick={() => setView({ name: 'pathway', pathwayId: p.id })}
+                        className="text-sm font-semibold text-[#233DFF] hover:underline px-1"
+                      >
+                        {v.state === 'past' ? 'See what was covered' : 'See the lessons'}
+                      </button>
+                    </div>
+
+                    {v.state === 'past' && (
+                      <p className="text-xs text-zinc-500">
+                        This cohort has finished. The coursework stays readable, and the next cohort
+                        will appear here when it is scheduled.
+                      </p>
                     )}
-                    {p.guidedStart && (
-                      <span className="inline-flex items-center gap-1.5 text-[#FF6E40]"><Sparkles size={13} /> Guided start {p.guidedStart}</span>
+                    {v.state === 'upcoming' && (
+                      <p className="text-xs text-zinc-500">
+                        Saving a spot holds your place and sends one reminder before it starts.
+                      </p>
                     )}
                   </div>
-                  {pct > 0 && <Bar percent={pct} />}
-                </button>
+                </article>
               );
             })}
           </div>
