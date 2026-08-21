@@ -3,12 +3,15 @@ import React, { useState } from 'react';
 import { User } from '../../types';
 import { Search, ChevronDown } from 'lucide-react';
 import { TOOLS, context as ctxApi } from '../../services/api';
+import Notifications from './Notifications';
 
 interface NavbarProps {
   user: User;
+  /** Lets a notification send someone to an in-app surface rather than off site. */
+  onNavigateTab?: (tab: string) => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ user }) => {
+const Navbar: React.FC<NavbarProps> = ({ user, onNavigateTab }) => {
   const [query, setQuery] = useState('');
   const search = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +36,8 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
         </form>
       </div>
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4 md:gap-6">
+        <Notifications onNavigateTab={onNavigateTab} />
         <div className="flex items-center gap-3 group cursor-pointer">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-semibold text-zinc-900 leading-tight">{user.firstName} {user.lastName}</p>
