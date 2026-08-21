@@ -181,7 +181,7 @@ const App: React.FC = () => {
             onLogout={handleLogout}
           />
           <div className="flex-1 flex flex-col min-w-0">
-            <Navbar user={currentUser} />
+            <Navbar user={currentUser} onNavigateTab={setActiveTab} />
             <main className="px-4 md:px-8 pb-28 pt-2 flex-1">
               {renderPortalContent()}
             </main>
