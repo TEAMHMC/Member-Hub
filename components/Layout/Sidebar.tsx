@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { UserRole, type Audience } from '../../types';
+import { UserRole, type Audience, type StaffStanding } from '../../types';
 import {
-  Home, Calendar, ClipboardList,
+  Home, Calendar,
   LogOut, Compass, ShieldCheck, Activity, Brain, GraduationCap,
+  SlidersHorizontal, Eye,
   User as UserIcon
 } from 'lucide-react';
 
@@ -13,37 +14,59 @@ interface SidebarProps {
   activeTab: string;
   onTabChange: (id: string) => void;
   onLogout: () => void;
+  /** Present only for staff. Adds the console entry; changes nothing else. */
+  staff?: StaffStanding | null;
+  staffView?: boolean;
+  onToggleStaffView?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ role, audience = 'care', activeTab, onTabChange, onLogout }) => {
+const Sidebar: React.FC<SidebarProps> = ({
+  audience = 'care', activeTab, onTabChange, onLogout,
+  staff = null, staffView = false, onToggleStaffView,
+}) => {
+  // Navigation is the member's navigation, for everybody. It used to branch on
+  // role, and the staff branch offered an Operations and a Tasks tab that no
+  // dashboard ever rendered. Staff browse the Hub as members and reach the
+  // console through the button below, so there is one set of surfaces to keep
+  // working and staff see the same thing members see.
   const getNavItems = () => {
-    if (role === UserRole.CLIENT) {
-      // A learner has no care relationship with HMC, so the screening,
-      // playbook, and results surfaces are not shown at all.
-      if (audience === 'learner') {
-        return [
-          { icon: <Home size={18} />, label: 'Home', id: 'dash' },
-          { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
-          { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
-        ];
-      }
+    // A learner has no care relationship with HMC, so the screening,
+    // playbook, and results surfaces are not shown at all.
+    if (audience === 'learner') {
       return [
         { icon: <Home size={18} />, label: 'Home', id: 'dash' },
         { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
         { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
-        { icon: <Compass size={18} />, label: 'Playbook', id: 'game-plan' },
-        { icon: <Activity size={18} />, label: 'Results', id: 'health' },
-        { icon: <ShieldCheck size={18} />, label: 'Resources', id: 'resources' },
-        { icon: <Brain size={18} />, label: 'Snapshot', id: 'check-yourself' },
       ];
     }
     return [
-      { icon: <Home size={18} />, label: 'Operations', id: 'dash' },
-      { icon: <ClipboardList size={18} />, label: 'Tasks', id: 'tasks' },
+      { icon: <Home size={18} />, label: 'Home', id: 'dash' },
+      { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
+      { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
+      { icon: <Compass size={18} />, label: 'Playbook', id: 'game-plan' },
+      { icon: <Activity size={18} />, label: 'Results', id: 'health' },
+      { icon: <ShieldCheck size={18} />, label: 'Resources', id: 'resources' },
+      { icon: <Brain size={18} />, label: 'Snapshot', id: 'check-yourself' },
     ];
   };
 
   const items = getNavItems();
+
+  // One control, two directions, so it is always obvious which view is showing.
+  const staffToggle = (compact = false) => {
+    if (!staff || !onToggleStaffView) return null;
+    return (
+      <button
+        onClick={onToggleStaffView}
+        className={`flex items-center gap-3 rounded-full transition-all font-bold uppercase tracking-wider text-[11px] whitespace-nowrap ${
+          compact ? 'px-4 py-2.5 shrink-0' : 'w-full px-4 py-3'
+        } ${staffView ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-white/60'}`}
+      >
+        {staffView ? <Eye size={compact ? 16 : 18} /> : <SlidersHorizontal size={compact ? 16 : 18} />}
+        {staffView ? 'Member view' : 'Manage hub'}
+      </button>
+    );
+  };
 
   const navButton = (item: { icon: React.ReactNode; label: string; id: string }, horizontal = false) => (
     <button
@@ -88,6 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, audience = 'care', activeTab, o
           >
             <UserIcon size={16} /> Profile
           </button>
+          {staffToggle(true)}
         </nav>
       </div>
 
@@ -98,6 +122,16 @@ const Sidebar: React.FC<SidebarProps> = ({ role, audience = 'care', activeTab, o
         <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
           <p className="px-4 text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-4">Explore</p>
           {items.map((item) => navButton(item))}
+
+          {staff && (
+            <div className="pt-6">
+              <p className="px-4 text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-4">Staff</p>
+              {staffToggle()}
+              <p className="px-4 pt-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                {staff.role}
+              </p>
+            </div>
+          )}
         </nav>
 
         <div className="p-6 border-t border-zinc-200/70 space-y-1">

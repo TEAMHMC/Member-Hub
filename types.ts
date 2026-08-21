@@ -39,9 +39,24 @@ export enum ContactPreference {
  */
 export type Audience = 'care' | 'learner' | 'both';
 
+/**
+ * Staff standing on the Hub, as returned by the server. Present only for people
+ * on the volunteers roster who hold an elevated role; null for every member.
+ * Never set by this client: the Hub asks the server who somebody is and what they
+ * may do, and the answer is recomputed on each call rather than stored in the
+ * session, so revoking a role in the portal takes effect immediately.
+ */
+export interface StaffStanding {
+  role: string;
+  name: string;
+  isAdmin: boolean;
+  capabilities: Array<'academy' | 'content' | 'support' | 'staffAdmin'>;
+}
+
 export interface User {
   id: string;
   audience?: Audience;
+  staff?: StaffStanding | null;
   phone: string;
   role: UserRole | null;
   firstName: string;

@@ -42,6 +42,12 @@ const App: React.FC = () => {
   }, []);
   const [activeTab, setActiveTab] = useState<string>('dash');
 
+  // Staff see the member experience by default and switch to the console
+  // deliberately. Somebody maintaining the Hub needs to look at what a member
+  // looks at, and a console that replaces the member view makes that impossible
+  // without a second account. The console is a destination, not a different app.
+  const [staffView, setStaffView] = useState(false);
+
   // Restore a session by validating the httpOnly cookie with the backend
   // (source of truth), not by trusting localStorage alone. localStorage only
   // caches non-sensitive UI fields (name, zip, badges) for a fast first paint.
@@ -50,12 +56,19 @@ const App: React.FC = () => {
     clientApi.me()
       .then((me) => {
         const base: User = cached ? JSON.parse(cached) : ({} as User);
+        // The role comes from the server. This used to be hardcoded to CLIENT,
+        // which is why the staff console below has never been reachable: the
+        // routing, the sidebar and the dashboard all existed and no session could
+        // ever arrive holding a role that selected them. A member still resolves
+        // to CLIENT, because /api/client/me returns staff: null for members.
+        const staff = me.staff || null;
         const restored: User = {
           ...base,
           id: base.id || `usr_${Math.random().toString(36).slice(2, 11)}`,
-          role: UserRole.CLIENT,
+          role: staff ? (staff.isAdmin ? UserRole.ADMIN : UserRole.STAFF) : UserRole.CLIENT,
+          staff,
           email: me.email || base.email || '',
-          firstName: me.profile?.firstName || base.firstName || 'Member',
+          firstName: me.profile?.firstName || base.firstName || (staff ? staff.name : 'Member'),
           lastName: base.lastName || '',
           phone: base.phone || '',
           zipCode: base.zipCode || '',
@@ -121,23 +134,19 @@ const App: React.FC = () => {
   const renderPortalContent = () => {
     if (!currentUser?.role) return null;
 
-    if (currentUser.role === UserRole.CLIENT) {
-      return (
-        <ClientDashboard
-          user={currentUser}
-          initialTab={activeTab}
-          onTabChange={setActiveTab}
-          onUpdateUser={handleUpdateUser}
-          visitorId={visitorId}
-        />
-      );
+    if (staffView && currentUser.staff) {
+      return <StaffDashboard staff={currentUser.staff} onExit={() => setStaffView(false)} />;
     }
 
-    if (currentUser.role === UserRole.STAFF || currentUser.role === UserRole.ADMIN) {
-      return <StaffDashboard user={currentUser} activeTab={activeTab} />;
-    }
-
-    return <div className="p-20 text-center font-black uppercase italic">Access Denied</div>;
+    return (
+      <ClientDashboard
+        user={currentUser}
+        initialTab={activeTab}
+        onTabChange={setActiveTab}
+        onUpdateUser={handleUpdateUser}
+        visitorId={visitorId}
+      />
+    );
   };
 
   if (view === 'loading') {
@@ -177,8 +186,11 @@ const App: React.FC = () => {
             role={currentUser.role!}
             audience={currentUser.audience}
             activeTab={activeTab}
-            onTabChange={setActiveTab}
+            onTabChange={(tab) => { setStaffView(false); setActiveTab(tab); }}
             onLogout={handleLogout}
+            staff={currentUser.staff}
+            staffView={staffView}
+            onToggleStaffView={() => setStaffView((v) => !v)}
           />
           <div className="flex-1 flex flex-col min-w-0">
             <Navbar user={currentUser} />
@@ -187,7 +199,7 @@ const App: React.FC = () => {
             </main>
             <Footer />
           </div>
-          {currentUser.role === UserRole.CLIENT && (
+          {!staffView && (
             <SunnyNavigator visitorId={visitorId} pageTitle={`HMC Member Hub — ${activeTab}`} pageContext={{ tab: activeTab }} />
           )}
         </>
