@@ -1359,20 +1359,27 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               <div className="space-y-3">
                 {c.lessons.map((l, i) => {
                   const done = state.lessons.includes(l.id);
+                  const locked = !registered;
                   return (
                     <button
                       key={l.id}
-                      onClick={() => setView({ name: 'lesson', pathwayId, courseId, index: i })}
-                      className={`w-full text-left flex items-start gap-5 p-6 rounded-2xl border transition-all ${done ? 'bg-zinc-50/60 border-zinc-100' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40 hover:shadow-sm'}`}
+                      onClick={() => {
+                        // Locked rows enroll rather than doing nothing. A row that
+                        // looks clickable and is not reads as broken.
+                        if (locked) { enroll(p); return; }
+                        setView({ name: 'lesson', pathwayId, courseId, index: i });
+                      }}
+                      aria-label={locked ? `${l.title}. Available after you enroll, which is free.` : l.title}
+                      className={`w-full text-left flex items-start gap-5 p-6 rounded-2xl border transition-all ${done ? 'bg-zinc-50/60 border-zinc-100' : locked ? 'bg-zinc-50/40 border-zinc-150 hover:border-[#233DFF]/30' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40 hover:shadow-sm'}`}
                     >
-                      <span className={`w-11 h-11 rounded-2xl flex items-center justify-center border shrink-0 ${done ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-[#233DFF] border-blue-100'}`}>
-                        {done ? <Check size={18} strokeWidth={3} /> : <span className="text-[13px] font-black">{i + 1}</span>}
+                      <span className={`w-11 h-11 rounded-2xl flex items-center justify-center border shrink-0 ${done ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : locked ? 'bg-zinc-100 text-zinc-400 border-zinc-200' : 'bg-blue-50 text-[#233DFF] border-blue-100'}`}>
+                        {done ? <Check size={18} strokeWidth={3} /> : locked ? <Lock size={16} /> : <span className="text-[13px] font-black">{i + 1}</span>}
                       </span>
                       <span className="min-w-0 flex-1 space-y-1.5">
                         <span className="block text-[15px] font-semibold text-zinc-900 leading-snug">{l.title}</span>
                         <span className="block text-[13px] text-zinc-500 leading-relaxed">{l.summary}</span>
                         <span className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 pt-0.5">
-                          {l.minutes} minutes{done ? ' · Complete' : ''}
+                          {l.minutes} minutes{done ? ' · Complete' : locked ? ' · Opens when you enroll' : ''}
                         </span>
                       </span>
                     </button>
@@ -1477,6 +1484,12 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     const c = p?.courses.find((x) => x.id === courseId);
     const lesson = c?.lessons[index];
     if (!p || !c || !lesson) return renderCatalog();
+    // Enrollment has to actually withhold something or it is decoration. The
+    // course page listed every lesson as clickable and this view rendered whatever
+    // it was handed, so a lesson link read the whole course without enrolling.
+    // Sending someone to the course page rather than an error, because enrolling
+    // is free and one click away: this is a gate, not a wall.
+    if (!state.enrolled.includes(p.id)) return renderCourse(pathwayId, courseId);
     const isLast = index === c.lessons.length - 1;
     // v2 courses embed their checks in the lesson blocks where they belong, so
     // the end-of-course block would repeat them.
