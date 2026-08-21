@@ -12,10 +12,15 @@ interface LoginProps {
 // code to any address that asks for one, which is right at launch and wrong
 // before it, so an invitation code has to be cleared first.
 //
-// This is a launch control, not a security boundary: the codes ship in this
-// bundle and anyone reading it can find them. The durable fix is an allowlist on
-// /api/client/auth/request-link in the portal, so an uninvited address gets no
-// code at all. Until that ships this stops the public creating accounts.
+// The durable check now lives on /api/client/auth/request-link in the portal: an
+// existing member always gets a sign-in code, and an unknown address only gets one
+// with a valid invitation. That is where it belongs, because the codes ship in this
+// bundle and anyone reading it can find them.
+//
+// So this step is a path for new people, not a wall in front of everyone. It used
+// to be the first thing an existing member saw with no way past it, which meant
+// somebody with a working account had to request a fresh invitation to sign in to
+// the account they already had.
 // Set VITE_INVITE_ONLY=false to open the Hub, VITE_INVITE_CODES to rotate codes.
 const INVITE_ONLY = String((import.meta as any).env?.VITE_INVITE_ONLY ?? 'true') !== 'false';
 const INVITE_CODES: string[] = String((import.meta as any).env?.VITE_INVITE_CODES || 'HMC-MEMBER-2026')
@@ -69,7 +74,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setBusy(true);
     setErr(null);
     try {
-      await clientApi.requestLink(email.trim().toLowerCase());
+      await clientApi.requestLink(email.trim().toLowerCase(), invite.trim() || undefined);
       setStep('code');
     } catch {
       setErr('We could not send a code to that email. Please check it and try again.');
@@ -158,11 +163,18 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <button type="submit" className={buttonStyle} disabled={!invite.trim()}>
               Continue <ArrowRight size={18} />
             </button>
+            <button
+              type="button"
+              onClick={() => { setErr(null); setStep('email'); }}
+              className="block w-full text-center text-sm font-semibold text-[#233DFF] hover:underline"
+            >
+              Already a member? Sign in
+            </button>
             <a
               href="https://www.healthmatters.clinic/contact-us"
               className="block w-full text-center text-xs text-zinc-400 underline"
             >
-              Request an invitation
+              Need an invitation?
             </a>
           </form>
         )}

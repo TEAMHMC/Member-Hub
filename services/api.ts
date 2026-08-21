@@ -246,10 +246,15 @@ export const training = {
 
 // ── Client passwordless identity ─────────────────────────────────────────
 export const client = {
-  requestLink: (email: string) =>
+  /**
+   * @param invite an invitation code, when the person entered one. The server
+   *   issues a code to any existing member without it, and to a new address only
+   *   with it, so this has to travel or a genuinely invited person is refused.
+   */
+  requestLink: (email: string, invite?: string) =>
     req<{ ok: boolean }>('/api/client/auth/request-link', {
       method: 'POST',
-      body: JSON.stringify({ email }),
+      body: JSON.stringify(invite ? { email, invite } : { email }),
     }),
   verifyLink: (email: string, code: string) =>
     req<{ ok: boolean; identified: boolean; email: string }>('/api/client/auth/verify-link', {
