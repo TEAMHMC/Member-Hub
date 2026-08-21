@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Lock, Check, ArrowRight, Loader2 } from 'lucide-react';
 import { UserRole, User } from '../../types';
 import { client as clientApi, context as ctxApi } from '../../services/api';
@@ -8,21 +8,18 @@ interface LoginProps {
   onLogin: (userData: Partial<User>, role?: UserRole) => void;
 }
 
-// Member accounts are invitation-only for now. The sign-in step below emails a
-// code to any address that asks for one, which is right at launch and wrong
-// before it, so an invitation code has to be cleared first.
+// Whether an invitation is needed is the server's answer, read from
+// /api/public/auth-config, not a flag compiled into this bundle.
 //
-// The durable check now lives on /api/client/auth/request-link in the portal: an
-// existing member always gets a sign-in code, and an unknown address only gets one
-// with a valid invitation. That is where it belongs, because the codes ship in this
-// bundle and anyone reading it can find them.
+// It was a build-time flag defaulting to invitation-only, and that is how the Hub
+// came to show an invitation wall while the server had already stopped requiring
+// one. The two could disagree indefinitely, because changing the server's mind
+// meant rebuilding and redeploying this site. Asking the server removes the
+// possibility of disagreeing with it.
 //
-// So this step is a path for new people, not a wall in front of everyone. It used
-// to be the first thing an existing member saw with no way past it, which meant
-// somebody with a working account had to request a fresh invitation to sign in to
-// the account they already had.
-// Set VITE_INVITE_ONLY=false to open the Hub, VITE_INVITE_CODES to rotate codes.
-const INVITE_ONLY = String((import.meta as any).env?.VITE_INVITE_ONLY ?? 'true') !== 'false';
+// The codes themselves were never a security boundary: they ship in this bundle
+// and anyone reading it can find them. The real check is on
+// /api/client/auth/request-link.
 const INVITE_CODES: string[] = String((import.meta as any).env?.VITE_INVITE_CODES || 'HMC-MEMBER-2026')
   .split(',')
   .map((c) => c.trim().toLowerCase())
@@ -45,15 +42,76 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [lastName, setLastName] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [invite, setInvite] = useState('');
-  const [step, setStep] = useState<'invite' | 'email' | 'code' | 'onboarding'>(
-    INVITE_ONLY && !inviteAlreadyCleared() ? 'invite' : 'email',
-  );
+  // Starts on the email step. If the server says signup is closed, the invitation
+  // step is shown once that answer arrives. Defaulting the other way would put a
+  // wall in front of every member for as long as the request took, and put one
+  // there permanently if the request failed.
+  const [step, setStep] = useState<'invite' | 'email' | 'code' | 'onboarding'>('email');
+  const [googleClientId, setGoogleClientId] = useState<string | null>(null);
   const [consentData, setConsentData] = useState(false);
   const [consentSms, setConsentSms] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
+  // Ask the server what sign-in looks like: whether Google is available, and
+  // whether an invitation is required. A failure here leaves the email step
+  // showing, which is the working path, rather than a wall nobody can pass.
+  useEffect(() => {
+    let cancelled = false;
+    clientApi.authConfig()
+      .then((cfg) => {
+        if (cancelled) return;
+        setGoogleClientId(cfg.googleClientId);
+        if (cfg.signupMode === 'invite' && !inviteAlreadyCleared()) setStep('invite');
+      })
+      .catch(() => { /* email sign-in still works; nothing to show differently */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Google Identity Services, loaded only if the server gave us a client id.
+  // Rendered into the button container below once the script is ready.
+  useEffect(() => {
+    if (!googleClientId || step !== 'email') return;
+    let cancelled = false;
+
+    const render = () => {
+      const g = (window as any).google?.accounts?.id;
+      const host = document.getElementById('hmc-google-btn');
+      if (cancelled || !g || !host) return;
+      g.initialize({
+        client_id: googleClientId,
+        callback: async (resp: { credential?: string }) => {
+          if (!resp?.credential) return;
+          setBusy(true);
+          setErr(null);
+          try {
+            const r = await clientApi.googleSignIn(resp.credential);
+            onLogin({ email: r.email }, UserRole.CLIENT);
+          } catch {
+            setErr('Google could not sign you in. You can use a code instead.');
+          } finally {
+            setBusy(false);
+          }
+        },
+      });
+      host.innerHTML = '';
+      g.renderButton(host, { theme: 'outline', size: 'large', width: 300, text: 'continue_with' });
+    };
+
+    if ((window as any).google?.accounts?.id) { render(); return; }
+    const existing = document.getElementById('hmc-gsi-script') as HTMLScriptElement | null;
+    if (existing) { existing.addEventListener('load', render); return () => existing.removeEventListener('load', render); }
+    const sc = document.createElement('script');
+    sc.id = 'hmc-gsi-script';
+    sc.src = 'https://accounts.google.com/gsi/client';
+    sc.async = true;
+    sc.defer = true;
+    sc.onload = render;
+    document.head.appendChild(sc);
+    return () => { cancelled = true; };
+  }, [googleClientId, step, onLogin]);
 
   const handleInviteSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -195,8 +253,22 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             </div>
             {err ? <p className="text-xs font-medium text-[#FF6F91] ml-1">{err}</p> : null}
             <button type="submit" className={buttonStyle} disabled={busy || !emailValid}>
-              {busy ? <Loader2 size={18} className="animate-spin" /> : <>Continue <ArrowRight size={18} /></>}
+              {busy ? <Loader2 size={18} className="animate-spin" /> : <>Email me a code <ArrowRight size={18} /></>}
             </button>
+
+            {/* Shown only when the server supplied a client id, so nothing renders
+                a dead button if Google is not configured. Staff and volunteers
+                already sign in to the portal this way. */}
+            {googleClientId && (
+              <div className="space-y-4 pt-2">
+                <div className="flex items-center gap-3">
+                  <span className="h-px flex-1 bg-zinc-100" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-300">or</span>
+                  <span className="h-px flex-1 bg-zinc-100" />
+                </div>
+                <div id="hmc-google-btn" className="flex justify-center" />
+              </div>
+            )}
           </form>
         )}
 

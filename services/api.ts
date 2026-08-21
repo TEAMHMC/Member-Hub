@@ -327,6 +327,16 @@ export const client = {
       body: JSON.stringify({ email, code }),
     }),
   me: () => req<ClientMe>('/api/client/me'),
+  // What sign-in looks like, per the server rather than a build-time flag.
+  authConfig: () =>
+    req<{ googleClientId: string | null; signupMode: 'open' | 'invite' }>('/api/public/auth-config'),
+  // Exchange a Google credential for a Hub session. Verified server-side against
+  // the same OAuth client the volunteer portal uses.
+  googleSignIn: (credential: string) =>
+    req<{ ok: boolean; identified: boolean; email: string }>('/api/client/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ credential }),
+    }),
   logout: () => req<{ ok: boolean }>('/api/client/auth/logout', { method: 'POST' }),
 };
 
