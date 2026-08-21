@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Lock, Check, ArrowRight, Loader2 } from 'lucide-react';
 import { UserRole, User } from '../../types';
-import { client as clientApi, context as ctxApi } from '../../services/api';
+import { client as clientApi, context as ctxApi, ApiError } from '../../services/api';
 
 interface LoginProps {
   onLogin: (userData: Partial<User>, role?: UserRole) => void;
@@ -48,6 +48,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   // there permanently if the request failed.
   const [step, setStep] = useState<'invite' | 'email' | 'code' | 'onboarding'>('email');
   const [googleClientId, setGoogleClientId] = useState<string | null>(null);
+  // One resend per visit to the code step, so a stuck person is not walked into
+  // the five-per-hour limit on the endpoint by tapping it repeatedly.
+  const [resent, setResent] = useState(false);
   const [consentData, setConsentData] = useState(false);
   const [consentSms, setConsentSms] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -154,8 +157,25 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       } else {
         setStep('onboarding');
       }
-    } catch {
-      setErr('That code did not match or has expired. Please try again.');
+    } catch (e) {
+      // The server distinguishes four outcomes and this used to show one message
+      // for all of them, which gave wrong advice twice over: it told somebody to
+      // try again when they had been locked out after five wrong attempts, and it
+      // said a code did not match when no code had ever been issued for that
+      // address, which is what happens if the address here is not the address the
+      // email went to. Each case now says what to do about it.
+      const code = e instanceof ApiError ? e.code : null;
+      if (code === 'code_not_found') {
+        setErr(`We have no sign-in code on file for ${email.trim().toLowerCase()}. If the email arrived at a different address, sign in with that one, or ask for a new code.`);
+      } else if (code === 'code_expired') {
+        setErr('That code has expired. Codes last 15 minutes. Ask for a new one.');
+      } else if (code === 'too_many_attempts') {
+        setErr('Too many attempts, so that code is now void. Ask for a new one.');
+      } else if (code === 'invalid_code') {
+        setErr('That code is not right. Check the most recent email, since asking again replaces the previous code.');
+      } else {
+        setErr('We could not sign you in just then. Please try again.');
+      }
     } finally {
       setBusy(false);
     }
@@ -292,7 +312,29 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <button type="submit" className={buttonStyle} disabled={busy || code.length !== 6}>
               {busy ? <Loader2 size={18} className="animate-spin" /> : 'Sign in'}
             </button>
-            <button type="button" className="w-full text-xs text-zinc-400 underline" onClick={() => { setStep('email'); setCode(''); setErr(null); }}>
+            {/* Every message above can end in "ask for a new one", so there has to
+                be a way to do that without going back and retyping the address. */}
+            <button
+              type="button"
+              className="w-full text-xs font-semibold text-[#233DFF] hover:underline disabled:opacity-50"
+              disabled={busy || resent}
+              onClick={async () => {
+                setBusy(true);
+                setErr(null);
+                try {
+                  await clientApi.requestLink(email.trim().toLowerCase(), invite.trim() || undefined);
+                  setCode('');
+                  setResent(true);
+                } catch {
+                  setErr('We could not send another code just then. Please try again.');
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              {resent ? 'New code sent' : 'Send a new code'}
+            </button>
+            <button type="button" className="w-full text-xs text-zinc-400 underline" onClick={() => { setStep('email'); setCode(''); setErr(null); setResent(false); }}>
               Use a different email
             </button>
           </form>
