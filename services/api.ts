@@ -84,7 +84,72 @@ export interface ClientMe {
     urgencyLevel: string;
   }>;
   nextActions: NextAction[];
+  /**
+   * Staff standing, or null for a member. Derived on the server from the
+   * volunteers roster on every call, so it is not something this client can
+   * assert and not something a stale session can keep after a role is revoked.
+   */
+  staff: HubStaff | null;
 }
+
+// ── Staff (people who maintain the Hub) ──────────────────────────────────
+export type HubCapability = 'academy' | 'content' | 'support' | 'staffAdmin';
+
+export interface HubStaff {
+  role: string;
+  name: string;
+  isAdmin: boolean;
+  capabilities: HubCapability[];
+}
+
+export interface HubStaffOverview {
+  staff: HubStaff;
+  academy: {
+    configured: number;
+    hidden: number;
+    overrides: Record<string, { state: string; cohortLabel: string | null }>;
+  };
+  announcements: Array<{
+    id: string;
+    title: string;
+    date: string | null;
+    category: string | null;
+    status: string;
+  }>;
+}
+
+export interface MemberLookup {
+  email: string;
+  known: boolean;
+  record: 'member' | 'visitor' | 'none';
+  emailSuppressed: boolean;
+  lastSignIn: string | null;
+  canRequestCode: boolean;
+}
+
+export const staffApi = {
+  overview: () => req<HubStaffOverview>('/api/hub/staff/overview'),
+  setAcademyVisibility: (pathwayId: string, state: string, cohortLabel?: string) =>
+    req<{ success: boolean; pathwayId: string; state: string; cohortLabel: string | null }>(
+      `/api/hub/staff/academy-visibility/${encodeURIComponent(pathwayId)}`,
+      { method: 'PUT', body: JSON.stringify({ state, cohortLabel: cohortLabel || '' }) }
+    ),
+  lookupMember: (email: string) =>
+    req<MemberLookup>(`/api/hub/staff/member-lookup?email=${encodeURIComponent(email)}`),
+  postAnnouncement: (title: string, content: string, category: string) =>
+    req<{ id: string }>('/api/hub/staff/announcements', {
+      method: 'POST',
+      body: JSON.stringify({ title, content, category }),
+    }),
+  deleteAnnouncement: (id: string) =>
+    req<{ success: boolean }>(`/api/hub/staff/announcements/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }),
+  roster: () =>
+    req<{ staff: Array<{ name: string; email: string; role: string; isAdmin: boolean; capabilities: string[] }>; note: string }>(
+      '/api/hub/staff/roster'
+    ),
+};
 
 // ── Visitor context (anonymous identity — "remembers you") ───────────────
 export const context = {
