@@ -20,9 +20,19 @@ export const TOOLS = {
 
 export class ApiError extends Error {
   status: number;
-  constructor(status: number, message: string) {
+  /**
+   * The server's machine-readable reason, when it sent one.
+   *
+   * Without this a caller can only show one message for every failure, which is
+   * how sign-in came to tell somebody to try again when the server had actually
+   * locked them out after five wrong attempts, and to say a code did not match
+   * when no code had ever been issued for that address.
+   */
+  code: string | null;
+  constructor(status: number, message: string, code: string | null = null) {
     super(message);
     this.status = status;
+    this.code = code;
     this.name = 'ApiError';
   }
 }
@@ -35,12 +45,18 @@ async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
   });
   if (!res.ok) {
     let detail = '';
+    let code: string | null = null;
     try {
-      detail = JSON.stringify(await res.json());
+      const body = await res.json();
+      detail = JSON.stringify(body);
+      // Kept separate from the message so callers can branch on the reason
+      // instead of pattern-matching a stringified body.
+      const raw = (body as { error?: unknown })?.error;
+      if (typeof raw === 'string') code = raw;
     } catch {
       /* non-json */
     }
-    throw new ApiError(res.status, detail || res.statusText);
+    throw new ApiError(res.status, detail || res.statusText, code);
   }
   return res.json() as Promise<T>;
 }
