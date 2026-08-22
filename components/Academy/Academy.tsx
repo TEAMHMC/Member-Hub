@@ -518,7 +518,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {PATHWAYS.filter((p) => vis(p.id).state !== 'hidden').map((p, idx) => {
+            {PATHWAYS.filter((p) => vis(p.id).state !== 'hidden').map((p) => {
               const v = vis(p.id);
               const pct = pathwayPercent(p, state);
               const lessons = pathwayLessonIds(p).length;
@@ -528,39 +528,35 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               // it advertised itself as open and enrolled people into empty pages.
               const ready = pathwayHasContent(p);
               const enrollable = v.state === 'open' && ready;
-              // A cover per pathway, cycled so the catalog reads as a set rather
-              // than a wall of identical tiles.
-              const covers = [
-                'from-[#1b1f5c] via-[#233DFF] to-[#3a2a7a]',
-                'from-[#0f3b34] via-[#12715f] to-[#1b8f6a]',
-                'from-[#4a2c0a] via-[#a4620d] to-[#d08a1a]',
-                'from-[#26262b] via-[#43434d] to-[#5b5b68]',
-              ];
-              const cover = covers[idx % covers.length];
+              // The gradient cover block that used to sit on top of each card is
+              // gone. It cycled four invented colours that are not in the HMC
+              // palette, took up a 16:9 slab per card for decoration only, and
+              // pushed the course title and the enroll action below the fold on a
+              // phone. The badge and the title now sit in the card itself, where a
+              // reader is already looking.
               const badge =
-                v.state === 'past' ? { text: 'Past cohort', cls: 'bg-white/90 text-zinc-700' }
-                : v.state === 'upcoming' ? { text: v.cohortLabel || 'Upcoming', cls: 'bg-white/90 text-[#8a4b08]' }
-                : ready ? { text: 'Open now', cls: 'bg-white/95 text-zinc-900' }
-                : { text: 'In curriculum review', cls: 'bg-white/80 text-zinc-600' };
+                v.state === 'past' ? { text: 'Past cohort', cls: 'bg-zinc-100 text-zinc-600' }
+                : v.state === 'upcoming' ? { text: v.cohortLabel || 'Upcoming', cls: 'bg-[#F9C74F] text-zinc-900' }
+                : ready ? { text: 'Open now', cls: 'bg-emerald-50 text-emerald-700' }
+                : { text: 'In curriculum review', cls: 'bg-zinc-100 text-zinc-500' };
 
               return (
                 <article key={p.id} className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm overflow-hidden flex flex-col hover:border-[#233DFF]/40 hover:shadow-md transition-all">
-                  <div className={`bg-gradient-to-br ${cover} text-white p-6 aspect-[16/9] flex flex-col justify-between`}>
-                    <span className={`self-start text-[10px] font-bold tracking-wide px-2.5 py-1 rounded-full ${badge.cls}`}>
-                      {badge.text}
-                    </span>
+                  <div className="p-6 flex flex-col gap-3 flex-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">{p.level}</p>
+                      <span className={`text-[10px] font-bold tracking-wide px-2.5 py-1 rounded-full shrink-0 ${badge.cls}`}>
+                        {badge.text}
+                      </span>
+                    </div>
                     <div>
-                      <h3 className="text-xl font-semibold leading-tight">{p.title}</h3>
-                      <p className="text-[12px] text-white/85 mt-1.5">
+                      <h3 className="text-xl font-semibold leading-tight text-zinc-900">{p.title}</h3>
+                      <p className="text-[12px] text-zinc-500 mt-1.5">
                         {ready
                           ? `${p.courses.length} ${p.courses.length === 1 ? 'course' : 'courses'}${lessons ? ` \u00b7 ${lessons} lessons` : ''}${hours ? ` \u00b7 about ${hours} ${hours === 1 ? 'hour' : 'hours'}` : ''}`
                           : 'Courses available soon'}
                       </p>
                     </div>
-                  </div>
-
-                  <div className="p-6 flex flex-col gap-3 flex-1">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">{p.level}</p>
                     <p className="text-sm text-zinc-600 leading-relaxed flex-1">{p.purpose}</p>
                     {pct > 0 && <Bar percent={pct} />}
 
