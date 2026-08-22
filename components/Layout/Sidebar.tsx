@@ -4,7 +4,7 @@ import { UserRole, type Audience, type StaffStanding } from '../../types';
 import {
   Home, Calendar,
   LogOut, Compass, ShieldCheck, Activity, Brain, GraduationCap,
-  SlidersHorizontal, Eye,
+  SlidersHorizontal, Eye, Coins,
   User as UserIcon
 } from 'lucide-react';
 
@@ -37,6 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         { icon: <Home size={18} />, label: 'Home', id: 'dash' },
         { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
         { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
+        { icon: <Coins size={18} />, label: 'Credits', id: 'credits' },
       ];
     }
     return [
@@ -47,6 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       { icon: <Activity size={18} />, label: 'Results', id: 'health' },
       { icon: <ShieldCheck size={18} />, label: 'Resources', id: 'resources' },
       { icon: <Brain size={18} />, label: 'Snapshot', id: 'check-yourself' },
+      { icon: <Coins size={18} />, label: 'Credits', id: 'credits' },
     ];
   };
 
