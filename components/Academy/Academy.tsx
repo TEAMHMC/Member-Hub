@@ -23,6 +23,7 @@ import {
   type Pathway,
   type Session,
   pathwayLessonIds,
+  pathwayHasContent,
 } from './catalog';
 import { CAMP_WEEKS, CAMP_TEMPLATE } from './programStemCollab';
 import type { Block, KnowledgeCheck } from './blocks';
@@ -343,6 +344,27 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
   }, []);
 
   const vis = (id: string): Visibility => visibility[id] || { state: 'open' };
+
+  /**
+   * Whether a pathway is genuinely open to a learner right now.
+   *
+   * One place, because the answer was previously kept in three hand-maintained
+   * flags that all went stale in the same direction: Pathway.status,
+   * Course.available and Credential.available. Every course in the Academy carried
+   * available: false, including all eight courses of the one pathway marked
+   * published, which between them hold 163 written content blocks. Ten courses with
+   * real content were telling members "In development", and setting a pathway to
+   * open in the staff console changed none of it.
+   *
+   * Derived instead of declared. Content is counted, so it cannot drift, and an
+   * admin setting the pathway open is the operational decision that outranks the
+   * catalog flag.
+   */
+  const isAvailable = (pathwayId: string): boolean => {
+    const p = pathwayById(pathwayId);
+    if (!p || !pathwayHasContent(p)) return false;
+    return vis(p.id).state === 'open' || p.status === 'published';
+  };
   const [showCert, setShowCert] = useState<string | null>(null);
   // Which course the learner is registering for, plus the session if one exists.
   const [registering, setRegistering] = useState<{ course: Course; session?: Session } | null>(null);
@@ -501,7 +523,11 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               const pct = pathwayPercent(p, state);
               const lessons = pathwayLessonIds(p).length;
               const hours = Math.round(pathwayMinutes(p) / 60);
-              const enrollable = v.state === 'open' && p.courses.length > 0;
+              // Enrollable means there is something to read, not merely that a course
+              // object exists. One pathway had eight lessons and no content blocks, so
+              // it advertised itself as open and enrolled people into empty pages.
+              const ready = pathwayHasContent(p);
+              const enrollable = v.state === 'open' && ready;
               // A cover per pathway, cycled so the catalog reads as a set rather
               // than a wall of identical tiles.
               const covers = [
@@ -514,7 +540,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               const badge =
                 v.state === 'past' ? { text: 'Past cohort', cls: 'bg-white/90 text-zinc-700' }
                 : v.state === 'upcoming' ? { text: v.cohortLabel || 'Upcoming', cls: 'bg-white/90 text-[#8a4b08]' }
-                : p.courses.length > 0 ? { text: 'Open now', cls: 'bg-white/95 text-zinc-900' }
+                : ready ? { text: 'Open now', cls: 'bg-white/95 text-zinc-900' }
                 : { text: 'In curriculum review', cls: 'bg-white/80 text-zinc-600' };
 
               return (
@@ -526,7 +552,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     <div>
                       <h3 className="text-xl font-semibold leading-tight">{p.title}</h3>
                       <p className="text-[12px] text-white/85 mt-1.5">
-                        {p.courses.length > 0
+                        {ready
                           ? `${p.courses.length} ${p.courses.length === 1 ? 'course' : 'courses'}${lessons ? ` \u00b7 ${lessons} lessons` : ''}${hours ? ` \u00b7 about ${hours} ${hours === 1 ? 'hour' : 'hours'}` : ''}`
                           : 'Courses available soon'}
                       </p>
@@ -651,8 +677,8 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                       <span className="text-[13px] font-semibold text-zinc-700 group-hover:text-[#233DFF] leading-snug">
                         {s.title.replace('HMC ', '')}
                       </span>
-                      <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full shrink-0 ${s.available ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-500'}`}>
-                        {s.available ? 'Open' : 'Soon'}
+                      <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full shrink-0 ${isAvailable(s.pathwayId) ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-500'}`}>
+                        {isAvailable(s.pathwayId) ? 'Open' : 'Soon'}
                       </span>
                     </button>
                   ))}
@@ -685,7 +711,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     <button onClick={() => setView({ name: 'pathway', pathwayId: c.pathwayId })} className="text-left group">
                       <span className="block text-[13.5px] font-semibold text-zinc-900 group-hover:text-[#233DFF] leading-snug">{c.title}</span>
                       <span className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mt-1.5">
-                        {c.level} · {c.available ? 'Open for enrollment' : 'In development'}
+                        {c.level} · {isAvailable(c.pathwayId) ? 'Open for enrollment' : 'In development'}
                       </span>
                     </button>
                   </td>
@@ -715,16 +741,16 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${LEVEL_ACCENT[c.level].bg} ${LEVEL_ACCENT[c.level].text}`}>{c.level}</span>
                     <span className="pill pill-neutral">{c.type}</span>
-                    {!c.available && <span className="pill pill-neutral">In development</span>}
+                    {!isAvailable(c.pathwayId) && <span className="pill pill-neutral">In development</span>}
                   </div>
                   <h3 className="text-xl font-semibold text-zinc-900 leading-snug">{c.title}</h3>
                 </div>
                 <Btn
-                  variant={c.available ? 'primary' : 'secondary'}
+                  variant={isAvailable(c.pathwayId) ? 'primary' : 'secondary'}
                   className="shrink-0"
                   onClick={() => setView({ name: 'pathway', pathwayId: c.pathwayId })}
                 >
-                  {c.available ? 'Start preparing' : 'View pathway'}
+                  {isAvailable(c.pathwayId) ? 'Start preparing' : 'View pathway'}
                 </Btn>
               </div>
 
@@ -837,9 +863,30 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     if (!p) return renderCatalog();
     const accent = LEVEL_ACCENT[p.level];
     const registered = state.enrolled.includes(p.id);
-    const published = p.status === 'published';
-    // A pathway can be mid-build: some courses released, credential not yet open.
-    const hasCourses = p.courses.length > 0;
+    // What a member is told about readiness, and where that comes from.
+    //
+    // This used to be p.status === 'published' alone: a flag typed by hand into the
+    // catalog. It went stale in both directions. Youth Mentorship and STEAM held
+    // sixty six content blocks and still displayed "In development", so setting the
+    // pathway to open in the staff console changed nothing a member could see. And a
+    // pathway with no content at all displayed the same label as one nearly finished.
+    //
+    // Two sources now, in order. An admin setting the pathway open is an operational
+    // decision and outranks the catalog flag. Below that, readiness is derived from
+    // whether there is any content, which cannot go stale because it is counted
+    // rather than declared.
+    const adminOpen = vis(p.id).state === 'open';
+    const hasContent = pathwayHasContent(p);
+    const published = hasContent && (adminOpen || p.status === 'published');
+    // Distinguishes "nearly finished" from "nothing here yet", which the single
+    // In development label could not.
+    const buildLabel = !hasContent
+      ? 'Not yet available'
+      : !published
+        ? 'In development'
+        : null;
+    // Registration needs something to read, not merely a course object.
+    const hasCourses = hasContent;
     const { gates, eligible } = evaluateGates(p, state);
     const issued = state.credentials[p.id];
     const pre = state.preTest[p.id];
@@ -855,7 +902,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               {p.level}
             </span>
             <span className="pill pill-neutral">Version {p.version}</span>
-            {!published && <span className="pill pill-neutral">In development</span>}
+            {buildLabel && <span className="pill pill-neutral">{buildLabel}</span>}
           </div>
           <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">{p.title}</h1>
           <p className="text-lg text-zinc-500 leading-relaxed">{p.purpose}</p>

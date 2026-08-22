@@ -790,3 +790,25 @@ export const pathwayMinutes = (p: Pathway) =>
 
 export const pathwayLessonIds = (p: Pathway) =>
   p.courses.flatMap((c) => c.lessons.map((l) => l.id));
+
+/**
+ * How much teachable content a pathway actually holds.
+ *
+ * Counted in blocks, not courses or lessons, because a lesson can exist with
+ * nothing in it. Field-Based Community Health had one course and eight lessons and
+ * zero blocks: the catalog reported it as having courses, the card said "Open now",
+ * and enrolling took a learner into eight empty pages.
+ *
+ * Readiness is derived from this rather than from a hand-maintained flag, so it
+ * cannot go stale. Youth Mentorship and STEAM carried status 'in-development' while
+ * holding sixty six blocks across six lessons, and a member was shown "In
+ * development" on a pathway that was substantially written.
+ */
+export const pathwayBlockCount = (p: Pathway) =>
+  p.courses.reduce(
+    (n, c) => n + c.lessons.reduce((m, l) => m + ((l as any).blocks?.length || 0), 0),
+    0
+  );
+
+/** Is there anything here a learner could actually read? */
+export const pathwayHasContent = (p: Pathway) => pathwayBlockCount(p) > 0;
