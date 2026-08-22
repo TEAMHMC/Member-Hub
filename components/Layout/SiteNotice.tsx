@@ -39,10 +39,23 @@ const STYLES: Record<Level, { bar: string; icon: React.ReactNode; label: string 
   },
 };
 
-// Keyed by message, so a new notice reappears for somebody who dismissed the
-// previous one. A constant key would silence every future notice for anyone who
-// ever closed one.
-const dismissKey = (message: string) => `hmc.notice.dismissed.${message.slice(0, 60)}`;
+// Keyed on the whole notice, not on the message alone.
+//
+// It used to be message.slice(0, 60). A maintenance notice went up with the wrong
+// contact address on it, the detail line was corrected an hour later, and everybody
+// who had already closed the banner kept the old dismissal: the message string had
+// not changed, so neither had the key, and the correction was invisible to exactly
+// the people who had read the wrong version. Level and detail are part of the
+// identity of a notice, so they are part of the key.
+//
+// A 32-bit hash rather than the concatenated text, because the detail line runs to
+// a couple of hundred characters and storage keys should not.
+const dismissKey = (n: { message: string; detail?: string | null; level?: string }): string => {
+  const raw = `${n.level || 'info'}|${n.message}|${n.detail || ''}`;
+  let h = 0;
+  for (let i = 0; i < raw.length; i++) h = (Math.imul(h, 31) + raw.charCodeAt(i)) | 0;
+  return `hmc.notice.dismissed.${h >>> 0}`;
+};
 
 const SiteNotice: React.FC = () => {
   const [notice, setNotice] = useState<SiteNoticeData | null>(null);
@@ -60,7 +73,7 @@ const SiteNotice: React.FC = () => {
         }
         setNotice(data);
         try {
-          setDismissed(sessionStorage.getItem(dismissKey(data.message)) === '1');
+          setDismissed(sessionStorage.getItem(dismissKey(data)) === '1');
         } catch {
           /* private mode: show it, which is the safer default */
         }
@@ -87,7 +100,7 @@ const SiteNotice: React.FC = () => {
   const dismiss = () => {
     setDismissed(true);
     try {
-      sessionStorage.setItem(dismissKey(notice.message), '1');
+      sessionStorage.setItem(dismissKey(notice), '1');
     } catch {
       /* dismissal simply does not persist */
     }
