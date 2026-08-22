@@ -1,6 +1,10 @@
 name: Deploy Member Hub to GitHub Pages
 
 on:
+  # Pull requests are checked too. Without this the gates only ran after a merge,
+  # which meant a change was already on main and already deploying by the time
+  # anything verified it. A gate that runs after the door is a log, not a gate.
+  pull_request:
   push:
     branches: [main]
   workflow_dispatch:
@@ -33,6 +37,8 @@ jobs:
 
   deploy:
     needs: build
+    # Only main publishes. A pull request runs the gates and stops there.
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
