@@ -151,6 +151,33 @@ export const staffApi = {
     ),
 };
 
+// ── Site notice (the banner every HMC front end shows) ───────────────────
+//
+// One message, written once, read by the portal, this Hub and the Webflow pages.
+// Served from site_config/notice so it can be raised and cleared in seconds
+// without deploying any of them.
+export interface SiteNoticeData {
+  active: boolean;
+  level: 'info' | 'warning' | 'maintenance';
+  message: string;
+  detail?: string | null;
+  updatedAt?: string | null;
+}
+
+export const siteNotice = {
+  // credentials omitted: this has to answer on the sign-in screen before anyone
+  // has a session, and it carries nothing personal in either direction.
+  get: async (): Promise<SiteNoticeData | null> => {
+    try {
+      const res = await fetch(`${API_BASE}/api/public/site-notice`, { credentials: 'omit' });
+      if (!res.ok) return null;
+      return (await res.json()) as SiteNoticeData;
+    } catch {
+      return null;
+    }
+  },
+};
+
 // ── Visitor context (anonymous identity — "remembers you") ───────────────
 export const context = {
   hello: () =>

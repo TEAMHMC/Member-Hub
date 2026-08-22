@@ -7,6 +7,7 @@ import StaffDashboard from './components/Dashboards/StaffDashboard';
 import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
 import Footer from './components/Layout/Footer';
+import SiteNotice from './components/Layout/SiteNotice';
 import { context as ctxApi, client as clientApi } from './services/api';
 import SunnyNavigator from './components/Navigator/SunnyNavigator';
 import TrainingRegistration from './components/Academy/TrainingRegistration';
@@ -161,7 +162,12 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#f5f3ef]">
+    // The banner sits outside the layout div rather than inside it. That div is
+    // the sidebar layout, a flex row on desktop, so a child would be laid out
+    // beside the sidebar instead of above everything.
+    <>
+      <SiteNotice />
+      <div className="min-h-screen flex flex-col lg:flex-row bg-[#f5f3ef]">
       {view === 'login' && <Login onLogin={handleLogin} />}
 
       {/* Registration is shown over the sign-in screen for an unauthenticated
@@ -204,7 +210,8 @@ const App: React.FC = () => {
           )}
         </>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 
