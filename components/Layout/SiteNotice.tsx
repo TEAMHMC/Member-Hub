@@ -28,8 +28,8 @@ const STYLES: Record<Level, { bar: string; icon: React.ReactNode; label: string 
     label: 'Notice',
   },
   warning: {
-    bar: 'bg-amber-50 border-amber-200 text-amber-900',
-    icon: <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />,
+    bar: 'bg-[#F9C74F] border-[#E0A82E] text-zinc-900',
+    icon: <AlertTriangle size={16} className="text-zinc-900 shrink-0 mt-0.5" />,
     label: 'Heads up',
   },
   maintenance: {
