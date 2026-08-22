@@ -167,6 +167,34 @@ export const staffApi = {
     ),
 };
 
+// ── Health Credits (the member's own wallet) ─────────────────────────────
+//
+// Read only by design. Awarding and reversal stay on the staff side, where the
+// controls and the audit trail already are.
+export interface CreditTransaction {
+  id: string;
+  type: string;
+  direction: 'credit' | 'debit';
+  amount: number;
+  reason: string;
+  category: string | null;
+  balanceAfter: number | null;
+  createdAt: string | null;
+}
+
+export interface CreditWallet {
+  balance: number;
+  lifetimeEarned: number;
+  lifetimeSpent: number;
+  transactions: CreditTransaction[];
+  account: 'client' | 'email' | null;
+  earnRates?: Record<string, number>;
+}
+
+export const credits = {
+  wallet: () => req<CreditWallet>('/api/client/credits'),
+};
+
 // ── Site notice (the banner every HMC front end shows) ───────────────────
 //
 // One message, written once, read by the portal, this Hub and the Webflow pages.

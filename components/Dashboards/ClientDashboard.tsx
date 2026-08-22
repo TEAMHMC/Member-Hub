@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { User, Shift, Resource, ServiceEncounter, Referral, Assessment } from '../../types';
 import { buildPlanFromScores } from '../../services/plan';
 import { context as ctxApi, client as clientApi, referrals as referralsApi, sunny as sunnyApi, toolLink, TOOLS, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
+import HealthCredits from './HealthCredits';
 import { useEvents } from '../../services/hooks';
 import Academy from '../Academy/Academy';
 import {
@@ -878,6 +879,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       case 'game-plan': return renderGamePlan();
       case 'check-yourself': return renderScreener();
       case 'resources': return renderResources();
+      case 'credits': return <HealthCredits />;
       case 'profile': return renderProfile();
       case 'dash': default: return renderHome();
     }
