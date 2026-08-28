@@ -354,6 +354,7 @@ const HCE_PRE: Check[] = [
 ];
 
 import { CARE_NAVIGATION_COVERAGE } from './pathwayFieldBased';
+import { MENTOR_LEADER_COURSES, MENTOR_PRE, MENTOR_POST } from './pathwayMentorLeader';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
 import { MENTAL_HEALTH_COURSES } from './pathwayMentalHealth';
 import { STEM_CAMP } from './programStemCollab';
@@ -722,24 +723,24 @@ export const PATHWAYS: Pathway[] = [
       'Readiness acknowledgement',
       'Additional eligibility checks if the assignment involves minors, supervision, or sensitive access',
     ],
+    // Five of the twelve are written. The seven below are the ones still to write, so this
+    // list reads as a plan rather than as a promise: a planned title next to a written
+    // course is how a catalogue starts advertising work nobody has done.
     plannedCourses: [
-      'The Role of a Mentor',
-      'Building Trust + Psychological Safety',
-      'Coaching vs Advising vs Supervising',
       'Goal Setting + Development Planning',
-      'Giving Effective Feedback',
       'Inclusive Mentorship',
       'Facilitating Groups + Learning',
-      'Recognizing Risk + Escalating Concerns',
       'Supporting Reflection + Portfolio Development',
       'Peer Leadership + Team Coordination',
       'Mentor Practice Case',
       'Mentor / Leader Readiness Review',
     ],
-    courses: [],
-    version: '0.9 draft',
-    effectiveDate: 'In development',
-    nextReview: 'Pending governance review',
+    courses: MENTOR_LEADER_COURSES,
+    preTest: MENTOR_PRE,
+    postTest: MENTOR_POST,
+    version: '1.0 partial',
+    effectiveDate: 'Five of twelve courses written, August 28, 2026',
+    nextReview: 'When the remaining seven are written, and before the mentor practice case is used to gate a credential',
   },
 ];
 
@@ -760,9 +761,10 @@ PATHWAYS.push({
     'Facilitator readiness sequence recorded and approved by program leadership',
   ],
   courses: MENTAL_HEALTH_COURSES,
+  // Only what is still to come. Both of the first two titles were listed here while also
+  // shipping as written courses, so the pathway advertised outstanding work that was
+  // already done and a member reading the list could not tell what was missing.
   plannedCourses: [
-    'Unstoppable: The Power of Healing and Growth (continuing education)',
-    'Community Mental Health Worker and Facilitator Training',
     'Unstoppable Community Learning (participant facing)',
   ],
   version: '2.0 migration',

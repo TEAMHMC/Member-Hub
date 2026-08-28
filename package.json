@@ -8,8 +8,9 @@
     "build": "npm run generate:courses && vite build",
     "preview": "vite preview",
     "test:curriculum": "tsx tests/curriculum.test.ts",
-    "test": "npm run test:curriculum && tsc --noEmit",
-    "generate:courses": "tsx scripts/generate-course-manifest.ts"
+    "test": "npm run test:curriculum && npm run test:visibility && tsc --noEmit",
+    "generate:courses": "tsx scripts/generate-course-manifest.ts",
+    "test:visibility": "tsx tests/visibility.test.ts"
   },
   "dependencies": {
     "lucide-react": "^0.562.0",
