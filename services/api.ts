@@ -98,6 +98,27 @@ export interface ClientMe {
     status: string;
     createdAt: string | null;
     urgencyLevel: string;
+    /**
+     * Where the referral stands, derived on the server from the record. The words a member
+     * reads are written here in the Hub, deliberately: the server returns a machine stage
+     * so HMC's copy rules stay enforceable in the repository that holds the copy.
+     *
+     * Optional because a session can outlive a deploy. A member signed in against an older
+     * backend gets the four fields that always existed and no stage detail, which is the
+     * page as it was rather than a page of blanks.
+     */
+    stage?: 'received' | 'matched' | 'in_touch' | 'completed' | 'closed';
+    /** Somebody has made contact about this referral. */
+    contacted?: boolean;
+    /** Open, and nobody has been in touch. The state where a member should be told how to chase it. */
+    awaitingResponse?: boolean;
+    /** Public directory contact for the organisation, or null when the directory holds none. */
+    resource?: {
+      phone: string | null;
+      website: string | null;
+      address: string | null;
+      hours: string | null;
+    } | null;
   }>;
   nextActions: NextAction[];
   /**
@@ -142,6 +163,37 @@ export interface MemberLookup {
   lastSignIn: string | null;
   canRequestCode: boolean;
 }
+
+/**
+ * Published corrections to course content, made in the portal's review queue.
+ *
+ * A course here is a TypeScript catalogue entry compiled at build time, so a clinician
+ * correcting a passage could not reach members without a deployment. Reviewed content is
+ * stored against the course id in the portal, and this reads it back so the correction is
+ * what a member actually sees.
+ *
+ * Failure is deliberately quiet. If this cannot be reached the Academy renders its own
+ * catalogue, which is the same material minus any pending correction, so a member reads
+ * a slightly older lesson instead of an error.
+ */
+export interface HubCourseOverride {
+  content: string;
+  sections: { heading: string; body: string }[];
+  version: number;
+}
+
+export const curriculumApi = {
+  publishedContent: async (): Promise<Record<string, HubCourseOverride>> => {
+    try {
+      const res = await fetch(`${API_BASE}/api/curriculum/hub-content`, { credentials: 'omit' });
+      if (!res.ok) return {};
+      const data = await res.json() as { content?: Record<string, HubCourseOverride> };
+      return data.content || {};
+    } catch {
+      return {};
+    }
+  },
+};
 
 export const staffApi = {
   overview: () => req<HubStaffOverview>('/api/hub/staff/overview'),

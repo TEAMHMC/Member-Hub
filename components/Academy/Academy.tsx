@@ -28,7 +28,8 @@ import {
 import { CAMP_WEEKS, CAMP_TEMPLATE } from './programStemCollab';
 import type { Block, KnowledgeCheck } from './blocks';
 import TrainingRegistration from './TrainingRegistration';
-import { training as trainingApi, chw as trainingApi_chw, type ScheduledSession } from '../../services/api';
+import { training as trainingApi, chw as trainingApi_chw, curriculumApi, type ScheduledSession } from '../../services/api';
+import { reviewedProse, preservedBlocks, extraSections, type OverrideMap } from './overrides';
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
@@ -363,6 +364,25 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     const p = pathwayById(id);
     return { state: p?.status === 'published' ? 'open' : 'upcoming' };
   };
+
+  /**
+   * Corrections a reviewer published in the portal, keyed by course id.
+   *
+   * A course is compiled into the bundle, so without this a clinician correcting a
+   * passage could not reach a member without a deployment. Failure is deliberately
+   * quiet and the empty map is the safe state: the Academy then renders its own
+   * catalogue, which is the same material minus any pending correction, so a member
+   * reads slightly older text rather than an error.
+   */
+  const [overrides, setOverrides] = useState<OverrideMap>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    curriculumApi.publishedContent()
+      .then((d) => { if (!cancelled) setOverrides(d); })
+      .catch(() => { /* the catalogue renders without corrections */ });
+    return () => { cancelled = true; };
+  }, []);
 
   /**
    * Whether a pathway is genuinely open to a learner right now.
@@ -1416,6 +1436,31 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               </div>
             </section>
 
+            {(() => {
+              // Sections a reviewer published that match no module title. Rendered here
+              // rather than dropped, because publishing a new section is a decision that a
+              // member should read it. Deliberately not turned into extra modules: module
+              // count drives the progress bar and the completion gate, and a correction
+              // must not move a member's completion goalposts.
+              const additions = extraSections(c, overrides[c.id]);
+              if (!additions.length) return null;
+              return (
+                <section className="space-y-4">
+                  <h2 className="text-xl font-semibold text-zinc-900">Also part of this course</h2>
+                  <div className="space-y-5">
+                    {additions.map((a) => (
+                      <div key={a.heading} className="rounded-2xl border border-zinc-200 bg-white p-6 space-y-3">
+                        <h3 className="text-[15px] font-semibold text-zinc-900 leading-snug">{a.heading}</h3>
+                        {a.paragraphs.map((para, i) => (
+                          <p key={i} className="text-[14.5px] text-zinc-700 leading-relaxed">{para}</p>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            })()}
+
             <section className="space-y-4">
               <h2 className="text-xl font-semibold text-zinc-900">This course contains the following modules</h2>
               <div className="space-y-3">
@@ -1557,6 +1602,11 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     // the end-of-course block would repeat them.
     const inlineChecks = c.lessons.some((l) => l.blocks?.some((b) => b.kind === 'check'));
     const checksHere = isLast && !inlineChecks ? c.checks : [];
+    // A correction published in the portal replaces this lesson's prose. Its knowledge
+    // checks are kept: a reviewer rewriting an explanation has not decided the
+    // assessment should disappear, and those items are what the curriculum gate counts.
+    const reviewed = reviewedProse(lesson, overrides[c.id]);
+    const keptChecks = reviewed ? preservedBlocks(lesson) : [];
 
     return (
       <div className="max-w-3xl mx-auto py-8 space-y-8 animate-in fade-in duration-500">
@@ -1573,7 +1623,23 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
         {/* v2 courses carry typed blocks; v1 courses carry plain paragraphs.
             Both are optional on the model, so neither is assumed to exist. */}
-        {lesson.blocks?.length ? (
+        {reviewed ? (
+          <div className="space-y-8">
+            <div className="space-y-6">
+              {reviewed.map((para, i) => (
+                <p key={i} className="text-lg text-zinc-700 leading-relaxed">{para}</p>
+              ))}
+            </div>
+            {keptChecks.map((b, i) => (
+              <BlockView
+                key={`kept-${i}`}
+                block={b}
+                checks={state.checks}
+                onCheck={(id, choice) => set((st) => ({ ...st, checks: { ...st.checks, [id]: choice } }))}
+              />
+            ))}
+          </div>
+        ) : lesson.blocks?.length ? (
           <div className="space-y-8">
             {lesson.blocks.map((b, i) => (
               <BlockView

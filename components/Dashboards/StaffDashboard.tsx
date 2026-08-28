@@ -343,6 +343,10 @@ const SupportPanel: React.FC = () => {
 
       {result && (
         <div className={card}>
+          {/* Which address this verdict is about. A staffer on a call looks up several
+              people in a row, and a card that does not name the address is a card they
+              have to trust their memory about. */}
+          <p className="text-[13px] font-semibold text-zinc-900 mb-3 break-all">{result.email}</p>
           <div className="flex flex-wrap items-center gap-2 mb-4">
             <Row ok={result.known} yes="Account found" no="No account" />
             <Row ok={!result.emailSuppressed} yes="Email deliverable" no="Email suppressed" />
@@ -351,7 +355,12 @@ const SupportPanel: React.FC = () => {
           <p className="text-sm text-zinc-700 leading-relaxed">{verdict(result).text}</p>
           <p className="text-[11px] text-zinc-400 mt-4">
             Record: {result.record}
-            {result.lastSignIn ? ` · last signed in ${new Date(result.lastSignIn).toLocaleString()}` : ' · no sign-in recorded'}
+            {/* Pacific, not the reader's zone. A coordinator working from anywhere else was
+                being shown a sign-in time that did not match the one HMC recorded, which is
+                the wrong thing to read out to somebody on the phone. */}
+            {result.lastSignIn
+              ? ` · last signed in ${new Date(result.lastSignIn).toLocaleString('en-US', { timeZone: 'America/Los_Angeles', dateStyle: 'medium', timeStyle: 'short' })} Pacific`
+              : ' · no sign-in recorded'}
           </p>
         </div>
       )}
