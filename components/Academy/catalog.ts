@@ -355,6 +355,7 @@ const HCE_PRE: Check[] = [
 
 import { CARE_NAVIGATION_COVERAGE } from './pathwayFieldBased';
 import { FBCH_CORE_COURSES, FBCH_PRE, FBCH_POST } from './pathwayFieldBasedCore';
+import { CES_FOUNDATION_COURSES, CES_PRE, CES_POST } from './pathwayClinicalFoundations';
 import { MENTOR_LEADER_COURSES, MENTOR_PRE, MENTOR_POST } from './pathwayMentorLeader';
 import { INTERNSHIP_COURSES } from './pathwayInternships';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
@@ -650,11 +651,13 @@ export const PATHWAYS: Pathway[] = [
       'Assigned practical competency review',
       'Reflection and debrief',
     ],
+    // Three written, and the three that teach nothing clinical. Everything left below either
+    // teaches or rehearses a clinical judgement, and this pathway's record has said it is
+    // pending clinical governance review since it was created. HMC has a PMHNP; that is who
+    // reviews them. Writing them without that review is how a curriculum acquires an error
+    // nobody catches, which has already happened once in this codebase.
     plannedCourses: [
       'Community-Centered Clinical Care',
-      'Healthcare Team Roles + Scope',
-      'Medical Terminology Foundations',
-      'Patient Communication + Interviewing',
       'Vitals + Screening Concepts',
       'Infection Prevention + PPE',
       'Clinical Documentation + Scribing Concepts',
@@ -667,10 +670,12 @@ export const PATHWAYS: Pathway[] = [
       'Debrief + Reflection',
       'Practical / Simulation Competency Review',
     ],
-    courses: [],
-    version: '0.9 draft',
-    effectiveDate: 'In development',
-    nextReview: 'Pending clinical governance review',
+    courses: CES_FOUNDATION_COURSES,
+    preTest: CES_PRE,
+    postTest: CES_POST,
+    version: '1.0 partial',
+    effectiveDate: 'Three non-clinical foundations written, August 28, 2026',
+    nextReview: 'Clinical governance review, which the remaining twelve courses wait on',
   },
   {
     id: 'internships-fellowships',
