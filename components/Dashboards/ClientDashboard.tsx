@@ -4,6 +4,8 @@ import { User, Shift, Resource, ServiceEncounter, Referral, Assessment } from '.
 import { buildPlanFromScores } from '../../services/plan';
 import { context as ctxApi, client as clientApi, referrals as referralsApi, sunny as sunnyApi, toolLink, TOOLS, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
 import HealthCredits from './HealthCredits';
+import MemberReferrals from './MemberReferrals';
+import { isOpen as referralIsOpen } from './referralCopy';
 import { useEvents } from '../../services/hooks';
 import Academy from '../Academy/Academy';
 import {
@@ -372,10 +374,15 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
             {me.credits.balance > 0 && (
               <span className="pill pill-blue">{me.credits.balance} Health Credits</span>
             )}
-            {me.referrals.filter((r) => r.status !== 'completed' && r.status !== 'closed').length > 0 && (
-              <span className="pill pill-orange">
-                {me.referrals.filter((r) => r.status !== 'completed' && r.status !== 'closed').length} referral in progress
-              </span>
+            {/* Counted through the same stage rules the referral cards use, so the pill and
+                the Resources tab can never disagree about how many are open. Clicking it
+                goes to the cards: a count with no way to see what it counts is a dead end. */}
+            {me.referrals.filter(referralIsOpen).length > 0 && (
+              <button onClick={() => setActiveTab('resources')} className="pill pill-orange">
+                {me.referrals.filter(referralIsOpen).length === 1
+                  ? '1 referral in progress'
+                  : `${me.referrals.filter(referralIsOpen).length} referrals in progress`}
+              </button>
             )}
           </div>
         )}
@@ -759,6 +766,9 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
           </Card>
         </div>
       </div>
+      {/* A member's own referrals. Renders nothing when they hold none, so this page is
+          unchanged for somebody who has never asked for a connection. */}
+      <MemberReferrals me={me} />
     </div>
   );
 
