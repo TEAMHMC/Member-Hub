@@ -8,9 +8,11 @@
     "build": "npm run generate:courses && vite build",
     "preview": "vite preview",
     "test:curriculum": "tsx tests/curriculum.test.ts",
-    "test": "npm run test:curriculum && npm run test:visibility && tsc --noEmit",
+    "test": "npm run test:curriculum && npm run test:overrides && npm run test:visibility && tsc --noEmit",
     "generate:courses": "tsx scripts/generate-course-manifest.ts",
-    "test:visibility": "tsx tests/visibility.test.ts"
+    "test:overrides": "tsx tests/overrides.test.ts",
+    "test:visibility": "tsx tests/visibility.test.ts",
+    "test:render": "node tests/browser/published-corrections.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.562.0",
@@ -24,6 +26,7 @@
     "@vitejs/plugin-react": "^5.0.0",
     "tsx": "^4.23.11",
     "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "vite": "^6.2.0",
+    "playwright": "^1.62.1"
   }
 }
