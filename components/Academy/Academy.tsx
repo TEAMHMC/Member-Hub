@@ -344,7 +344,26 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     return () => { cancelled = true; };
   }, []);
 
-  const vis = (id: string): Visibility => visibility[id] || { state: 'open' };
+  /**
+   * What the public sees for a pathway.
+   *
+   * The default is not 'open' for everything, and that mattered the moment content
+   * landed in a pathway nobody had made a decision about. Availability is derived from
+   * whether there is content to read, so three pathways sat at 'open' harmlessly for as
+   * long as they were empty. Writing the first course into one of them would have put a
+   * partly written curriculum in front of members, enrollable, with nobody having chosen
+   * that.
+   *
+   * So the absence of a staff decision means 'open' only for a pathway the catalogue marks
+   * published. Anything still in development shows as upcoming until somebody says
+   * otherwise: visible and honest, with a save-my-spot rather than an enrollment.
+   */
+  const vis = (id: string): Visibility => {
+    const set = visibility[id];
+    if (set) return set;
+    const p = pathwayById(id);
+    return { state: p?.status === 'published' ? 'open' : 'upcoming' };
+  };
 
   /**
    * Corrections a reviewer published in the portal, keyed by course id.
