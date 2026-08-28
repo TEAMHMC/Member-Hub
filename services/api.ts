@@ -143,6 +143,37 @@ export interface MemberLookup {
   canRequestCode: boolean;
 }
 
+/**
+ * Published corrections to course content, made in the portal's review queue.
+ *
+ * A course here is a TypeScript catalogue entry compiled at build time, so a clinician
+ * correcting a passage could not reach members without a deployment. Reviewed content is
+ * stored against the course id in the portal, and this reads it back so the correction is
+ * what a member actually sees.
+ *
+ * Failure is deliberately quiet. If this cannot be reached the Academy renders its own
+ * catalogue, which is the same material minus any pending correction, so a member reads
+ * a slightly older lesson instead of an error.
+ */
+export interface HubCourseOverride {
+  content: string;
+  sections: { heading: string; body: string }[];
+  version: number;
+}
+
+export const curriculumApi = {
+  publishedContent: async (): Promise<Record<string, HubCourseOverride>> => {
+    try {
+      const res = await fetch(`${API_BASE}/api/curriculum/hub-content`, { credentials: 'omit' });
+      if (!res.ok) return {};
+      const data = await res.json() as { content?: Record<string, HubCourseOverride> };
+      return data.content || {};
+    } catch {
+      return {};
+    }
+  },
+};
+
 export const staffApi = {
   overview: () => req<HubStaffOverview>('/api/hub/staff/overview'),
   setAcademyVisibility: (pathwayId: string, state: string, cohortLabel?: string) =>
