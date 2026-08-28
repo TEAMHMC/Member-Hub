@@ -355,6 +355,7 @@ const HCE_PRE: Check[] = [
 
 import { CARE_NAVIGATION_COVERAGE } from './pathwayFieldBased';
 import { MENTOR_LEADER_COURSES, MENTOR_PRE, MENTOR_POST } from './pathwayMentorLeader';
+import { INTERNSHIP_COURSES } from './pathwayInternships';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
 import { MENTAL_HEALTH_COURSES } from './pathwayMentalHealth';
 import { STEM_CAMP } from './programStemCollab';
@@ -688,23 +689,23 @@ export const PATHWAYS: Pathway[] = [
       'Final supervisor evaluation',
       'Approved portfolio artifact',
     ],
+    // Four written, seven to go. Three of the seven are not courses in any honest sense:
+    // the midpoint review, the capstone presentation and the final evaluation are scheduled
+    // events with a supervisor in the room, and writing them as self-paced reading would
+    // misrepresent what they are.
     plannedCourses: [
-      'Professional Orientation + Expectations',
-      'Project Planning + Milestones',
       'Research + Evidence Use',
       'Communication + Documentation',
       'Team Collaboration',
-      'Ethics, Confidentiality + Organizational Responsibility',
       'Professional Feedback + Growth',
-      'Portfolio + Impact Documentation',
       'Midpoint Review',
       'Capstone Presentation',
       'Final Evaluation + Career Reflection',
     ],
-    courses: [],
-    version: '0.9 draft',
-    effectiveDate: 'In development',
-    nextReview: 'Pending placement agreements',
+    courses: INTERNSHIP_COURSES,
+    version: '1.0 partial',
+    effectiveDate: 'Four of eleven courses written, August 28, 2026',
+    nextReview: 'When a placement agreement exists, since the remaining gates depend on one',
   },
   {
     id: 'mentor-leader',
