@@ -354,6 +354,7 @@ const HCE_PRE: Check[] = [
 ];
 
 import { CARE_NAVIGATION_COVERAGE } from './pathwayFieldBased';
+import { FBCH_CORE_COURSES, FBCH_PRE, FBCH_POST } from './pathwayFieldBasedCore';
 import { MENTOR_LEADER_COURSES, MENTOR_PRE, MENTOR_POST } from './pathwayMentorLeader';
 import { INTERNSHIP_COURSES } from './pathwayInternships';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
@@ -603,16 +604,15 @@ export const PATHWAYS: Pathway[] = [
       'Assigned practicum or service requirement',
       'Supervisor readiness sign-off',
     ],
+    // Five written of the fifteen. Care Navigation and Coverage is the approved coverage
+    // course; the four below it are the written core. What remains listed is what remains
+    // to be written, plus three items that are not self-paced courses at all: the case lab,
+    // the readiness assessment and the practicum are supervised and scheduled.
     plannedCourses: [
-      'Community Health + Health Equity',
-      'Social Determinants of Health',
       'Communication + Active Listening',
       'Cultural Humility + Trauma-Informed Engagement',
-      'Professional Boundaries + Ethics + Privacy',
-      'Field Safety + Infection Prevention',
       'Mental Health + Substance Use Awareness',
       'Harm Reduction Foundations',
-      'Care Navigation + Resource Coordination',
       'Motivational Interviewing Foundations',
       'De-escalation + Conflict Response',
       'Data Collection + Documentation',
@@ -620,15 +620,17 @@ export const PATHWAYS: Pathway[] = [
       'Field Readiness Assessment',
       'Practicum / Supervised Service',
     ],
-    courses: [CARE_NAVIGATION_COVERAGE],
+    courses: [CARE_NAVIGATION_COVERAGE, ...FBCH_CORE_COURSES],
+    preTest: FBCH_PRE,
+    postTest: FBCH_POST,
     sourceKey: [
       { key: 'DHCS', label: 'California Department of Health Care Services, Medi-Cal Changes' },
       { key: 'DPSS', label: 'Los Angeles County Department of Public Social Services, Work Requirements' },
       { key: 'CoveredCA', label: 'Covered California, Find an Enroller' },
     ],
     version: '1.0 partial',
-    effectiveDate: 'Coverage content verified August 3, 2026',
-    nextReview: 'Before each renewal season and before any large outreach push',
+    effectiveDate: 'Coverage content verified August 3, 2026. Written core added August 28, 2026',
+    nextReview: 'Before each renewal season and before any large outreach push, since the coverage course quotes dated policy',
   },
   {
     id: 'clinical-exposure-simulation',
