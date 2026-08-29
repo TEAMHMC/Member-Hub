@@ -9,9 +9,12 @@ interface NavbarProps {
   user: User;
   /** Lets a notification send someone to an in-app surface rather than off site. */
   onNavigateTab?: (tab: string) => void;
+  /** Nobody is signed in, so the identity chip becomes a way in. */
+  guest?: boolean;
+  onSignIn?: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ user, onNavigateTab }) => {
+const Navbar: React.FC<NavbarProps> = ({ user, onNavigateTab, guest = false, onSignIn }) => {
   const [query, setQuery] = useState('');
   const search = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,16 +41,28 @@ const Navbar: React.FC<NavbarProps> = ({ user, onNavigateTab }) => {
 
       <div className="flex items-center gap-4 md:gap-6">
         <Notifications onNavigateTab={onNavigateTab} />
-        <div className="flex items-center gap-3 group cursor-pointer">
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold text-zinc-900 leading-tight">{user.firstName} {user.lastName}</p>
-            <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-0.5">Member</p>
+        {/* A visitor is not a member and the chip should not claim they are. It said
+            "M / MEMBER" to somebody with no account, which is both wrong and a small lie
+            about who is looking at the page. */}
+        {guest ? (
+          <button
+            onClick={onSignIn}
+            className="hmc-btn hmc-btn-primary h-11 px-6 text-[11px]"
+          >
+            Sign In
+          </button>
+        ) : (
+          <div className="flex items-center gap-3 group cursor-pointer">
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-semibold text-zinc-900 leading-tight">{user.firstName} {user.lastName}</p>
+              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-0.5">Member</p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-[#233DFF] text-white flex items-center justify-center font-black text-sm group-hover:ring-2 group-hover:ring-[#233DFF]/30 transition-all" aria-hidden="true">
+               {(user.firstName || 'M').charAt(0)}{(user.lastName || '').charAt(0)}
+            </div>
+            <ChevronDown size={14} className="text-zinc-300" />
           </div>
-          <div className="w-10 h-10 rounded-full bg-[#233DFF] text-white flex items-center justify-center font-black text-sm group-hover:ring-2 group-hover:ring-[#233DFF]/30 transition-all" aria-hidden="true">
-             {(user.firstName || 'M').charAt(0)}{(user.lastName || '').charAt(0)}
-          </div>
-          <ChevronDown size={14} className="text-zinc-300" />
-        </div>
+        )}
       </div>
     </nav>
   );

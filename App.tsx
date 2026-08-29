@@ -49,6 +49,18 @@ const App: React.FC = () => {
   // without a second account. The console is a destination, not a different app.
   const [staffView, setStaffView] = useState(false);
 
+  /**
+   * The sign-in panel, and why it is a panel.
+   *
+   * The Hub answered every route with a sign-in form. Somebody sent a link to a course or
+   * an event landed on a form and could not see the thing they had been sent, which loses
+   * them and makes every link HMC shares worthless to anyone without an account. The Hub
+   * is now readable, and sign-in is asked for at the moment it is actually needed, with a
+   * line saying what it is for.
+   */
+  const [signIn, setSignIn] = useState<{ open: boolean; reason?: string }>({ open: false });
+  const requireSignIn = (reason?: string) => setSignIn({ open: true, reason });
+
   // Restore a session by validating the httpOnly cookie with the backend
   // (source of truth), not by trusting localStorage alone. localStorage only
   // caches non-sensitive UI fields (name, zip, badges) for a fast first paint.
@@ -76,6 +88,11 @@ const App: React.FC = () => {
           xp: base.xp ?? 0,
           level: base.level ?? 1,
           badges: base.badges || ['Member'],
+          // From the server, not from the cached copy. The Hub has branched on audience
+          // since it was built and nothing ever set it, so every account fell through to
+          // the care surfaces. A member who changes it in the portal sees the change on
+          // their next load rather than whenever their browser cache happens to clear.
+          audience: me.audience || base.audience,
           hoursLogged: base.hoursLogged ?? 0,
           shiftsRegistered: base.shiftsRegistered ?? 0,
           wellnessPoints: base.wellnessPoints ?? me.credits?.balance ?? 0,
@@ -104,6 +121,7 @@ const App: React.FC = () => {
       xp: 0,
       level: 1,
       badges: ['Member'],
+      audience: userData.audience,
       hoursLogged: 0,
       shiftsRegistered: 0,
       wellnessPoints: 0,
@@ -132,16 +150,40 @@ const App: React.FC = () => {
     setActiveTab('dash');
   };
 
-  const renderPortalContent = () => {
-    if (!currentUser?.role) return null;
+  /**
+   * What a visitor is, for the surfaces that expect a user object.
+   *
+   * Not a fake account. It carries no id that anything persists against, no email, and
+   * audience 'both' so a visitor sees the whole catalogue rather than a guess about which
+   * half of HMC they came for. Every surface that could act on it is gated separately.
+   */
+  const guestUser: User = {
+    id: 'guest',
+    firstName: '',
+    lastName: '',
+    email: '',
+    zipCode: '',
+    phone: '',
+    xp: 0,
+    level: 1,
+    badges: [],
+    hoursLogged: 0,
+    shiftsRegistered: 0,
+    wellnessPoints: 0,
+    role: UserRole.CLIENT,
+    audience: 'both',
+  };
 
-    if (staffView && currentUser.staff) {
+  const renderPortalContent = () => {
+    if (staffView && currentUser?.staff) {
       return <StaffDashboard staff={currentUser.staff} onExit={() => setStaffView(false)} />;
     }
 
     return (
       <ClientDashboard
-        user={currentUser}
+        user={currentUser || guestUser}
+        guest={!currentUser}
+        onRequireSignIn={requireSignIn}
         initialTab={activeTab}
         onTabChange={setActiveTab}
         onUpdateUser={handleUpdateUser}
@@ -168,13 +210,10 @@ const App: React.FC = () => {
     <>
       <SiteNotice />
       <div className="min-h-screen flex flex-col lg:flex-row bg-[#f5f3ef]">
-      {view === 'login' && <Login onLogin={handleLogin} />}
-
-      {/* Registration is shown over the sign-in screen for an unauthenticated
-          deep link, so the learner completes what they came for first. On a
-          valid deep link with an unknown course id, nothing is shown and the
-          normal sign-in stands rather than a broken modal. */}
-      {view === 'login' && deepLinkCourse && !deepLinkDone && (
+      {/* Registration is shown over the Hub for an unauthenticated deep link, so the
+          learner completes what they came for first. On a valid deep link with an unknown
+          course id, nothing is shown and the Hub stands rather than a broken modal. */}
+      {!currentUser && deepLinkCourse && !deepLinkDone && (
         <TrainingRegistration
           course={deepLinkCourse}
           member={null}
@@ -186,20 +225,22 @@ const App: React.FC = () => {
           }}
         />
       )}
-      {view === 'portal' && currentUser && (
+      {(view === 'portal' || view === 'login') && (
         <>
           <Sidebar
-            role={currentUser.role!}
-            audience={currentUser.audience}
+            role={currentUser?.role || UserRole.CLIENT}
+            audience={currentUser?.audience}
+            guest={!currentUser}
+            onSignIn={() => requireSignIn()}
             activeTab={activeTab}
             onTabChange={(tab) => { setStaffView(false); setActiveTab(tab); }}
             onLogout={handleLogout}
-            staff={currentUser.staff}
+            staff={currentUser?.staff}
             staffView={staffView}
             onToggleStaffView={() => setStaffView((v) => !v)}
           />
           <div className="flex-1 flex flex-col min-w-0">
-            <Navbar user={currentUser} onNavigateTab={setActiveTab} />
+            <Navbar user={currentUser || guestUser} onNavigateTab={setActiveTab} guest={!currentUser} onSignIn={() => requireSignIn()} />
             <main className="px-4 md:px-8 pb-28 pt-2 flex-1">
               {renderPortalContent()}
             </main>
@@ -211,6 +252,29 @@ const App: React.FC = () => {
         </>
       )}
       </div>
+
+      {/* Sign-in as a panel over the Hub, not a wall in front of it. The reason line is
+          the point: "sign in" on its own, next to a button somebody just pressed, reads as
+          a refusal rather than as a step. */}
+      {signIn.open && !currentUser && (
+        <div className="fixed inset-0 z-[60] overflow-y-auto bg-zinc-900/40 backdrop-blur-sm">
+          <button
+            aria-label="Close sign in"
+            onClick={() => setSignIn({ open: false })}
+            className="fixed top-5 right-5 z-[61] w-11 h-11 rounded-full bg-white shadow-lg text-zinc-500 hover:text-zinc-900 flex items-center justify-center text-xl"
+          >
+            &times;
+          </button>
+          <div className="min-h-full flex flex-col items-center justify-center py-10">
+            {signIn.reason && (
+              <p className="mb-4 px-6 py-3 rounded-full bg-white text-[13px] font-semibold text-zinc-700 shadow-sm max-w-md text-center">
+                Sign in {signIn.reason}.
+              </p>
+            )}
+            <Login onLogin={(u, r) => { setSignIn({ open: false }); handleLogin(u, r); }} />
+          </div>
+        </div>
+      )}
     </>
   );
 };

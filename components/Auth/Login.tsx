@@ -41,6 +41,15 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [zipCode, setZipCode] = useState('');
+  /**
+   * Which experience this member is here for.
+   *
+   * Asked once, in their words rather than in ours. The Hub has always had two audiences
+   * and no way for anybody to indicate which they were, so a person who came to take a
+   * training was given a screening surface, a health playbook and results they will never
+   * have. Nothing derived from behaviour is as good as the person saying it.
+   */
+  const [audience, setAudience] = useState<'care' | 'learner' | 'both' | null>(null);
   const [invite, setInvite] = useState('');
   // Starts on the email step. If the server says signup is closed, the invitation
   // step is shown once that answer arrives. Defaulting the other way would put a
@@ -183,11 +192,34 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   const handleOnboardingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!consentData || !consentSms) return;
+    if (!consentData || !consentSms || !audience) return;
+    setBusy(true);
+    setErr(null);
     // Record cross-tool memory consent so the Navigator can remember them.
     ctxApi.consent(true).catch(() => {});
+    try {
+      // The part that was missing entirely. Without this the answers live in localStorage
+      // and nowhere else, `identified` stays false because no clients record exists, and
+      // this same form is shown again on the next sign-in, and the one after that.
+      await clientApi.saveProfile({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        phone,
+        zipCode: zipCode.trim(),
+        audience,
+        consentToShare: consentData,
+        consentToContact: consentSms,
+      });
+    } catch {
+      // Not fatal to the sign-in. They are already authenticated, and blocking entry on a
+      // profile write would lock somebody out of the Hub over a saved name. They will be
+      // asked once more next time, which is the old behaviour rather than a new failure.
+      setErr('We signed you in, but could not save your details just then. We may ask again next time.');
+    } finally {
+      setBusy(false);
+    }
     onLogin(
-      { email: email.trim().toLowerCase(), phone, firstName, lastName, zipCode, badges: ['First Login'] },
+      { email: email.trim().toLowerCase(), phone, firstName, lastName, zipCode, audience, badges: ['First Login'] },
       UserRole.CLIENT
     );
   };
@@ -363,6 +395,37 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               </div>
             </div>
 
+            {/* Asked once, in their words. Everything the Hub shows a member branches on
+                this, and until now nothing set it, so a person who came for a training was
+                shown a screening surface and a health playbook. */}
+            <div className="space-y-3 pt-6 border-t border-zinc-100">
+              <label className={labelStyle}>WHAT BRINGS YOU TO HMC</label>
+              <div className="grid grid-cols-1 gap-3">
+                {([
+                  { id: 'care', title: 'Health support for myself or my family',
+                    detail: 'Screenings, results, help with food, housing and care, and a plan you can follow.' },
+                  { id: 'learner', title: 'Courses and training',
+                    detail: 'Free self-paced courses and scheduled trainings that open doors into health careers.' },
+                  { id: 'both', title: 'Both', detail: 'You get everything. You can change this later in your profile.' },
+                ] as const).map((o) => (
+                  <button
+                    key={o.id}
+                    type="button"
+                    onClick={() => setAudience(o.id)}
+                    aria-pressed={audience === o.id}
+                    className={`text-left rounded-2xl border p-4 transition-all ${
+                      audience === o.id
+                        ? 'border-[#233DFF] bg-blue-50/60 ring-4 ring-[#233DFF]/10'
+                        : 'border-zinc-200 bg-white hover:border-zinc-300'
+                    }`}
+                  >
+                    <p className="text-sm font-semibold text-zinc-900 leading-tight">{o.title}</p>
+                    <p className="text-xs text-zinc-400 leading-relaxed mt-1">{o.detail}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="space-y-5 pt-6 border-t border-zinc-100">
                <label className="flex items-start gap-4 cursor-pointer group" onClick={() => setConsentData(!consentData)}>
                   <div className={`w-6 h-6 rounded-lg border flex items-center justify-center mt-0.5 transition-all ${consentData ? 'bg-[#233DFF] border-[#233DFF] text-white shadow-md shadow-blue-200' : 'border-zinc-200 bg-white group-hover:border-zinc-300'}`}>
@@ -387,9 +450,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <button
               type="submit"
               className={`${buttonStyle} h-[60px]`}
-              disabled={!consentData || !consentSms}
+              disabled={!consentData || !consentSms || !audience || busy}
             >
-               Create My Account
+               {busy ? 'Saving' : 'Create My Account'}
             </button>
           </form>
         )}

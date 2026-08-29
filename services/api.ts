@@ -90,7 +90,20 @@ export interface HmcEvent {
 export interface ClientMe {
   identified: boolean;
   email: string;
-  profile: { firstName: string | null };
+  profile: {
+    firstName: string | null;
+    lastName?: string | null;
+    zipCode?: string | null;
+    phone?: string | null;
+  };
+  /**
+   * Which experience this member gets. Derived on the server unless the member said.
+   *
+   * Optional because a session can outlive a deploy: a member signed in against an older
+   * backend gets undefined, and the Hub then behaves exactly as it did before, which is
+   * the care surface.
+   */
+  audience?: 'care' | 'learner' | 'both';
   credits: { balance: number; lifetimeEarned: number; lifetimeSpent: number };
   referrals: Array<{
     id: string;
@@ -459,6 +472,27 @@ export const client = {
     req<{ ok: boolean; identified: boolean; email: string }>('/api/client/auth/google', {
       method: 'POST',
       body: JSON.stringify({ credential }),
+    }),
+  /**
+   * Records who a member is, so they are never asked again.
+   *
+   * Its absence was the whole of the onboarding loop: the Hub collected a name, a zip and
+   * two consents and had nowhere to send them, and `identified` on sign-in stays false
+   * until a clients record exists, so every returning member was onboarded again on every
+   * single sign-in and everything they typed was discarded.
+   */
+  saveProfile: (input: {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    zipCode?: string;
+    audience?: 'care' | 'learner' | 'both';
+    consentToShare?: boolean;
+    consentToContact?: boolean;
+  }) =>
+    req<{ ok: boolean; identified: boolean; audience: string | null }>('/api/client/profile', {
+      method: 'POST',
+      body: JSON.stringify(input),
     }),
   logout: () => req<{ ok: boolean }>('/api/client/auth/logout', { method: 'POST' }),
 };

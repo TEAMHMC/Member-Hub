@@ -8,12 +8,14 @@
     "build": "npm run generate:courses && vite build",
     "preview": "vite preview",
     "test:curriculum": "tsx tests/curriculum.test.ts",
-    "test": "npm run test:curriculum && npm run test:overrides && npm run test:referrals && npm run test:visibility && tsc --noEmit",
+    "test": "npm run test:curriculum && npm run test:overrides && npm run test:referrals && npm run test:visibility && npm run test:audience && npm run test:notifications && tsc --noEmit",
     "generate:courses": "tsx scripts/generate-course-manifest.ts",
     "test:overrides": "tsx tests/overrides.test.ts",
     "test:referrals": "tsx tests/referral-copy.test.ts",
     "test:visibility": "tsx tests/visibility.test.ts",
-    "test:render": "node tests/browser/published-corrections.cjs"
+    "test:render": "node tests/browser/published-corrections.cjs",
+    "test:audience": "tsx tests/audience.test.ts",
+    "test:notifications": "tsx tests/notifications.test.ts"
   },
   "dependencies": {
     "lucide-react": "^0.562.0",

@@ -23,9 +23,13 @@ interface ClientDashboardProps {
   onTabChange?: (tab: string) => void;
   onUpdateUser?: (data: Partial<User>) => void;
   visitorId?: string | null;
+  /** Nobody is signed in. Readable surfaces render; acting on them asks for an account. */
+  guest?: boolean;
+  /** Opens the sign-in panel, with a line saying what it is for. */
+  onRequireSignIn?: (reason?: string) => void;
 }
 
-const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'dash', onTabChange, onUpdateUser, visitorId = null }) => {
+const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'dash', onTabChange, onUpdateUser, visitorId = null, guest = false, onRequireSignIn }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [zipInput, setZipInput] = useState(user.zipCode || '');
@@ -362,12 +366,30 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   const renderHome = () => (
     <div className="space-y-12 animate-in fade-in duration-500 max-w-5xl mx-auto py-8">
       <div className="text-center space-y-4">
-        <div className="pill pill-blue mx-auto">Member Portal Active</div>
-        <h1 className="text-5xl font-semibold tracking-tight text-zinc-900">Hello, {user.firstName}.</h1>
-        <p className="text-zinc-500 max-w-md mx-auto leading-relaxed text-lg">You're cleared to serve. Everything you need to manage your wellness is right here.</p>
+        {/* A visitor is greeted as one. The signed-in copy said "Hello, undefined" and
+            "You're cleared to serve" to somebody who had not signed in and was not a
+            volunteer, which is three wrong things in one line. */}
+        <div className="pill pill-blue mx-auto">{guest ? 'Free and open to everyone' : 'Member Portal Active'}</div>
+        <h1 className="text-5xl font-semibold tracking-tight text-zinc-900">
+          {guest ? 'Health Matters Clinic' : `Hello, ${user.firstName}.`}
+        </h1>
+        <p className="text-zinc-500 max-w-md mx-auto leading-relaxed text-lg">
+          {guest
+            ? 'Free screenings, community events, help with food, housing and care, and self-paced courses that open doors into health careers. Look around. You only need an account to save anything.'
+            : "You're cleared to serve. Everything you need to manage your wellness is right here."}
+        </p>
         <div className="flex flex-wrap gap-4 pt-6 justify-center">
-             <ButtonPrimary onClick={() => setActiveTab('check-yourself')}>Start my Snapshot</ButtonPrimary>
-             <ButtonSecondary onClick={() => setActiveTab('events')}>Explore Events</ButtonSecondary>
+             {guest ? (
+               <>
+                 <ButtonPrimary onClick={() => setActiveTab('academy')}>Browse Courses</ButtonPrimary>
+                 <ButtonSecondary onClick={() => setActiveTab('events')}>Explore Events</ButtonSecondary>
+               </>
+             ) : (
+               <>
+                 <ButtonPrimary onClick={gated('to save your Wellbeing Snapshot and get a plan', () => setActiveTab('check-yourself'))}>Start my Snapshot</ButtonPrimary>
+                 <ButtonSecondary onClick={() => setActiveTab('events')}>Explore Events</ButtonSecondary>
+               </>
+             )}
         </div>
         {me && (me.credits.balance > 0 || me.referrals.length > 0) && (
           <div className="flex flex-wrap gap-3 justify-center pt-2">
@@ -416,7 +438,10 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
            </div>
            <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('academy'); }} className="w-full">Start learning</ButtonSecondary>
         </Card>
-        <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={() => setActiveTab('game-plan')}>
+        {/* Two of these four open surfaces a visitor cannot reach. Rather than hiding them,
+            which would make the Hub look emptier than it is, they say what an account is
+            for and open the sign-in panel with that reason attached. */}
+        <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={gated('to build and keep your Wellness Playbook', () => setActiveTab('game-plan'))}>
            <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-[#233DFF] shadow-sm group-hover:bg-[#233DFF] group-hover:text-white transition-all">
               <Compass size={24} />
            </div>
@@ -424,7 +449,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
              <h3 className="text-xl font-semibold text-zinc-900">Wellness Playbook</h3>
              <p className="text-sm text-zinc-500 leading-relaxed">Your AI-powered roadmap to recovery and local community resources.</p>
            </div>
-           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('game-plan'); }} className="w-full">Open Playbook</ButtonSecondary>
+           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); gated('to build and keep your Wellness Playbook', () => setActiveTab('game-plan'))(); }} className="w-full">{guest ? 'Sign in to open' : 'Open Playbook'}</ButtonSecondary>
         </Card>
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#FF6E40]/30 transition-all cursor-pointer" onClick={() => setActiveTab('events')}>
            <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-[#FF6E40] shadow-sm group-hover:bg-[#FF6E40] group-hover:text-white transition-all">
@@ -436,7 +461,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
            </div>
            <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('events'); }} className="w-full">View Calendar</ButtonSecondary>
         </Card>
-        <Card className="flex flex-col gap-6 p-8 group hover:border-[#FF6F91]/30 transition-all cursor-pointer" onClick={() => setActiveTab('health')}>
+        <Card className="flex flex-col gap-6 p-8 group hover:border-[#FF6F91]/30 transition-all cursor-pointer" onClick={gated('to see your screening results', () => setActiveTab('health'))}>
            <div className="w-12 h-12 rounded-2xl bg-pink-50 flex items-center justify-center text-[#FF6F91] shadow-sm group-hover:bg-[#FF6F91] group-hover:text-white transition-all">
               <Activity size={24} />
            </div>
@@ -444,7 +469,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
              <h3 className="text-xl font-semibold text-zinc-900">Latest Results</h3>
              <p className="text-sm text-zinc-500 leading-relaxed">Securely access your blood pressure, vitals, and provider notes.</p>
            </div>
-           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('health'); }} className="w-full">Open Results</ButtonSecondary>
+           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); gated('to see your screening results', () => setActiveTab('health'))(); }} className="w-full">{guest ? 'Sign in to open' : 'Open Results'}</ButtonSecondary>
         </Card>
       </div>
     </div>
@@ -558,7 +583,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
                    <p className="text-sm font-semibold text-zinc-600">Finish your Wellbeing Snapshot</p>
                    <p className="text-xs text-zinc-400 max-w-[180px] mx-auto leading-relaxed">This will unlock your personalized health insights and local resources.</p>
                  </div>
-                 <ButtonPrimary onClick={() => setActiveTab('check-yourself')} className="px-10">Start my Snapshot</ButtonPrimary>
+                 <ButtonPrimary onClick={gated('to save your Wellbeing Snapshot and get a plan', () => setActiveTab('check-yourself'))} className="px-10">Start my Snapshot</ButtonPrimary>
               </Card>
             )}
           </div>
@@ -762,7 +787,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
               <h3 className="text-xl font-semibold text-zinc-900">Request a warm handoff</h3>
               <p className="text-sm text-zinc-500 leading-relaxed">Take the Wellbeing Snapshot and we will connect you with a real person for the needs you flag.</p>
             </div>
-            <ButtonPrimary onClick={() => setActiveTab('check-yourself')} className="w-full md:w-auto">Start my Snapshot</ButtonPrimary>
+            <ButtonPrimary onClick={gated('to save your Wellbeing Snapshot and get a plan', () => setActiveTab('check-yourself'))} className="w-full md:w-auto">Start my Snapshot</ButtonPrimary>
           </Card>
         </div>
       </div>
@@ -873,9 +898,37 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     </div>
   );
 
-  const LEARNER_TABS = ['dash', 'academy', 'events', 'profile'];
+  // Must match the learner nav in Sidebar.tsx. It did not: the sidebar offered Credits and
+  // this list did not contain it, so a learner clicking Credits was bounced to the Academy
+  // with no explanation. A tab that is offered and then refused is worse than one that is
+  // not offered.
+  const LEARNER_TABS = ['dash', 'academy', 'events', 'credits', 'profile'];
+
+  /**
+   * What is readable with no account.
+   *
+   * Must match the guest nav in Sidebar.tsx, and a test diffs the two. Everything here is
+   * something a person was previously sent a link to and met a sign-in form instead: a
+   * course, an event, the resource directory. Acting on any of them still asks.
+   */
+  const PUBLIC_TABS = ['dash', 'academy', 'events', 'resources'];
+
+  /**
+   * Runs an action, or asks for an account first.
+   *
+   * The prompt carries the reason, because "sign in" with no explanation next to a button
+   * somebody just pressed reads as a wall rather than as a step.
+   */
+  const gated = (reason: string, run: () => void) => () => {
+    if (guest) { onRequireSignIn?.(reason); return; }
+    run();
+  };
 
   const renderContent = () => {
+    // A visitor can read the public surfaces and nothing else. Sending them to Home rather
+    // than to a sign-in form keeps them somewhere they can act.
+    if (guest && !PUBLIC_TABS.includes(activeTab)) return renderHome();
+
     // Care-only surfaces are not reachable for a learner account.
     if (user.audience === 'learner' && !LEARNER_TABS.includes(activeTab)) {
       return renderAcademy();
