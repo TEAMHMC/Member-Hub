@@ -873,7 +873,11 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     </div>
   );
 
-  const LEARNER_TABS = ['dash', 'academy', 'events', 'profile'];
+  // Must match the learner nav in Sidebar.tsx. It did not: the sidebar offered Credits and
+  // this list did not contain it, so a learner clicking Credits was bounced to the Academy
+  // with no explanation. A tab that is offered and then refused is worse than one that is
+  // not offered.
+  const LEARNER_TABS = ['dash', 'academy', 'events', 'credits', 'profile'];
 
   const renderContent = () => {
     // Care-only surfaces are not reachable for a learner account.

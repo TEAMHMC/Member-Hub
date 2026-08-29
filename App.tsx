@@ -76,6 +76,11 @@ const App: React.FC = () => {
           xp: base.xp ?? 0,
           level: base.level ?? 1,
           badges: base.badges || ['Member'],
+          // From the server, not from the cached copy. The Hub has branched on audience
+          // since it was built and nothing ever set it, so every account fell through to
+          // the care surfaces. A member who changes it in the portal sees the change on
+          // their next load rather than whenever their browser cache happens to clear.
+          audience: me.audience || base.audience,
           hoursLogged: base.hoursLogged ?? 0,
           shiftsRegistered: base.shiftsRegistered ?? 0,
           wellnessPoints: base.wellnessPoints ?? me.credits?.balance ?? 0,
@@ -104,6 +109,7 @@ const App: React.FC = () => {
       xp: 0,
       level: 1,
       badges: ['Member'],
+      audience: userData.audience,
       hoursLogged: 0,
       shiftsRegistered: 0,
       wellnessPoints: 0,
