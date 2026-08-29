@@ -3,7 +3,7 @@ import React from 'react';
 import { UserRole, type Audience, type StaffStanding } from '../../types';
 import {
   Home, Calendar,
-  LogOut, Compass, ShieldCheck, Activity, Brain, GraduationCap,
+  LogOut, LogIn, Compass, ShieldCheck, Activity, Brain, GraduationCap,
   SlidersHorizontal, Eye, Coins,
   User as UserIcon
 } from 'lucide-react';
@@ -11,6 +11,9 @@ import {
 interface SidebarProps {
   role: UserRole;
   audience?: Audience;
+  /** Nobody is signed in. The nav shows what can be read without an account. */
+  guest?: boolean;
+  onSignIn?: () => void;
   activeTab: string;
   onTabChange: (id: string) => void;
   onLogout: () => void;
@@ -21,7 +24,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
-  audience = 'care', activeTab, onTabChange, onLogout,
+  audience = 'care', activeTab, onTabChange, onLogout, guest = false, onSignIn,
   staff = null, staffView = false, onToggleStaffView,
 }) => {
   // Navigation is the member's navigation, for everybody. It used to branch on
@@ -30,6 +33,18 @@ const Sidebar: React.FC<SidebarProps> = ({
   // console through the button below, so there is one set of surfaces to keep
   // working and staff see the same thing members see.
   const getNavItems = () => {
+    // What anybody can read without an account. The Hub used to answer every route with a
+    // sign-in wall, so somebody sent a link to a course or an event landed on a form and
+    // could not see the thing they were sent. These four are readable; acting on any of
+    // them still asks for an account at the moment it is needed.
+    if (guest) {
+      return [
+        { icon: <Home size={18} />, label: 'Home', id: 'dash' },
+        { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
+        { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
+        { icon: <ShieldCheck size={18} />, label: 'Resources', id: 'resources' },
+      ];
+    }
     // A learner has no care relationship with HMC, so the screening,
     // playbook, and results surfaces are not shown at all.
     if (audience === 'learner') {
@@ -101,18 +116,26 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="lg:hidden sticky top-0 z-50 bg-[#f5f3ef]/95 backdrop-blur border-b border-zinc-200/70">
         <div className="flex items-center justify-between px-4 py-3">
           {Brand}
-          <button onClick={onLogout} className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#FF6E40]">
-            <LogOut size={16} /> Sign Out
-          </button>
+          {guest ? (
+            <button onClick={onSignIn} className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#233DFF]">
+              <LogIn size={16} /> Sign In
+            </button>
+          ) : (
+            <button onClick={onLogout} className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#FF6E40]">
+              <LogOut size={16} /> Sign Out
+            </button>
+          )}
         </div>
         <nav className="flex gap-2 overflow-x-auto px-4 pb-3 no-scrollbar">
           {items.map((item) => navButton(item, true))}
-          <button
-            onClick={() => onTabChange('profile')}
-            className={`flex items-center gap-2 rounded-full px-4 py-2.5 shrink-0 font-bold uppercase tracking-wider text-[11px] ${activeTab === 'profile' ? 'bg-zinc-900 text-white' : 'text-zinc-500 hover:bg-white/60'}`}
-          >
-            <UserIcon size={16} /> Profile
-          </button>
+          {!guest && (
+            <button
+              onClick={() => onTabChange('profile')}
+              className={`flex items-center gap-2 rounded-full px-4 py-2.5 shrink-0 font-bold uppercase tracking-wider text-[11px] ${activeTab === 'profile' ? 'bg-zinc-900 text-white' : 'text-zinc-500 hover:bg-white/60'}`}
+            >
+              <UserIcon size={16} /> Profile
+            </button>
+          )}
           {staffToggle(true)}
         </nav>
       </div>
@@ -137,18 +160,29 @@ const Sidebar: React.FC<SidebarProps> = ({
         </nav>
 
         <div className="p-6 border-t border-zinc-200/70 space-y-1">
-          <button
-            onClick={() => onTabChange('profile')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-full transition-all font-bold uppercase tracking-wider text-[11px] ${activeTab === 'profile' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-white/60'}`}
-          >
-            <UserIcon size={18} /> Profile
-          </button>
-          <button
-            onClick={onLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-full transition-all font-bold uppercase tracking-wider text-[11px] text-[#FF6E40] hover:bg-orange-50/60"
-          >
-            <LogOut size={18} /> Sign Out
-          </button>
+          {!guest && (
+            <button
+              onClick={() => onTabChange('profile')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-full transition-all font-bold uppercase tracking-wider text-[11px] ${activeTab === 'profile' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-white/60'}`}
+            >
+              <UserIcon size={18} /> Profile
+            </button>
+          )}
+          {guest ? (
+            <button
+              onClick={onSignIn}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-full transition-all font-bold uppercase tracking-wider text-[11px] text-[#233DFF] hover:bg-blue-50/60"
+            >
+              <LogIn size={18} /> Sign In
+            </button>
+          ) : (
+            <button
+              onClick={onLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-full transition-all font-bold uppercase tracking-wider text-[11px] text-[#FF6E40] hover:bg-orange-50/60"
+            >
+              <LogOut size={18} /> Sign Out
+            </button>
+          )}
         </div>
       </aside>
     </>

@@ -73,5 +73,32 @@ console.log('An older session still works');
 ok(/audience = 'care'/.test(sidebar) || /audience === 'learner'/.test(sidebar),
   'undefined falls through to the care surface rather than to nothing');
 
+console.log('The public front door');
+// The Hub answered every route with a sign-in form, so a link to a course or an event
+// landed somebody on a form and they could not see the thing they were sent.
+const guestNav = sidebar.slice(sidebar.indexOf('if (guest)'), sidebar.indexOf('if (guest)') + 500);
+const guestIds = Array.from(guestNav.matchAll(/id: '([a-z-]+)'/g)).map((m) => m[1]);
+const pub = /const PUBLIC_TABS = \[([^\]]+)\]/.exec(dash);
+const publicIds = pub ? Array.from(pub[1].matchAll(/'([a-z-]+)'/g)).map((m) => m[1]) : [];
+ok(guestIds.length === 4, 'the guest nav offers four surfaces', guestIds.join(', '));
+for (const id of ['dash', 'academy', 'events', 'resources']) {
+  ok(guestIds.includes(id), `a visitor can reach "${id}"`, guestIds.join(', '));
+  ok(publicIds.includes(id), `the dashboard allows "${id}" without an account`, publicIds.join(', '));
+}
+// Offered and refused is worse than never offered, same rule as the learner nav.
+for (const id of guestIds) {
+  ok(publicIds.includes(id), `guest nav offers "${id}" and the dashboard allows it`);
+}
+for (const gatedTab of ['check-yourself', 'health', 'game-plan', 'credits', 'profile']) {
+  ok(!publicIds.includes(gatedTab), `"${gatedTab}" still needs an account`);
+}
+ok(/onRequireSignIn/.test(dash) && /const gated =/.test(dash),
+  'acting on a public surface asks for an account rather than failing silently');
+ok(/Sign in \{signIn\.reason\}/.test(app),
+  'the prompt says what the account is for',
+  '"sign in" alone, next to a button somebody just pressed, reads as a refusal');
+ok(/guest=\{!currentUser\}/.test(app), 'a visitor is rendered the Hub, not a wall');
+ok(!/view === 'login' && <Login/.test(app), 'the sign-in wall is gone');
+
 console.log(`\n${checks - failures}/${checks} passed${failures ? `, ${failures} FAILED` : ''}\n`);
 process.exit(failures ? 1 : 0);
