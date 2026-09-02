@@ -534,3 +534,52 @@ export function toolLink(
   }
   return url.toString();
 }
+
+/**
+ * What a member has actually done, across every HMC product.
+ *
+ * Until this existed, CalmKit kept walks in one browser's local storage, Check
+ * Yourself kept check-ins, Event Finder kept RSVPs and the Academy kept course
+ * progress, and none of them could see each other. The end-of-walk dialog said
+ * "your progress will be saved" and there was nowhere it could be seen, which
+ * made the promise untrue rather than merely incomplete.
+ *
+ * Server-derived on purpose. Streaks and totals are computed once in the portal
+ * so every surface that asks gets the same answer, and so the shape a person is
+ * shown is the same shape Sunny will later read.
+ */
+export interface MemberProgress {
+  hasHistory: boolean;
+  totals: {
+    events?: number;
+    activeDays?: number;
+    minutes?: number;
+    miles?: number;
+    byType?: Record<string, number>;
+  };
+  thisWeek: { events?: number; byType?: Record<string, number> };
+  currentStreakDays?: number;
+  recent: { id: string; type: string; source: string; at: string; summary: string }[];
+}
+
+export interface MemberEventInput {
+  /** Minted by the caller so an offline retry lands on the same document. */
+  id?: string;
+  type:
+    | 'calmkit_session' | 'check_in' | 'screening' | 'event_rsvp'
+    | 'event_attended' | 'referral_made' | 'course_progress' | 'course_completed';
+  source: 'calmkit' | 'hub' | 'portal' | 'eventfinder' | 'academy' | 'checkyourself';
+  at?: string;
+  summary: string;
+  metrics?: Record<string, number | string>;
+}
+
+export const memberActivity = {
+  progress: () => req<MemberProgress>('/api/member/progress'),
+  events: (limit = 50) => req<{ events: any[] }>(`/api/member/events?limit=${limit}`),
+  record: (input: MemberEventInput) =>
+    req<{ success: boolean; id: string; duplicate: boolean }>('/api/member/events', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }),
+};

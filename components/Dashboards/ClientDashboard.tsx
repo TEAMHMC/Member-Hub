@@ -4,6 +4,7 @@ import { User, Shift, Resource, ServiceEncounter, Referral, Assessment } from '.
 import { buildPlanFromScores } from '../../services/plan';
 import { context as ctxApi, client as clientApi, referrals as referralsApi, sunny as sunnyApi, toolLink, TOOLS, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
 import HealthCredits from './HealthCredits';
+import YourProgress from './YourProgress';
 import MemberReferrals from './MemberReferrals';
 import { isOpen as referralIsOpen } from './referralCopy';
 import { useEvents } from '../../services/hooks';
@@ -426,6 +427,13 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
           </div>
         </div>
       )}
+
+      {/* A member's own history, which until now had nowhere to live. CalmKit told
+          people their progress was being saved while it sat in one browser's local
+          storage with no screen to show it on. Hidden from guests because there is
+          nothing to show somebody who has not signed in, and an empty panel reads
+          as a broken one. */}
+      {!guest && <YourProgress />}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={() => setActiveTab('academy')}>
