@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-28T15:10:42.579Z",
+  "generatedAt": "2026-09-03T15:41:29.026Z",
   "courses": [
     {
       "id": "hce-1",
@@ -69,6 +69,118 @@
       "title": "Care Navigation and Coverage",
       "pathwayId": "field-based-community-health",
       "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-2",
+      "title": "Community Health + Health Equity",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-3",
+      "title": "Social Determinants of Health",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-4",
+      "title": "Professional Boundaries + Ethics + Privacy",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-5",
+      "title": "Field Safety + Infection Prevention",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ces-1",
+      "title": "Healthcare Team Roles + Scope",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ces-2",
+      "title": "Medical Terminology Foundations",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ces-3",
+      "title": "Patient Communication + Interviewing",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "if-1",
+      "title": "Professional Orientation + Expectations",
+      "pathwayId": "internships-fellowships",
+      "pathwayTitle": "Internships + Fellowships",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "if-2",
+      "title": "Project Planning + Milestones",
+      "pathwayId": "internships-fellowships",
+      "pathwayTitle": "Internships + Fellowships",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "if-3",
+      "title": "Ethics, Confidentiality + Organizational Responsibility",
+      "pathwayId": "internships-fellowships",
+      "pathwayTitle": "Internships + Fellowships",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "if-4",
+      "title": "Portfolio + Impact Documentation",
+      "pathwayId": "internships-fellowships",
+      "pathwayTitle": "Internships + Fellowships",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ml-1",
+      "title": "The Role of a Mentor",
+      "pathwayId": "mentor-leader",
+      "pathwayTitle": "Mentor + Leader",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ml-2",
+      "title": "Building Trust + Psychological Safety",
+      "pathwayId": "mentor-leader",
+      "pathwayTitle": "Mentor + Leader",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ml-3",
+      "title": "Coaching vs Advising vs Supervising",
+      "pathwayId": "mentor-leader",
+      "pathwayTitle": "Mentor + Leader",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ml-4",
+      "title": "Giving Effective Feedback",
+      "pathwayId": "mentor-leader",
+      "pathwayTitle": "Mentor + Leader",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ml-5",
+      "title": "Recognizing Risk + Escalating Concerns",
+      "pathwayId": "mentor-leader",
+      "pathwayTitle": "Mentor + Leader",
       "delivery": "self-paced"
     },
     {
