@@ -60,6 +60,19 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   // One resend per visit to the code step, so a stuck person is not walked into
   // the five-per-hour limit on the endpoint by tapping it repeatedly.
   const [resent, setResent] = useState(false);
+  /**
+   * An age band, never a date of birth.
+   *
+   * Every youth and TAY funder asks for an age disaggregation, and a member who signs up
+   * here rather than being enrolled at an event was invisible to it. A band answers that
+   * without the Hub holding a birth date, which is a Safe Harbor identifier and something
+   * the profile allowlist explicitly forbids.
+   *
+   * The bands are split finer than LA County reports them so the county roll-up stays an
+   * exact sum while TAY, which straddles the county bands, is still derivable.
+   */
+  const AGE_BANDS = ['Under 16', '16-17', '18-24', '25', '26-34', '35-44', '45-54', '55-64', '65+', 'Prefer not to say'] as const;
+  const [ageBand, setAgeBand] = useState<string>('');
   const [consentData, setConsentData] = useState(false);
   const [consentSms, setConsentSms] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -192,7 +205,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   const handleOnboardingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!consentData || !consentSms || !audience) return;
+    if (!consentData || !consentSms || !audience || !ageBand) return;
     setBusy(true);
     setErr(null);
     // Record cross-tool memory consent so the Navigator can remember them.
@@ -206,6 +219,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         lastName: lastName.trim(),
         phone,
         zipCode: zipCode.trim(),
+        ageBand,
         audience,
         consentToShare: consentData,
         consentToContact: consentSms,
@@ -398,6 +412,30 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             {/* Asked once, in their words. Everything the Hub shows a member branches on
                 this, and until now nothing set it, so a person who came for a training was
                 shown a screening surface and a health playbook. */}
+            <div className="space-y-3 pt-6 border-t border-zinc-100">
+              <label className={labelStyle}>YOUR AGE</label>
+              <div className="grid grid-cols-3 gap-2">
+                {AGE_BANDS.map((b) => (
+                  <button
+                    key={b}
+                    type="button"
+                    onClick={() => setAgeBand(b)}
+                    className={`rounded-2xl border px-3 py-3 text-sm font-semibold transition-all ${
+                      ageBand === b
+                        ? 'border-[#233DFF] bg-[#233DFF]/5 text-[#233DFF]'
+                        : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300'
+                    } ${b === 'Prefer not to say' ? 'col-span-3' : ''}`}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-zinc-400 leading-relaxed ml-1">
+                Asked so we can report who we reach to the programs that fund this work. We do
+                not ask for your date of birth.
+              </p>
+            </div>
+
             <div className="space-y-3 pt-6 border-t border-zinc-100">
               <label className={labelStyle}>WHAT BRINGS YOU TO HMC</label>
               <div className="grid grid-cols-1 gap-3">

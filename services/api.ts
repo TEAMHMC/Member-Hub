@@ -486,6 +486,8 @@ export const client = {
     lastName?: string;
     phone?: string;
     zipCode?: string;
+    /** An age band, never a date of birth. See buildMemberProfile's allowlist. */
+    ageBand?: string;
     audience?: 'care' | 'learner' | 'both';
     consentToShare?: boolean;
     consentToContact?: boolean;
