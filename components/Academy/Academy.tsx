@@ -92,6 +92,172 @@ const Back: React.FC<{ label: string; onClick: () => void }> = ({ label, onClick
   </button>
 );
 
+/* ── How a course announces itself ────────────────────────────────────────
+ *
+ * A learner's first question about any course is whether they take it at their own pace
+ * or on a date with an instructor. The catalogue knew the answer all along in the
+ * `delivery` field and never showed it, so a self-paced reading course and a live
+ * LACDMH-approved CE training looked identical in a list. The only way to tell them
+ * apart was to open both.
+ *
+ * Two badges, never more. The first says how the course is delivered. The second says
+ * what it costs or what it carries. Every HMC course is free, which is the most useful
+ * thing to know at a glance, and a CE-approved course is the rarer thing somebody may be
+ * hunting for specifically.
+ */
+const DELIVERY_BADGE: Record<string, string> = {
+  'self-paced': 'Self-paced',
+  live: 'Live class',
+  blended: 'Blended',
+  practical: 'Practicum',
+  practicum: 'Practicum',
+};
+
+const Badge: React.FC<{ children: React.ReactNode; tone?: 'outline' | 'solid' }> = ({ children, tone = 'outline' }) => (
+  <span
+    className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold tracking-tight whitespace-nowrap ${
+      tone === 'solid'
+        ? 'bg-zinc-900 text-white'
+        : 'border border-zinc-900/25 text-zinc-800'
+    }`}
+  >
+    {children}
+  </span>
+);
+
+/**
+ * Your path to a credential, as a sequence you can see yourself inside.
+ *
+ * Every pathway already carries `gates`, which the catalogue describes as "completion
+ * requirements, shown to the learner up front". They were never rendered anywhere, so a
+ * learner enrolled without being told what finishing actually takes and then found out
+ * one requirement at a time.
+ *
+ * The steps are numbered because this genuinely is a sequence and the order matters. You
+ * take the baseline before the courses and the capstone after them. The step that opens
+ * is the first unfinished one, so the panel answers what to do now instead of explaining
+ * what the pathway is.
+ */
+const PathSteps: React.FC<{
+  steps: { title: string; status: string; detail: string; done: boolean }[];
+}> = ({ steps }) => {
+  const firstOpen = Math.max(0, steps.findIndex((s) => !s.done));
+  const [open, setOpen] = useState<number>(firstOpen === -1 ? 0 : firstOpen);
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-zinc-200 rounded-2xl overflow-hidden border border-zinc-200">
+      {steps.map((s, i) => {
+        const isOpen = open === i;
+        return (
+          <div key={s.title} className={isOpen ? 'bg-[#18181b] text-white' : 'bg-white'}>
+            <button
+              onClick={() => setOpen(i)}
+              aria-expanded={isOpen}
+              className="w-full h-full text-left p-6 flex flex-col gap-1 min-h-[132px]"
+            >
+              <span className={`text-[11px] font-semibold ${isOpen ? 'text-white/60' : 'text-zinc-400'}`}>
+                Step {i + 1}
+              </span>
+              <span className={`text-[19px] font-semibold tracking-tight ${isOpen ? 'text-white' : 'text-zinc-900'}`}>
+                {s.title}
+              </span>
+              {isOpen && (
+                <span className="text-[13px] leading-relaxed text-white/75 mt-2">{s.detail}</span>
+              )}
+              {/* Status and the expand control share one bottom row, so the badge sits in
+                  the same place on every card whether it is open or shut. */}
+              <span className="mt-auto pt-3 flex items-end justify-between gap-2">
+                <span
+                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                    s.done
+                      ? isOpen ? 'bg-white/15 text-white' : 'bg-emerald-50 text-emerald-700'
+                      : isOpen ? 'bg-white/15 text-white' : 'bg-zinc-100 text-zinc-500'
+                  }`}
+                >
+                  {s.status}
+                </span>
+                <span className={`text-xl leading-none ${isOpen ? 'text-white/50' : 'text-zinc-400'}`} aria-hidden="true">
+                  {isOpen ? '−' : '+'}
+                </span>
+              </span>
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/**
+ * A course, as a card.
+ *
+ * The gradient is the card itself and not a cover slab sitting on top of one. That
+ * distinction is why the previous gradient block was removed from the catalogue. It added
+ * a 16:9 band of decoration to every card and pushed the title and the action below the
+ * fold on a phone. Here the gradient is only the surface the content sits on, so it costs
+ * no height at all, and the colours come from HMC's own blue, pink and orange.
+ *
+ * Content order is fixed so that a column of these can be scanned. Badges, then course
+ * number, then title, then the one-sentence promise, then progress if there is any, then
+ * the action. Every card puts the same thing in the same place.
+ */
+const CourseCard: React.FC<{
+  num: number;
+  total: number;
+  title: string;
+  promise?: string;
+  minutes?: number;
+  delivery?: string;
+  ce?: boolean;
+  percent: number;
+  done: boolean;
+  onOpen: () => void;
+}> = ({ num, total, title, promise, minutes, delivery, ce, percent, done, onOpen }) => (
+  <article
+    className="relative flex flex-col rounded-3xl border border-zinc-900/15 overflow-hidden transition-all hover:border-zinc-900/35 hover:-translate-y-0.5"
+    style={{
+      background: done
+        ? 'linear-gradient(175deg, #EDF6F1 0%, #F6FAF7 60%, #FBFCFB 100%)'
+        : 'linear-gradient(175deg, #E6E9FF 0%, #F6E6EC 58%, #FDF0E6 100%)',
+    }}
+  >
+    <div className="p-6 flex flex-col gap-4 flex-1">
+      <div className="flex flex-wrap items-center gap-2">
+        {delivery && DELIVERY_BADGE[delivery] && <Badge>{DELIVERY_BADGE[delivery]}</Badge>}
+        {ce ? <Badge tone="solid">CE approved</Badge> : <Badge>Free</Badge>}
+      </div>
+
+      <div className="mt-2">
+        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500">
+          Course {num} of {total}
+        </p>
+        <h3 className="text-[21px] font-semibold leading-tight tracking-tight text-zinc-900 mt-1.5 text-balance">
+          {title}
+        </h3>
+      </div>
+
+      {promise && <p className="text-[13.5px] leading-relaxed text-zinc-700 flex-1">{promise}</p>}
+
+      <div className="mt-auto space-y-4 pt-2">
+        <div className="flex items-center gap-3 text-[11px] font-semibold text-zinc-600">
+          {minutes ? <span>{minutes} min</span> : null}
+          <span>{done ? 'Complete' : percent > 0 ? `${percent}% done` : 'Not started'}</span>
+        </div>
+        {percent > 0 && !done && (
+          <div className="h-1 w-full rounded-full bg-zinc-900/10 overflow-hidden">
+            <div className="h-full rounded-full bg-zinc-900/70 transition-all duration-500" style={{ width: `${percent}%` }} />
+          </div>
+        )}
+        <button
+          onClick={onOpen}
+          className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-7 py-3 text-[12px] font-bold uppercase tracking-wider text-white transition-all hover:bg-zinc-800 active:scale-95"
+        >
+          {done ? 'Review' : percent > 0 ? 'Continue' : 'Start'}
+        </button>
+      </div>
+    </div>
+  </article>
+);
+
 
 // ── v2 guided-block renderer ─────────────────────────────────────────────
 // One component per block kind from the Written Guided Curriculum Standard.
@@ -425,6 +591,41 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
       .catch(() => { /* the catalog still renders without dates */ });
     return () => { cancelled = true; };
   }, []);
+
+  /**
+   * Adopt the completions the server already holds.
+   *
+   * Course completions have been written through to the portal for a while and never read
+   * back, so the record existed while the learner could not see it. Signing in on a new
+   * phone, or after clearing a browser, showed an empty transcript for courses the server
+   * knew were finished. The write only ever went one way.
+   *
+   * This is additive. A completed course marks its lessons done and nothing local is
+   * removed, so progress can only be restored and never taken away.
+   */
+  useEffect(() => {
+    let cancelled = false;
+    trainingApi_chw.myEnrollment()
+      .then((e) => {
+        const done = e?.enrollment?.completedCourseIds || [];
+        if (cancelled || !done.length) return;
+        setState((s) => {
+          const lessons = new Set(s.lessons);
+          let added = 0;
+          for (const p of PATHWAYS) {
+            for (const c of p.courses) {
+              if (!done.includes(c.id)) continue;
+              for (const l of c.lessons || []) {
+                if (!lessons.has(l.id)) { lessons.add(l.id); added++; }
+              }
+            }
+          }
+          return added ? { ...s, lessons: [...lessons] } : s;
+        });
+      })
+      .catch(() => { /* a learner with no CHW enrollment is the normal case */ });
+    return () => { cancelled = true; };
+  }, [userId]);
 
   // Braces matter here. An arrow with an expression body returns that
   // expression, and React treats a non-undefined effect return as a cleanup
@@ -944,6 +1145,39 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           <p className="text-sm text-zinc-400">{p.format}</p>
         </div>
 
+        {/* What finishing takes, and where this learner is inside it.
+            evaluateGates has always computed a real status and a real detail line for each
+            gate, and only its boolean was ever used. The gates themselves, which the
+            catalogue calls "completion requirements, shown to the learner up front", were
+            never shown to anyone. */}
+        {hasCourses && gates.length > 0 && (
+          <section className="space-y-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              {/* This uses p.title and not p.credentialTitle on purpose. The credential
+                  titles are approved copy and several of them contain an em dash, which HMC
+                  does not use in anything a member reads. Naming the pathway keeps the
+                  heading correct without editing copy that is not ours to edit. */}
+              <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">
+                Your path to {p.title}
+              </h2>
+              <p className="text-[12px] font-semibold text-zinc-400">
+                {gates.filter((g) => g.met).length} of {gates.length} complete
+              </p>
+            </div>
+            <PathSteps
+              steps={gates.map((g) => ({
+                title: g.label,
+                status: g.met ? 'Complete' : 'Not yet',
+                detail: g.detail || (g.met ? 'You have finished this step.' : 'Still to do.'),
+                done: g.met,
+              }))}
+            />
+            <p className="text-[12px] text-zinc-400 ml-1">
+              Every pathway is free. Nothing here locks, and you can start any step at any time.
+            </p>
+          </section>
+        )}
+
         {p.guidedStart && (
           <div className="rounded-2xl border border-[#FF6E40]/25 bg-orange-50/50 p-6 space-y-1.5">
             <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF6E40]">Next guided start</p>
@@ -1026,32 +1260,30 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               </div>
             )}
 
-            <div className="space-y-3">
+            {/* Courses as cards instead of a stack of rows.
+                A row gave a title and a percentage. It had no room to say whether a course
+                was self-paced or a live class on a date, which is the first thing a learner
+                needs to know, and no room for the one-line promise that says what the
+                course actually makes you able to do. */}
+            <div className="space-y-4">
               <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Courses</h2>
-              {p.courses.map((c) => {
-                const pct = coursePercent(p, c.id, state);
-                const done = isCourseComplete(p, c.id, state);
-                return (
-                  <button
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {p.courses.map((c) => (
+                  <CourseCard
                     key={c.id}
-                    onClick={() => setView({ name: 'course', pathwayId: p.id, courseId: c.id })}
-                    className={`w-full text-left flex items-center justify-between gap-4 p-5 px-6 rounded-2xl border transition-all ${done ? 'bg-zinc-50/50 border-zinc-100' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40 hover:shadow-sm'}`}
-                  >
-                    <div className="flex items-center gap-5 min-w-0">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center border shrink-0 ${done ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-[#233DFF] border-blue-100'}`}>
-                        {done ? <Check size={18} strokeWidth={3} /> : <span className="text-xs font-black">{c.num}</span>}
-                      </div>
-                      <div className="min-w-0">
-                        <p className={`text-sm font-semibold ${done ? 'text-zinc-400' : 'text-zinc-800'}`}>{c.title}</p>
-                        <p className="text-[11px] text-zinc-400 mt-0.5">
-                          Course {c.num} of {p.courses.length} · {c.minutes} min · {done ? 'Complete' : `${pct}% complete`}
-                        </p>
-                      </div>
-                    </div>
-                    <ChevronRight size={18} className="text-zinc-300 shrink-0" />
-                  </button>
-                );
-              })}
+                    num={c.num}
+                    total={p.courses.length}
+                    title={c.title}
+                    promise={c.promise}
+                    minutes={c.minutes}
+                    delivery={c.delivery}
+                    ce={!!c.ce}
+                    percent={coursePercent(p, c.id, state)}
+                    done={isCourseComplete(p, c.id, state)}
+                    onOpen={() => setView({ name: 'course', pathwayId: p.id, courseId: c.id })}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Assessment + capstone */}

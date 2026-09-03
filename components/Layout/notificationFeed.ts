@@ -60,6 +60,26 @@ export const kindLabel = (k: NotificationKind): string => KIND_LABEL[k] || 'Upda
  */
 export const relativeTime = (iso: string | null, now: Date = new Date()): string => {
   if (!iso) return '';
+
+  /**
+   * A calendar date is a calendar date and not an instant.
+   *
+   * Date.parse reads "2026-12-12" as midnight UTC. Formatting that in Pacific time lands
+   * at 4pm on the 11th, so the panel rendered a December 12 event as "Dec 11". Every
+   * dated notice in the Hub was a day early in the same direction, which is the worst
+   * kind of wrong for the surface HMC uses to tell people when to turn up. A bare date
+   * carries no time zone, so it is now read as a local calendar date and never shifted.
+   * A full timestamp still has a real instant behind it and is left alone.
+   */
+  const dateOnly = /^\d{4}-\d{2}-\d{2}$/.exec(iso);
+  if (dateOnly) {
+    const [y, m, d] = iso.split('-').map(Number);
+    const local = new Date(y, m - 1, d);
+    if (local.getTime() >= now.getTime()) {
+      return local.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+  }
+
   const t = Date.parse(iso);
   if (!Number.isFinite(t)) return '';
   const diff = now.getTime() - t;
@@ -107,6 +127,25 @@ export interface SessionRow {
   startsAt: string;
 }
 
+/**
+ * An upcoming event, as /api/public/events returns it.
+ *
+ * This is the same list the Events tab shows, and adding it here is the whole point. The
+ * bell used to read only the content library, which is `opportunities` filtered to
+ * isPublicFacing. Adding an event in the Event Finder admin never sets that flag, so
+ * nothing anyone scheduled ever reached the bell. Five events inside three weeks were
+ * live on the Events tab while the panel showed a single workshop in December.
+ */
+export interface EventRow {
+  id: string;
+  title: string;
+  date?: string;
+  dateDisplay?: string;
+  time?: string;
+  location?: string;
+  description?: string;
+}
+
 const LIBRARY_KIND: Record<string, NotificationKind> = {
   webinar: 'webinar', cohort: 'cohort', training: 'training', workshop: 'workshop',
   'office-hours': 'office-hours', podcast: 'recording', guide: 'news',
@@ -125,6 +164,8 @@ export const buildFeed = (input: {
   knownCourseIds: string[];
   sessions: SessionRow[];
   library: LibraryRow[];
+  /** The live calendar, the same one the Events tab shows. */
+  events?: EventRow[];
   /** Pathways a coordinator has opened, so an opening is news rather than a permanent card. */
   openPathwayIds?: string[];
   now?: Date;
@@ -163,11 +204,51 @@ export const buildFeed = (input: {
     });
   }
 
+  /**
+   * The live calendar, which is what the bell was missing.
+   *
+   * Anything already past is dropped, because a member can do nothing about it and a panel
+   * filling with things nobody can act on is how a bell gets ignored. Dates here are bare
+   * calendar dates and are compared as calendar dates.
+   */
+  const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  /**
+   * The two sources give the same event two different ids, so an event is identified by
+   * its title on its date. The calendar returns the Event Finder sheet id
+   * ("Dec-12-2026") while the library returns the Firestore document id
+   * ("Q1rABY80US2IKu9M01Aj"). Matching on id put the December toy distribution in the
+   * panel twice.
+   */
+  const identity = (title: string, date?: string) =>
+    `${title.trim().toLowerCase()}|${(date || '').slice(0, 10)}`;
+
+  const announced = new Set<string>();
+  for (const ev of input.events || []) {
+    const key = (ev.date || '').slice(0, 10);
+    if (key && key < todayKey) continue;
+    announced.add(identity(ev.title, ev.date));
+    items.push({
+      id: `event:${ev.id}`,
+      kind: 'workshop',
+      group: 'event',
+      title: ev.title,
+      detail: [ev.time, ev.location].filter(Boolean).join(' at ') || ev.description?.slice(0, 140),
+      date: ev.date || null,
+      action: { label: 'See the event', tab: 'events' },
+      weight: 4,
+    });
+  }
+
   for (const row of input.library) {
-    // Past with nothing to watch is not news. A member can do nothing about it, and the
-    // panel filling with things nobody can act on is how a bell gets ignored.
+    // Past with nothing to watch is not news.
     if (row.state === 'past') continue;
     const recorded = row.state === 'recorded';
+    // Upcoming events now arrive from the live calendar above, which is the list the
+    // Events tab shows and the one that actually gets updated. The library remains the
+    // only source of recordings, so it keeps that job and stops duplicating the other.
+    // Anything it holds that the calendar already announced is skipped.
+    if (!recorded && announced.has(identity(row.title, row.date || undefined))) continue;
     items.push({
       id: `library:${row.id}`,
       kind: recorded ? 'recording' : (LIBRARY_KIND[row.contentType || ''] || 'workshop'),

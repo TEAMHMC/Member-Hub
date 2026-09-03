@@ -73,11 +73,15 @@ export interface User {
   foodSecurity?: 'Secure' | 'Mild Insecurity' | 'Critical';
   emergencyContactName?: string;
   emergencyContactPhone?: string;
-  // Personal Progress
-  xp: number;
-  level: number;
+  // Personal Progress.
+  //
+  // xp, level and wellnessPoints used to live here. None of them existed anywhere but
+  // this browser's local storage, and the Profile page rendered wellnessPoints in a row
+  // beside the real Health Credits balance as though they were comparable. Credits are a
+  // server-side wallet with a transaction ledger, while those three were a counter that
+  // disappeared with the cache. Badges stay, because a badge is a label and not a
+  // balance.
   badges: string[];
-  wellnessPoints?: number;
   // Engagement
   lastActive?: string;
   contactPreference?: ContactPreference;

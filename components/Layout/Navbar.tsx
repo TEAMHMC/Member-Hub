@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { User } from '../../types';
-import { Search, ChevronDown } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { TOOLS, context as ctxApi } from '../../services/api';
 import Notifications from './Notifications';
 
@@ -52,16 +52,22 @@ const Navbar: React.FC<NavbarProps> = ({ user, onNavigateTab, guest = false, onS
             Sign In
           </button>
         ) : (
-          <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-semibold text-zinc-900 leading-tight">{user.firstName} {user.lastName}</p>
-              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-0.5">Member</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-[#233DFF] text-white flex items-center justify-center font-black text-sm group-hover:ring-2 group-hover:ring-[#233DFF]/30 transition-all" aria-hidden="true">
+          /* The chip opens the profile. It used to carry a dropdown arrow and a
+             cursor-pointer and then do nothing at all when pressed, which teaches people
+             to stop trusting the controls that do work. It is a real button now, and the
+             arrow is gone because there is no menu behind it. */
+          <button
+            onClick={() => onNavigateTab?.('profile')}
+            className="flex items-center gap-3 group rounded-full pl-3 pr-1 py-1 hover:bg-white/70 transition-all"
+          >
+            <span className="text-right hidden sm:block">
+              <span className="block text-sm font-semibold text-zinc-900 leading-tight">{user.firstName} {user.lastName}</span>
+              <span className="block text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-0.5">View profile</span>
+            </span>
+            <span className="w-10 h-10 rounded-full bg-[#233DFF] text-white flex items-center justify-center font-black text-sm group-hover:ring-2 group-hover:ring-[#233DFF]/30 transition-all" aria-hidden="true">
                {(user.firstName || 'M').charAt(0)}{(user.lastName || '').charAt(0)}
-            </div>
-            <ChevronDown size={14} className="text-zinc-300" />
-          </div>
+            </span>
+          </button>
         )}
       </div>
     </nav>
