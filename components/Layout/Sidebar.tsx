@@ -72,10 +72,16 @@ const Sidebar: React.FC<SidebarProps> = ({
       { icon: <Home size={18} />, label: 'Home', id: 'dash' },
       { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
       { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
+      // One Playbook, not a Snapshot and a Playbook.
+      //
+      // These were two nav items for one flow. "Wellbeing Snapshot" was the set of
+      // questions and "Wellness Playbook" was the plan those questions produce, and
+      // nothing on either screen said so, so the Hub asked people to tell apart two
+      // invented names for two halves of the same thing. The questions now live inside
+      // the Playbook, which is what a member is actually there for.
       { icon: <Compass size={18} />, label: 'Playbook', id: 'game-plan' },
       ...(hasResults ? [{ icon: <Activity size={18} />, label: 'Results', id: 'health' }] : []),
       { icon: <ShieldCheck size={18} />, label: 'Resources', id: 'resources' },
-      { icon: <Brain size={18} />, label: 'Snapshot', id: 'check-yourself' },
       { icon: <Coins size={18} />, label: 'Credits', id: 'credits' },
     ];
   };

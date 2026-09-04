@@ -14,7 +14,16 @@ export const TOOLS = {
   calmKit: 'https://calmkit.healthmatters.clinic',
   eventFinder: 'https://eventfinder.healthmatters.clinic',
   resources: 'https://healthmatters.clinic/resources', // branded landing hub
-  directory: 'https://www.healthmatters.clinic/resources/resourcedirectory', // branded directory (never expose the github source)
+  /**
+   * The directory's own domain, not the Webflow page that embeds it.
+   *
+   * The Hub pointed at www.healthmatters.clinic/resources/resourcedirectory, which is a
+   * Webflow page wrapping the directory in an iframe. Inside that wrapper the keyword
+   * search does not work and Sunny answers "an error occurred while connecting to the AI
+   * service", so every search from the Hub's own search bar, and every Playbook link that
+   * opens the directory, landed somewhere broken. Both work on the directory's own domain.
+   */
+  directory: 'https://directory.healthmatters.clinic',
   donate: 'https://www.healthmatters.clinic/donate',
 };
 

@@ -46,6 +46,10 @@ interface AcademyProps {
   initialView?: 'catalog' | 'credentials' | 'transcript';
   /** Signed-in member, used to prefill training registration. */
   member?: { firstName?: string; lastName?: string; email?: string; phone?: string } | null;
+  /** Nobody is signed in. The catalogue stays readable; lesson content does not. */
+  guest?: boolean;
+  /** Opens the sign-in panel with a line saying what it is for. */
+  onRequireSignIn?: (reason?: string) => void;
 }
 
 type View =
@@ -60,6 +64,11 @@ type View =
   | { name: 'credentials' }
   | { name: 'transcript' };
 
+/**
+ * The site's button, not this file's own. See the note on ButtonPrimary in
+ * ClientDashboard: the Academy had its own uppercase, bold, shadowed pill, which is
+ * why every button here looked like a different product from Sign In.
+ */
 const Btn: React.FC<{
   children: React.ReactNode;
   onClick?: () => void;
@@ -70,11 +79,7 @@ const Btn: React.FC<{
   <button
     onClick={onClick}
     disabled={disabled}
-    className={
-      variant === 'primary'
-        ? `px-8 py-3.5 bg-[#233DFF] text-white rounded-full font-bold uppercase tracking-wider text-xs transition-all hover:bg-[#1a2acc] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-[#233DFF]/20 inline-flex items-center justify-center gap-2 ${className}`
-        : `px-8 py-3.5 border border-zinc-200 bg-white text-zinc-900 rounded-full font-bold uppercase tracking-wider text-xs transition-all hover:bg-zinc-50 active:scale-95 disabled:opacity-40 inline-flex items-center justify-center gap-2 ${className}`
-    }
+    className={`hmc-btn ${variant === 'primary' ? 'hmc-btn-primary' : 'hmc-btn-secondary'} justify-center disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
   >
     {children}
   </button>
@@ -115,10 +120,10 @@ const DELIVERY_BADGE: Record<string, string> = {
 
 const Badge: React.FC<{ children: React.ReactNode; tone?: 'outline' | 'solid' }> = ({ children, tone = 'outline' }) => (
   <span
-    className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold tracking-tight whitespace-nowrap ${
+    className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium tracking-tight whitespace-nowrap ${
       tone === 'solid'
-        ? 'bg-[#233DFF] text-white'
-        : 'border border-[#233DFF]/35 text-zinc-800'
+        ? 'bg-[#0f0f0f] text-white'
+        : 'border border-[#0f0f0f]/35 text-zinc-800'
     }`}
   >
     {children}
@@ -212,11 +217,10 @@ const CourseCard: React.FC<{
   done: boolean;
   onOpen: () => void;
 }> = ({ num, total, title, promise, minutes, delivery, ce, percent, done, onOpen }) => (
-  /* The outline is HMC blue at low opacity, the same hairline the site buttons carry,
-     so a card reads as part of the same system rather than as a floating panel. It
-     strengthens on hover instead of changing colour. */
+  /* The outline is the same #0f0f0f hairline the site buttons carry, so a card and a
+     button read as the same system. It darkens on hover rather than changing colour. */
   <article
-    className="relative flex flex-col rounded-3xl border border-[#233DFF]/25 overflow-hidden transition-all hover:border-[#233DFF]/60 hover:-translate-y-0.5"
+    className="relative flex flex-col rounded-3xl border border-[#0f0f0f]/20 overflow-hidden transition-all hover:border-[#0f0f0f]/45 hover:-translate-y-0.5"
     style={{
       background: done
         ? 'linear-gradient(175deg, #EDF6F1 0%, #F6FAF7 60%, #FBFCFB 100%)'
@@ -250,10 +254,7 @@ const CourseCard: React.FC<{
             <div className="h-full rounded-full bg-zinc-900/70 transition-all duration-500" style={{ width: `${percent}%` }} />
           </div>
         )}
-        <button
-          onClick={onOpen}
-          className="inline-flex items-center justify-center rounded-full bg-[#233DFF] px-7 py-3 text-[12px] font-bold uppercase tracking-wider text-white shadow-md shadow-[#233DFF]/20 transition-all hover:bg-[#1a2acc] active:scale-95"
-        >
+        <button onClick={onOpen} className="hmc-btn hmc-btn-primary justify-center">
           {done ? 'Review' : percent > 0 ? 'Continue' : 'Start'}
         </button>
       </div>
@@ -487,7 +488,7 @@ const BlockView: React.FC<{
   }
 };
 
-const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal, initialView = 'catalog', member = null }) => {
+const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal, initialView = 'catalog', member = null, guest = false, onRequireSignIn }) => {
   const [state, setState] = useState<LearnerState>(() => loadState(userId));
   const [view, setView] = useState<View>({ name: initialView } as View);
 
@@ -667,11 +668,28 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
   const set = (fn: (s: LearnerState) => LearnerState) => setState((s) => fn(s));
 
-  const enroll = (p: Pathway) => {
+  /**
+   * Enrolling requires an account, which is what makes the lesson gate mean anything.
+   *
+   * renderLesson has always refused to render for somebody not enrolled. The hole was
+   * here: enrolling wrote to this browser's local storage and asked nobody for anything,
+   * so a visitor could press Enrol, clear the gate and read every module without ever
+   * having an account. The Academy could not then record who learned what, could not
+   * issue a completion record, and had nobody to follow up with.
+   *
+   * Returns false when it asked for sign-in instead, so callers do not navigate onward
+   * into a course the person still cannot read.
+   */
+  const enroll = (p: Pathway): boolean => {
+    if (guest) {
+      onRequireSignIn?.('to enrol and keep your progress');
+      return false;
+    }
     if (!state.enrolled.includes(p.id)) {
       set((s) => ({ ...s, enrolled: [...s.enrolled, p.id] }));
       onSignal?.('academy_enroll', { pathwayId: p.id });
     }
+    return true;
   };
 
   const artifactValue = (courseId: string, fieldId: string, i = 0): string =>
@@ -805,12 +823,12 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
                     <div className="flex flex-wrap items-center gap-2 mt-auto pt-1">
                       {enrollable && (
-                        <Btn onClick={() => { enroll(p); setView({ name: 'pathway', pathwayId: p.id }); }}>
+                        <Btn onClick={() => { if (enroll(p)) setView({ name: 'pathway', pathwayId: p.id }); }}>
                           {state.enrolled.includes(p.id) ? 'Continue' : 'Enroll'}
                         </Btn>
                       )}
                       {v.state === 'upcoming' && (
-                        <Btn onClick={() => { enroll(p); setView({ name: 'pathway', pathwayId: p.id }); }}>
+                        <Btn onClick={() => { if (enroll(p)) setView({ name: 'pathway', pathwayId: p.id }); }}>
                           Save my spot
                         </Btn>
                       )}
@@ -1176,7 +1194,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               }))}
             />
             <p className="text-[12px] text-zinc-400 ml-1">
-              Every pathway is free. Nothing here locks, and you can start any step at any time.
+              You can start any step at any time, and come back to it whenever you want.
             </p>
           </section>
         )}
@@ -1186,8 +1204,8 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF6E40]">Next guided start</p>
             <p className="text-lg font-semibold text-zinc-900">{p.guidedStart}</p>
             <p className="text-sm text-zinc-600">
-              The guided start is a momentum cue, not a deadline or a live class. Register now and begin
-              immediately, or wait for the cohort to launch. The course never locks.
+              Register now and begin straight away, or start with the group on this date. If the date
+              passes, you will be offered the next one.
             </p>
           </div>
         )}
@@ -1198,12 +1216,12 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               <p className="text-2xl font-semibold text-zinc-900">Register</p>
               <p className="text-sm text-zinc-500 mt-1">
                 {published
-                  ? 'Free. Self-paced. Start any time.'
-                  : 'Free. Start the courses that are open now. More are added as they are released, and the completion record opens when the pathway is published.'}
+                  ? 'Self-paced. Start any time.'
+                  : 'Start the courses that are open now. More are added as they are released, and the completion record opens when the pathway is published.'}
               </p>
             </div>
             <Btn onClick={() => {
-                enroll(p);
+                if (!enroll(p)) return;
                 // Only pathways with a published baseline check start on one.
                 if (p.preTest?.length) setView({ name: 'test', pathwayId: p.id, kind: 'pre' });
               }}>
@@ -1386,6 +1404,41 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
   // ── Course ─────────────────────────────────────────────────────────────
 
+  /**
+   * Whether this person may read a course's lessons.
+   *
+   * The catalogue is public on purpose, because a course somebody cannot see is a course
+   * they will never choose. The lessons are not. Anyone could open a module and read the
+   * whole thing without an account, which meant the Academy could not record who had
+   * learned what, could not issue a completion record, and could not follow up with
+   * anybody, since none of it was attached to a person.
+   *
+   * Two gates, in order. Sign in, then enrol. Both state what they are for rather than
+   * refusing, and everything above the lesson list stays readable either way.
+   */
+  const lessonsUnlocked = (pathwayId: string) => !guest && state.enrolled.includes(pathwayId);
+
+  const LockedLessons: React.FC<{ pathwayId: string; pathway: Pathway }> = ({ pathwayId, pathway }) => (
+    <div className="rounded-2xl border border-[#0f0f0f]/20 bg-white p-8 space-y-4 text-center">
+      <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Course content</p>
+      <p className="text-lg font-semibold text-zinc-900">
+        {guest ? 'Create a free account to start this course' : 'Enrol to start this course'}
+      </p>
+      <p className="text-sm text-zinc-500 max-w-md mx-auto leading-relaxed">
+        {guest
+          ? 'Your place, your progress and your completion record are all kept against your account, so you can stop and pick it up on any device.'
+          : 'Enrolling records your progress against your account and puts this pathway on your transcript.'}
+      </p>
+      <div className="flex justify-center pt-1">
+        {guest ? (
+          <Btn onClick={() => onRequireSignIn?.('to start this course and keep your progress')}>Create an account</Btn>
+        ) : (
+          <Btn onClick={() => { enroll(pathway); }}>Enrol and start</Btn>
+        )}
+      </div>
+    </div>
+  );
+
   const renderCourse = (pathwayId: string, courseId: string) => {
     const p = pathwayById(pathwayId);
     const c = p?.courses.find((x) => x.id === courseId);
@@ -1414,11 +1467,11 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                 </Btn>
               ) : (
                 <Btn onClick={() => {
-                enroll(p);
+                if (!enroll(p)) return;
                 // Only pathways with a published baseline check start on one.
                 if (p.preTest?.length) setView({ name: 'test', pathwayId: p.id, kind: 'pre' });
               }}>
-                  Register, free
+                  Enrol
                 </Btn>
               )}
               <span className="text-[11px] text-zinc-400 font-semibold">
@@ -1711,7 +1764,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                         if (locked) { enroll(p); return; }
                         setView({ name: 'lesson', pathwayId, courseId, index: i });
                       }}
-                      aria-label={locked ? `${l.title}. Available after you enroll, which is free.` : l.title}
+                      aria-label={locked ? `${l.title}. Available once you enrol.` : l.title}
                       className={`w-full text-left flex items-start gap-5 p-6 rounded-2xl border transition-all ${done ? 'bg-zinc-50/60 border-zinc-100' : locked ? 'bg-zinc-50/40 border-zinc-150 hover:border-[#233DFF]/30' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40 hover:shadow-sm'}`}
                     >
                       <span className={`w-11 h-11 rounded-2xl flex items-center justify-center border shrink-0 ${done ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : locked ? 'bg-zinc-100 text-zinc-400 border-zinc-200' : 'bg-blue-50 text-[#233DFF] border-blue-100'}`}>
