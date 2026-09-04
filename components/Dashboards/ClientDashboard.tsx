@@ -339,7 +339,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       '/daily-needs': 'resources',
       '/my/referrals': 'resources',
       '/my/playbook': 'game-plan',
-      '/check-in': 'check-yourself',
+      '/check-in': 'game-plan',
     };
     setActiveTab(map[href] || 'dash');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -356,21 +356,29 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   );
 
   // HMC signature buttons: rounded-full, uppercase, tracking-wider, bold
+  /**
+   * The site's buttons, not this file's own.
+   *
+   * These two were hand-rolled Tailwind: uppercase, bold, extra-small, a coloured
+   * shadow and a grey hairline, none of which is the HMC button. The shared system at
+   * hmc-buttons-1.0.5.css is already loaded by index.html and already used by Sign In,
+   * which is why Sign In was the only button on the page that looked right and every
+   * other one looked like a different product.
+   *
+   * .hmc-btn carries the pill, the 6px dot, the #0f0f0f hairline, sentence case and the
+   * brightness-only hover. Nothing is restyled here beyond size, because the point of a
+   * shared system is that callers stop having opinions about it.
+   */
   const ButtonPrimary = ({ children, onClick, disabled = false, className = "" }: any) => (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`px-8 py-3.5 bg-[#233DFF] text-white rounded-full font-bold uppercase tracking-wider text-xs transition-all hover:bg-[#1a2acc] active:scale-95 disabled:opacity-50 shadow-md shadow-[#233DFF]/20 inline-flex items-center justify-center gap-2 ${className}`}
-    >
+    <button onClick={onClick} disabled={disabled}
+      className={`hmc-btn hmc-btn-primary justify-center disabled:opacity-50 disabled:cursor-not-allowed ${className}`}>
       {children}
     </button>
   );
 
   const ButtonSecondary = ({ children, onClick, className = "" }: any) => (
-    <button
-      onClick={onClick}
-      className={`px-8 py-3.5 border border-zinc-200 bg-white text-zinc-900 rounded-full font-bold uppercase tracking-wider text-xs transition-all hover:bg-zinc-50 active:scale-95 inline-flex items-center justify-center gap-2 ${className}`}
-    >
+    <button onClick={onClick}
+      className={`hmc-btn hmc-btn-secondary justify-center ${className}`}>
       {children}
     </button>
   );
@@ -382,7 +390,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       icon: <Sparkles className="text-amber-400" size={32} />
     },
     {
-      title: "Your Wellbeing Snapshot",
+      title: "Your Playbook",
       description: "Start here. Tell us about your housing, food, and emotional needs. It's safe, private, and helps us build your plan.",
       icon: <Brain className="text-[#233DFF]" size={32} />
     },
@@ -416,7 +424,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
             copy that was being shown to members. */}
         <p className="text-zinc-500 max-w-lg mx-auto leading-relaxed text-lg">
           {guest
-            ? 'Free screenings, community events, and help with food, housing and care. Plus free courses that open doors into health careers. Everything here is free, and you only need an account to save anything.'
+            ? 'Health screenings, community events, and help with food, housing and care. Plus training pathways into health careers, with completion records you can show an employer. Most of it costs nothing, and where something does, the price is on it before you start.'
             : 'Everything you need for your health and wellbeing is here.'}
         </p>
         <div className="flex flex-wrap gap-4 pt-6 justify-center">
@@ -427,7 +435,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
                </>
              ) : (
                <>
-                 <ButtonPrimary onClick={gated('to save your Wellbeing Snapshot and get a plan', () => setActiveTab('check-yourself'))}>Start my Snapshot</ButtonPrimary>
+                 <ButtonPrimary onClick={gated('to build and keep your Wellness Playbook', () => setActiveTab('game-plan'))}>Build my Playbook</ButtonPrimary>
                  <ButtonSecondary onClick={() => setActiveTab('events')}>Explore Events</ButtonSecondary>
                </>
              )}
@@ -477,12 +485,9 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={() => setActiveTab('academy')}>
-           <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-[#8B6D00] shadow-sm group-hover:bg-[#F9C74F] group-hover:text-zinc-900 transition-all">
-              <GraduationCap size={24} />
-           </div>
            <div className="space-y-2">
              <h3 className="text-xl font-semibold text-zinc-900">HMC Academy</h3>
-             <p className="text-sm text-zinc-500 leading-relaxed">Short courses on wellness, keeping your coverage, and community power.</p>
+             <p className="text-sm text-zinc-500 leading-relaxed">Structured pathways into health careers, from first look to applied experience, with a completion record at the end. Self-paced, plus live trainings that carry CE credit.</p>
            </div>
            <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('academy'); }} className="w-full">Start learning</ButtonSecondary>
         </Card>
@@ -490,25 +495,19 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
             which would make the Hub look emptier than it is, they say what an account is
             for and open the sign-in panel with that reason attached. */}
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={gated('to build and keep your Wellness Playbook', () => setActiveTab('game-plan'))}>
-           <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-[#233DFF] shadow-sm group-hover:bg-[#233DFF] group-hover:text-white transition-all">
-              <Compass size={24} />
-           </div>
            <div className="space-y-2">
              <h3 className="text-xl font-semibold text-zinc-900">Wellness Playbook</h3>
-             <p className="text-sm text-zinc-500 leading-relaxed">Your AI-powered roadmap to recovery and local community resources.</p>
+             <p className="text-sm text-zinc-500 leading-relaxed">Answer a few questions about how things are going and get a plan built from your answers, with a real person to call when you want one.</p>
            </div>
            <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); gated('to build and keep your Wellness Playbook', () => setActiveTab('game-plan'))(); }} className="w-full">{guest ? 'Sign in to open' : 'Open Playbook'}</ButtonSecondary>
         </Card>
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#FF6E40]/30 transition-all cursor-pointer" onClick={() => setActiveTab('events')}>
-           <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-[#FF6E40] shadow-sm group-hover:bg-[#FF6E40] group-hover:text-white transition-all">
-              <Calendar size={24} />
-           </div>
            <div className="space-y-2">
              <h3 className="text-xl font-semibold text-zinc-900">Upcoming Events</h3>
              {/* This used to promise events "happening this week in your neighborhood".
                  The list is filtered neither to this week nor to a zip, so it was a claim
                  the page could not keep. */}
-             <p className="text-sm text-zinc-500 leading-relaxed">Free screenings, health fairs and community events across LA County.</p>
+             <p className="text-sm text-zinc-500 leading-relaxed">Screenings, health fairs and community events across LA County. RSVP and we will remind you.</p>
            </div>
            <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('events'); }} className="w-full">View Calendar</ButtonSecondary>
         </Card>
@@ -525,12 +524,9 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
             Resources is the opposite case. It works today, it holds the directory and a
             member's live referrals, and it had no card here at all. */}
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#FF6F91]/30 transition-all cursor-pointer" onClick={() => setActiveTab('resources')}>
-           <div className="w-12 h-12 rounded-2xl bg-pink-50 flex items-center justify-center text-[#FF6F91] shadow-sm group-hover:bg-[#FF6F91] group-hover:text-white transition-all">
-              <ShieldCheck size={24} />
-           </div>
            <div className="space-y-2">
              <h3 className="text-xl font-semibold text-zinc-900">Resources &amp; Support</h3>
-             <p className="text-sm text-zinc-500 leading-relaxed">Food, housing, legal aid and mental health near you, and a real person if you want one.</p>
+             <p className="text-sm text-zinc-500 leading-relaxed">Search verified LA County organisations by what you need, where you are and who they serve, then reach them directly.</p>
            </div>
            <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('resources'); }} className="w-full">Find support</ButtonSecondary>
         </Card>
@@ -555,7 +551,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
                  {aiNarrative && <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-white bg-[#233DFF] px-2 py-0.5 rounded-full"><Sparkles size={10} /> Sunny</span>}
                </div>
                <p className="text-zinc-300 text-sm font-medium leading-relaxed max-w-xl">
-                 {aiNarrative || 'Your Playbook is built from your Wellbeing Snapshot. Take the first play today.'}
+                 {aiNarrative || 'Your Playbook is built from your own answers. Take the first step today.'}
                </p>
             </div>
           </div>
@@ -564,7 +560,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
              <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Your next plays</h4>
              <div className="space-y-3">
                {[
-                 { title: 'Complete your Wellbeing Snapshot', done: dynamicGoals.length > 0, tab: 'check-yourself', cta: 'Start' },
+                 { title: 'Answer a few questions about how things are going', done: dynamicGoals.length > 0, tab: 'game-plan', cta: 'Start' },
                  { title: 'Get connected to support', done: (me?.referrals?.length || 0) > 0, tab: 'resources', cta: 'Get connected' },
                  { title: 'Find an event near you', done: false, tab: 'events', cta: 'Browse events' },
                ].map((s, i) => (
@@ -643,10 +639,10 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
               <Card className="text-center py-20 space-y-6 bg-zinc-50/50 border-dashed border-zinc-200">
                  <Brain size={48} className="mx-auto text-zinc-200" strokeWidth={1} />
                  <div className="space-y-2">
-                   <p className="text-sm font-semibold text-zinc-600">Finish your Wellbeing Snapshot</p>
+                   <p className="text-sm font-semibold text-zinc-600">Answer a few questions to build your Playbook</p>
                    <p className="text-xs text-zinc-400 max-w-[180px] mx-auto leading-relaxed">This will unlock your personalized health insights and local resources.</p>
                  </div>
-                 <ButtonPrimary onClick={gated('to save your Wellbeing Snapshot and get a plan', () => setActiveTab('check-yourself'))} className="px-10">Start my Snapshot</ButtonPrimary>
+                 <ButtonPrimary onClick={gated('to build and keep your Wellness Playbook', () => setActiveTab('game-plan'))} className="px-10">Build my Playbook</ButtonPrimary>
               </Card>
             )}
           </div>
@@ -658,9 +654,9 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   const renderScreener = () => (
     <div className="max-w-3xl mx-auto py-10 animate-in slide-in-from-bottom-4 duration-500">
       <div className="text-center space-y-4 mb-12">
-        <div className="pill pill-blue mx-auto">Safe & Confidential</div>
-        <h2 className="text-4xl font-semibold tracking-tight">Wellbeing Snapshot</h2>
-        <p className="text-zinc-500 max-w-md mx-auto text-lg leading-relaxed">Help us understand your needs so we can connect you with the right support partners.</p>
+        <div className="pill pill-blue mx-auto">Private</div>
+        <h2 className="text-4xl font-semibold tracking-tight">A few questions</h2>
+        <p className="text-zinc-500 max-w-md mx-auto text-lg leading-relaxed">Tell us how things are going and we will build your Wellness Playbook from your answers. Nothing here is shared without you asking us to.</p>
       </div>
 
       {/* Clinical mental-health screen lives in the Check Yourself tool.
@@ -848,9 +844,9 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
             <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-[#FF6E40]"><Heart size={24} /></div>
             <div className="space-y-2">
               <h3 className="text-xl font-semibold text-zinc-900">Request a warm handoff</h3>
-              <p className="text-sm text-zinc-500 leading-relaxed">Take the Wellbeing Snapshot and we will connect you with a real person for the needs you flag.</p>
+              <p className="text-sm text-zinc-500 leading-relaxed">Answer a few questions and we will connect you with a real person for whatever you flag.</p>
             </div>
-            <ButtonPrimary onClick={gated('to save your Wellbeing Snapshot and get a plan', () => setActiveTab('check-yourself'))} className="w-full md:w-auto">Start my Snapshot</ButtonPrimary>
+            <ButtonPrimary onClick={gated('to build and keep your Wellness Playbook', () => setActiveTab('game-plan'))} className="w-full md:w-auto">Build my Playbook</ButtonPrimary>
           </Card>
         </div>
       </div>
@@ -900,6 +896,8 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       member={{ firstName: user.firstName, lastName: user.lastName, email: user.email, phone: user.phone }}
       onNavigateTab={(tab) => { setActiveTab(tab); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
       onSignal={(type, payload) => ctxApi.event(type, payload)}
+      guest={guest}
+      onRequireSignIn={onRequireSignIn}
     />
   );
 
@@ -922,9 +920,6 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={() => setActiveTab('academy')}>
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-[#8B6D00] shadow-sm group-hover:bg-[#F9C74F] group-hover:text-zinc-900 transition-all">
-            <GraduationCap size={24} />
-          </div>
           <div className="space-y-2">
             <h3 className="text-xl font-semibold text-zinc-900">Continue learning</h3>
             <p className="text-sm text-zinc-500 leading-relaxed">Pick up your pathway where you left off, or browse the full catalog.</p>
@@ -932,9 +927,6 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('academy'); }} className="w-full">Open Academy</ButtonSecondary>
         </Card>
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={() => { setAcademyView('credentials'); setActiveTab('academy'); }}>
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-[#233DFF] shadow-sm group-hover:bg-[#233DFF] group-hover:text-white transition-all">
-            <Award size={24} />
-          </div>
           <div className="space-y-2">
             <h3 className="text-xl font-semibold text-zinc-900">Credentials</h3>
             <p className="text-sm text-zinc-500 leading-relaxed">See what each HMC completion record proves, what it requires, and how it is verified.</p>
@@ -942,9 +934,6 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setAcademyView('credentials'); setActiveTab('academy'); }} className="w-full">Browse credentials</ButtonSecondary>
         </Card>
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#FF6E40]/30 transition-all cursor-pointer" onClick={() => setActiveTab('events')}>
-          <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-[#FF6E40] shadow-sm group-hover:bg-[#FF6E40] group-hover:text-white transition-all">
-            <Calendar size={24} />
-          </div>
           <div className="space-y-2">
             <h3 className="text-xl font-semibold text-zinc-900">Learn in the field</h3>
             <p className="text-sm text-zinc-500 leading-relaxed">Applied pathways are completed at real HMC outreach events across LA County.</p>
@@ -1005,7 +994,9 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       case 'events': return renderEvents();
       case 'health': return renderHealthResults();
       case 'game-plan': return renderGamePlan();
-      case 'check-yourself': return renderScreener();
+      // The questions are a step inside the Playbook now, not a destination of
+      // their own. A deep link to the old tab still lands somewhere sensible.
+      case 'check-yourself': return renderGamePlan();
       case 'resources': return renderResources();
       case 'credits': return <HealthCredits />;
       case 'profile': return renderProfile();
