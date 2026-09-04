@@ -1,3 +1,12 @@
+/**
+ * Where a CE seat is paid for.
+ *
+ * HMC takes payment through PayPal, which is already configured. This is the only
+ * value in the Academy that has to be filled in by hand, and it is here rather than
+ * buried in checkout code so a price change is a catalogue edit.
+ */
+export const PAYPAL_CEU_URL = 'https://www.paypal.com/ncp/payment/HMC-UNSTOPPABLE-CEU';
+
 // Mental Health + Community Education.
 //
 // This is a MIGRATION, not new curriculum. Everything here is an existing HMC
@@ -61,6 +70,17 @@ export const UNSTOPPABLE_CE: Course = {
     ],
     deliveryNote:
       'This approval covers the scheduled session format. Attendance is recorded per session, and the certificate is issued against that session date.',
+  },
+  /**
+   * PAYPAL_CEU_URL below is the one thing here that is not yet real. The rest of this
+   * course, including the approval, the hours and the certificate the portal already
+   * generates against it, is. Point it at the HMC PayPal button for the CE seat and the
+   * whole flow works; until then the Hub shows the price and says how to pay.
+   */
+  price: {
+    amountUsd: 16,
+    payUrl: PAYPAL_CEU_URL,
+    note: 'Covers your seat and your CE certificate. Every other HMC course is free.',
   },
   sessions: [],
   retroEval: {

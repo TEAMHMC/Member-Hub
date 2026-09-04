@@ -213,10 +213,11 @@ const CourseCard: React.FC<{
   minutes?: number;
   delivery?: string;
   ce?: boolean;
+  priceUsd?: number;
   percent: number;
   done: boolean;
   onOpen: () => void;
-}> = ({ num, total, title, promise, minutes, delivery, ce, percent, done, onOpen }) => (
+}> = ({ num, total, title, promise, minutes, delivery, ce, priceUsd, percent, done, onOpen }) => (
   /* The outline is the same #0f0f0f hairline the site buttons carry, so a card and a
      button read as the same system. It darkens on hover rather than changing colour. */
   <article
@@ -230,7 +231,10 @@ const CourseCard: React.FC<{
     <div className="p-6 flex flex-col gap-4 flex-1">
       <div className="flex flex-wrap items-center gap-2">
         {delivery && DELIVERY_BADGE[delivery] && <Badge>{DELIVERY_BADGE[delivery]}</Badge>}
-        {ce ? <Badge tone="solid">CE approved</Badge> : <Badge>Free</Badge>}
+        {ce && <Badge tone="solid">CE approved</Badge>}
+        {/* A price where there is one, and Free where there genuinely is not. Every card
+            said Free, including on the one course that costs money. */}
+        <Badge>{priceUsd ? `$${priceUsd}` : 'Free'}</Badge>
       </div>
 
       <div className="mt-2">
@@ -1298,6 +1302,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     minutes={c.minutes}
                     delivery={c.delivery}
                     ce={!!c.ce}
+                    priceUsd={c.price?.amountUsd}
                     percent={coursePercent(p, c.id, state)}
                     done={isCourseComplete(p, c.id, state)}
                     onOpen={() => setView({ name: 'course', pathwayId: p.id, courseId: c.id })}

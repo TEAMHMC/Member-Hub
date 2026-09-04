@@ -57,6 +57,7 @@ const TrainingRegistration: React.FC<Props> = ({ course, session, member, onClos
   const [already, setAlready] = useState(false);
 
   const needsCe = !!course.ce;
+  const price = course.price;
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const detailsValid = firstName.trim() && lastName.trim() && emailValid && (!needsCe || licenseType);
 
@@ -91,7 +92,14 @@ const TrainingRegistration: React.FC<Props> = ({ course, session, member, onClos
         ? await trainingApi.rsvp({ ...payload, eventId: session.id, eventDate: session.startsAt })
         : await trainingApi.registerInterest(payload);
       setAlready(!!(res as any).alreadyRegistered);
-      // Registration is recorded. Account creation is a separate, optional step.
+      /**
+       * A paid seat goes to payment, and the place is already held.
+       *
+       * Registration is recorded first and payment second, deliberately. If PayPal fails,
+       * or somebody closes the tab at the checkout, HMC still knows they wanted the seat
+       * and can take the money another way. Taking payment first and recording second
+       * would mean a failed write loses a paying attendee silently.
+       */
       setStep(signedIn ? 'done' : 'account');
     } catch (e) {
       const status = e instanceof ApiError ? e.status : 0;
@@ -178,8 +186,27 @@ const TrainingRegistration: React.FC<Props> = ({ course, session, member, onClos
               attend the full session and complete the evaluation.
             </p>
           )}
+          {price && (
+            /* Payment comes after the place is held, on purpose. If PayPal fails or the
+               tab is closed at checkout, HMC still knows this person wanted the seat and
+               can take the money another way. The other order loses a paying attendee
+               silently. */
+            <div className="rounded-2xl border border-[#0f0f0f]/20 p-5 text-left space-y-3">
+              <div className="flex items-baseline justify-between gap-4">
+                <p className="text-[15px] font-semibold text-zinc-900">Seat fee</p>
+                <p className="text-2xl font-semibold text-zinc-900 tabular-nums">${price.amountUsd}</p>
+              </div>
+              {price.note && <p className="text-[13px] text-zinc-500 leading-relaxed">{price.note}</p>}
+              <a href={price.payUrl} target="_blank" rel="noreferrer" className="hmc-btn hmc-btn-primary w-full h-[50px] justify-center">
+                Pay with PayPal
+              </a>
+              <p className="text-[12px] text-zinc-400 leading-relaxed">
+                Your place is already held. If you would rather pay another way, call (323) 990-4325.
+              </p>
+            </div>
+          )}
         </div>
-        <button onClick={onClose} className="hmc-btn hmc-btn-primary w-full h-[50px] justify-center">
+        <button onClick={onClose} className={`hmc-btn w-full h-[50px] justify-center ${price ? 'hmc-btn-secondary' : 'hmc-btn-primary'}`}>
           Done
         </button>
       </Shell>

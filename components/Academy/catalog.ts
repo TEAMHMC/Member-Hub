@@ -159,6 +159,19 @@ export interface Course {
   /** Populated for live and blended courses. */
   sessions?: Session[];
   ce?: CeApproval;
+  /**
+   * What this course costs, in whole US dollars. Absent means free.
+   *
+   * Almost everything HMC teaches is free and stays free. Continuing education is not:
+   * it carries a real cost to run, it is bought by licensed professionals rather than by
+   * the community, and the Hub was telling everyone that every course was free on pages
+   * that included it.
+   *
+   * Payment is taken through PayPal, which is already set up for HMC, and the link lives
+   * on the course rather than in the checkout code so that adding a paid course is a
+   * catalogue edit and not a deployment of new payment logic.
+   */
+  price?: { amountUsd: number; payUrl: string; note?: string };
   /** Used instead of preTest/postTest where HMC's instrument is retrospective. */
   retroEval?: RetroPrePost;
   /** Ordered completion requirements, including work done outside the platform. */
