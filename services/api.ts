@@ -599,6 +599,52 @@ export const resultsAccess = {
   check: () => req<{ allowed: boolean; reason: string }>('/api/member/results-access'),
 };
 
+/** One screening, as the member is allowed to see it. */
+export interface MemberResult {
+  id: string;
+  at: string | null;
+  vitals: {
+    bloodPressure?: { systolic: number; diastolic: number };
+    heartRate?: number;
+    glucose?: number;
+    oxygenSaturation?: number;
+    bmi?: number;
+  };
+  /** The traffic light staff recorded, never re-derived here. */
+  flags: { measure: string; level: string; label: string }[];
+  followUpRecommended: boolean;
+}
+
+export interface MemberResultsResponse {
+  results: MemberResult[];
+  /** Travels with the data so a result can never render without it. */
+  disclaimer: string;
+}
+
+/**
+ * Screening results, and the two gates in front of them.
+ *
+ * `results()` throws an ApiError with code 'not_linked' or 'no_consent' rather
+ * than returning an empty list, so the screen can offer the claim flow or ask for
+ * consent instead of showing somebody an empty page and letting them conclude
+ * they were never screened.
+ */
+export const memberResults = {
+  // Access is checked through resultsAccess above, which App already uses to decide
+  // whether to offer Results at all. One caller, one place.
+  results: () => req<MemberResultsResponse>('/api/member/results'),
+  claim: (code: string) =>
+    req<{ success: boolean; linked: boolean; clientId: string }>('/api/member/claim-record', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    }),
+  consent: () =>
+    req<{ ok: boolean }>('/api/client/profile', {
+      method: 'POST',
+      body: JSON.stringify({ consentToViewResults: true }),
+    }),
+};
+
 export const memberActivity = {
   progress: () => req<MemberProgress>('/api/member/progress'),
   events: (limit = 50) => req<{ events: any[] }>(`/api/member/events?limit=${limit}`),
