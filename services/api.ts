@@ -135,6 +135,17 @@ export interface ClientMe {
   }>;
   nextActions: NextAction[];
   /**
+   * The member's most recent Wellbeing Snapshot, or null if they have not taken one.
+   *
+   * Scores only. The Playbook itself is never stored, because buildPlanFromScores is a
+   * pure function of these numbers and the Hub can rebuild the identical plan wherever
+   * the member signs in. The plan used to live in one browser's localStorage, so clearing
+   * a cache erased it and a phone showed nothing at all.
+   *
+   * Optional because a session can outlive a deploy.
+   */
+  snapshot?: { scores: Record<string, number>; at: string } | null;
+  /**
    * Staff standing, or null for a member. Derived on the server from the
    * volunteers roster on every call, so it is not something this client can
    * assert and not something a stale session can keep after a role is revoked.
@@ -575,6 +586,18 @@ export interface MemberEventInput {
   summary: string;
   metrics?: Record<string, number | string>;
 }
+
+/**
+ * Whether this member has anything clinical to be shown, and why not when they do not.
+ *
+ * The Hub asks before offering Results at all. Screening results only exist for somebody
+ * who was actually screened, at a health fair or an outreach event, which is a minority of
+ * members. Showing everyone a Results destination that can only ever say "nothing here"
+ * makes the Hub look broken to the many in order to serve the few.
+ */
+export const resultsAccess = {
+  check: () => req<{ allowed: boolean; reason: string }>('/api/member/results-access'),
+};
 
 export const memberActivity = {
   progress: () => req<MemberProgress>('/api/member/progress'),

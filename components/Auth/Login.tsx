@@ -73,6 +73,23 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
    */
   const AGE_BANDS = ['Under 16', '16-17', '18-24', '25', '26-34', '35-44', '45-54', '55-64', '65+', 'Prefer not to say'] as const;
   const [ageBand, setAgeBand] = useState<string>('');
+
+  /**
+   * What brought them, in their words, asked once and optional.
+   *
+   * Onboarding collected a name, a zip, an age band and two consents. That is everything
+   * HMC needs to report on somebody and nothing at all about what they came for, so the
+   * Hub's first personalised moment had nothing to personalise from. A member who arrived
+   * in housing trouble met the same four cards as everybody else.
+   *
+   * These options map onto the determinants the Playbook already knows how to answer, so
+   * an answer here can be acted on immediately instead of being stored as a preference.
+   * It is skippable on purpose. Making somebody declare a hardship before they can get in
+   * is the wrong trade, and the Snapshot asks properly later on.
+   */
+  const [needs, setNeeds] = useState<string[]>([]);
+  const toggleNeed = (id: string) =>
+    setNeeds((n) => (n.includes(id) ? n.filter((x) => x !== id) : [...n, id]));
   const [consentData, setConsentData] = useState(false);
   const [consentSms, setConsentSms] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -232,6 +249,21 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     } finally {
       setBusy(false);
     }
+
+    /**
+     * Tell the Navigator what they came for, so day one is not generic.
+     *
+     * This is sent as a search and not as a screening result, on purpose. A screening
+     * signal carries a severity and nobody has stated one. Ticking "food" on the way in
+     * says what someone is looking for and says nothing about how bad it is. The engine's
+     * existing needs rule matches on exactly these words, so a real next step appears
+     * immediately without inventing a score the member never gave.
+     */
+    if (needs.length) {
+      ctxApi.event('tool_search', { via: 'onboarding', query: needs.join(' ') });
+      try { localStorage.setItem('hmc_onboarding_needs', JSON.stringify(needs)); } catch { /* private mode */ }
+    }
+
     onLogin(
       { email: email.trim().toLowerCase(), phone, firstName, lastName, zipCode, audience, badges: ['First Login'] },
       UserRole.CLIENT
@@ -463,6 +495,43 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 ))}
               </div>
             </div>
+
+            {/* Only for somebody who came for care. An Academy learner has no care
+                relationship with HMC, so asking them what they are struggling with on the
+                way into a course is the wrong question at the wrong moment. */}
+            {(audience === 'care' || audience === 'both') && (
+              <div className="space-y-3 pt-6 border-t border-zinc-100">
+                <label className={labelStyle}>ANYTHING WE CAN HELP WITH RIGHT NOW</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {([
+                    { id: 'food', label: 'Food' },
+                    { id: 'housing', label: 'Housing' },
+                    { id: 'health insurance clinic', label: 'Getting covered' },
+                    { id: 'mental health', label: 'Feeling overwhelmed' },
+                    { id: 'transport', label: 'Getting around' },
+                    { id: 'safety', label: 'Safety' },
+                  ] as const).map((n) => (
+                    <button
+                      key={n.id}
+                      type="button"
+                      onClick={() => toggleNeed(n.id)}
+                      aria-pressed={needs.includes(n.id)}
+                      className={`rounded-2xl border px-3 py-3 text-sm font-semibold transition-all ${
+                        needs.includes(n.id)
+                          ? 'border-[#233DFF] bg-[#233DFF]/5 text-[#233DFF]'
+                          : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300'
+                      }`}
+                    >
+                      {n.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-zinc-400 leading-relaxed ml-1">
+                  Optional, and you can skip it. It just means we can point you somewhere
+                  useful straight away instead of showing you everything at once.
+                </p>
+              </div>
+            )}
 
             <div className="space-y-5 pt-6 border-t border-zinc-100">
                <label className="flex items-start gap-4 cursor-pointer group" onClick={() => setConsentData(!consentData)}>

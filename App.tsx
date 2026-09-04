@@ -8,10 +8,59 @@ import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
 import Footer from './components/Layout/Footer';
 import SiteNotice from './components/Layout/SiteNotice';
-import { context as ctxApi, client as clientApi } from './services/api';
+import { context as ctxApi, client as clientApi, resultsAccess } from './services/api';
 import SunnyNavigator from './components/Navigator/SunnyNavigator';
 import TrainingRegistration from './components/Academy/TrainingRegistration';
 import { PATHWAYS } from './components/Academy/catalog';
+
+/**
+ * One member, one id, on every device they sign in from.
+ *
+ * Built from the verified email, so a laptop and a phone produce the same value and a
+ * cleared cache does not change it. It only ever keys local storage, so it holds no
+ * secret and is not worth reversing. A session with no email returns null and the
+ * caller falls back.
+ */
+const stableUserId = (email?: string | null): string | null => {
+  const normalised = (email || '').trim().toLowerCase();
+  if (!normalised) return null;
+  let hash = 0;
+  for (let i = 0; i < normalised.length; i++) {
+    hash = (hash << 5) - hash + normalised.charCodeAt(i);
+    hash |= 0;
+  }
+  return `usr_${Math.abs(hash).toString(36)}`;
+};
+
+/**
+ * Carry local progress forward the first time a member arrives under their stable id.
+ *
+ * Everyone's Academy transcript and Playbook are currently filed under whatever random
+ * id their browser happens to hold, so without this step the id fix would itself look
+ * like data loss. Entries are copied across once, and only when the new key is empty,
+ * so real progress can never be overwritten.
+ */
+const adoptLocalProgress = (stableId: string) => {
+  const PREFIXES = ['hmc_academy_v2_', 'hmc_goals_', 'hmc_playbook_intro_', 'hmc_tour_seen_'];
+  try {
+    if (localStorage.getItem(`hmc_migrated_${stableId}`)) return;
+    for (const prefix of PREFIXES) {
+      const target = `${prefix}${stableId}`;
+      if (localStorage.getItem(target)) continue;
+      // The most recently written entry under an old random id, if there is one.
+      const orphan = Object.keys(localStorage)
+        .filter((k) => k.startsWith(prefix) && k !== target && k.startsWith(`${prefix}usr_`))
+        .pop();
+      if (orphan) {
+        const value = localStorage.getItem(orphan);
+        if (value) localStorage.setItem(target, value);
+      }
+    }
+    localStorage.setItem(`hmc_migrated_${stableId}`, '1');
+  } catch {
+    /* private mode, or a full quota. Progress still syncs from the server. */
+  }
+};
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -50,6 +99,16 @@ const App: React.FC = () => {
   const [staffView, setStaffView] = useState(false);
 
   /**
+   * Whether this member has results worth offering.
+   *
+   * Results is a real destination for somebody screened at a health fair, and a permanent
+   * empty room for everybody else. Asking the server first means the nav offers it to the
+   * people it is for. Undefined until the answer arrives, so nothing flickers into view
+   * and straight back out.
+   */
+  const [hasResults, setHasResults] = useState<boolean | undefined>(undefined);
+
+  /**
    * The sign-in panel, and why it is a panel.
    *
    * The Hub answered every route with a sign-in form. Somebody sent a link to a course or
@@ -77,7 +136,15 @@ const App: React.FC = () => {
         const staff = me.staff || null;
         const restored: User = {
           ...base,
-          id: base.id || `usr_${Math.random().toString(36).slice(2, 11)}`,
+          // Built from the account instead of minted at random.
+          //
+          // This was `base.id || 'usr_' + Math.random()`, where base is the localStorage
+          // cache. The Academy transcript, the Playbook and the tour are all keyed on it,
+          // so clearing a browser did more than drop a cache. It handed the same member a
+          // brand new identity and an empty transcript, and signing in on a phone produced
+          // a third one. Somebody could finish six lessons on a laptop and find nothing
+          // waiting on their phone.
+          id: stableUserId(me.email) || base.id || `usr_${Math.random().toString(36).slice(2, 11)}`,
           role: staff ? (staff.isAdmin ? UserRole.ADMIN : UserRole.STAFF) : UserRole.CLIENT,
           staff,
           email: me.email || base.email || '',
@@ -85,8 +152,6 @@ const App: React.FC = () => {
           lastName: base.lastName || '',
           phone: base.phone || '',
           zipCode: base.zipCode || '',
-          xp: base.xp ?? 0,
-          level: base.level ?? 1,
           badges: base.badges || ['Member'],
           // From the server, not from the cached copy. The Hub has branched on audience
           // since it was built and nothing ever set it, so every account fell through to
@@ -95,8 +160,11 @@ const App: React.FC = () => {
           audience: me.audience || base.audience,
           hoursLogged: base.hoursLogged ?? 0,
           shiftsRegistered: base.shiftsRegistered ?? 0,
-          wellnessPoints: base.wellnessPoints ?? me.credits?.balance ?? 0,
         };
+        adoptLocalProgress(restored.id);
+        resultsAccess.check()
+          .then((r) => setHasResults(!!r.allowed))
+          .catch(() => setHasResults(false));
         setCurrentUser(restored);
         localStorage.setItem('hmc_user', JSON.stringify(restored));
         setView('portal');
@@ -111,22 +179,22 @@ const App: React.FC = () => {
 
   const handleLogin = (userData: Partial<User>, role: UserRole = UserRole.CLIENT) => {
     const activeUser: User = {
-      id: 'usr_' + Math.random().toString(36).slice(2, 11),
+      // Same stable id as the session-restore path above, so a member who has just
+      // signed in and a member returning tomorrow are keyed identically.
+      id: stableUserId(userData.email) || 'usr_' + Math.random().toString(36).slice(2, 11),
       phone: userData.phone || '',
       role: role,
       firstName: userData.firstName || 'Member',
       lastName: userData.lastName || '',
       email: userData.email || '',
       zipCode: userData.zipCode || '',
-      xp: 0,
-      level: 1,
       badges: ['Member'],
       audience: userData.audience,
       hoursLogged: 0,
       shiftsRegistered: 0,
-      wellnessPoints: 0,
       ...userData
     };
+    adoptLocalProgress(activeUser.id);
     setCurrentUser(activeUser);
     localStorage.setItem('hmc_user', JSON.stringify(activeUser));
     setView('portal');
@@ -164,12 +232,9 @@ const App: React.FC = () => {
     email: '',
     zipCode: '',
     phone: '',
-    xp: 0,
-    level: 1,
     badges: [],
     hoursLogged: 0,
     shiftsRegistered: 0,
-    wellnessPoints: 0,
     role: UserRole.CLIENT,
     audience: 'both',
   };
@@ -230,6 +295,7 @@ const App: React.FC = () => {
           <Sidebar
             role={currentUser?.role || UserRole.CLIENT}
             audience={currentUser?.audience}
+            hasResults={hasResults}
             guest={!currentUser}
             onSignIn={() => requireSignIn()}
             activeTab={activeTab}

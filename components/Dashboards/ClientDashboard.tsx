@@ -123,6 +123,27 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   useEffect(() => {
     clientApi.me().then(setMe).catch(() => setMe(null));
   }, []);
+
+  /**
+   * Rebuild the Playbook from the server when this browser has none.
+   *
+   * The plan is derived and never stored. buildPlanFromScores is pure, so the same scores
+   * always produce the same plan. A member who filled in the Snapshot on a laptop gets
+   * their plan back on their phone, and clearing a cache no longer erases it. A local plan
+   * always wins, so nothing a member is currently looking at is replaced underneath them.
+   */
+  useEffect(() => {
+    const scores = me?.snapshot?.scores;
+    if (!scores || dynamicGoals.length > 0) return;
+    const restored: Assessment = { ...sdohScores, ...scores } as Assessment;
+    setSdohScores(restored);
+    const plan = buildPlanFromScores(restored);
+    setDynamicGoals(plan);
+    try { localStorage.setItem(`hmc_goals_${user.id}`, JSON.stringify(plan)); } catch { /* private mode */ }
+    // Keyed on the snapshot timestamp so this runs when a snapshot arrives, and not on
+    // every score change while somebody is still filling the form in.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [me?.snapshot?.at, user.id]);
   const nextAction: NextAction | undefined = me?.nextActions?.[0];
 
   // Check for tour requirement
@@ -254,10 +275,16 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       setDynamicGoals(recommendations);
       localStorage.setItem(`hmc_goals_${user.id}`, JSON.stringify(recommendations));
 
+      // A badge, and nothing that looks like a balance.
+      //
+      // This used to add 200 "Wellness Points" and 100 XP. Neither existed anywhere but
+      // this browser's local storage, and the Profile page showed Wellness Points in a row
+      // beside the real Health Credits balance as though the two were the same kind of
+      // thing. Health Credits are a server-side wallet with a transaction ledger an admin
+      // can audit, while Wellness Points evaporated when somebody cleared their cache.
+      // Credits are awarded by the portal, where the ledger and the controls already are.
       onUpdateUser?.({
         badges: Array.from(new Set([...(user.badges || []), 'Health Navigator'])),
-        wellnessPoints: (user.wellnessPoints || 0) + 200,
-        xp: (user.xp || 0) + 100
       });
       // Pull refreshed next-actions / referrals for the plan + home.
       clientApi.me().then(setMe).catch(() => {});
@@ -301,10 +328,17 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       window.open(href, href.startsWith('http') ? '_blank' : '_self');
       return;
     }
+    // Where each next-action card actually goes.
+    //
+    // "/my/referrals" used to land on Profile, which shows a name, a balance and some
+    // badges and has never listed a referral. The referral cards render on Resources, so
+    // the one card that matters most to somebody waiting on a housing or food connection
+    // sent them to a page that did not mention it.
     const map: Record<string, string> = {
       '/': 'dash',
       '/daily-needs': 'resources',
-      '/my/referrals': 'profile',
+      '/my/referrals': 'resources',
+      '/my/playbook': 'game-plan',
       '/check-in': 'check-yourself',
     };
     setActiveTab(map[href] || 'dash');
@@ -370,20 +404,26 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         {/* A visitor is greeted as one. The signed-in copy said "Hello, undefined" and
             "You're cleared to serve" to somebody who had not signed in and was not a
             volunteer, which is three wrong things in one line. */}
-        <div className="pill pill-blue mx-auto">{guest ? 'Free and open to everyone' : 'Member Portal Active'}</div>
+        <div className="pill pill-blue mx-auto">{guest ? 'Member Hub' : 'Member Portal Active'}</div>
         <h1 className="text-5xl font-semibold tracking-tight text-zinc-900">
           {guest ? 'Health Matters Clinic' : `Hello, ${user.firstName}.`}
         </h1>
-        <p className="text-zinc-500 max-w-md mx-auto leading-relaxed text-lg">
+        {/* A visitor is asked which of the two things they came for, because the Hub has
+            always served two people and showed them both the same page. Somebody here for
+            a course was offered a screening surface and a health playbook, and somebody
+            here because they cannot afford food had to find that through a course catalogue.
+            The signed-in line no longer says "You're cleared to serve", which is volunteer
+            copy that was being shown to members. */}
+        <p className="text-zinc-500 max-w-lg mx-auto leading-relaxed text-lg">
           {guest
-            ? 'Free screenings, community events, help with food, housing and care, and self-paced courses that open doors into health careers. Look around. You only need an account to save anything.'
-            : "You're cleared to serve. Everything you need to manage your wellness is right here."}
+            ? 'Free screenings, community events, and help with food, housing and care. Plus free courses that open doors into health careers. Everything here is free, and you only need an account to save anything.'
+            : 'Everything you need for your health and wellbeing is here.'}
         </p>
         <div className="flex flex-wrap gap-4 pt-6 justify-center">
              {guest ? (
                <>
-                 <ButtonPrimary onClick={() => setActiveTab('academy')}>Browse Courses</ButtonPrimary>
-                 <ButtonSecondary onClick={() => setActiveTab('events')}>Explore Events</ButtonSecondary>
+                 <ButtonPrimary onClick={() => setActiveTab('resources')}>Get support</ButtonPrimary>
+                 <ButtonSecondary onClick={() => setActiveTab('academy')}>Browse courses</ButtonSecondary>
                </>
              ) : (
                <>
@@ -465,19 +505,34 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
            </div>
            <div className="space-y-2">
              <h3 className="text-xl font-semibold text-zinc-900">Upcoming Events</h3>
-             <p className="text-sm text-zinc-500 leading-relaxed">Screenings and health fairs happening this week in your neighborhood.</p>
+             {/* This used to promise events "happening this week in your neighborhood".
+                 The list is filtered neither to this week nor to a zip, so it was a claim
+                 the page could not keep. */}
+             <p className="text-sm text-zinc-500 leading-relaxed">Free screenings, health fairs and community events across LA County.</p>
            </div>
            <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('events'); }} className="w-full">View Calendar</ButtonSecondary>
         </Card>
-        <Card className="flex flex-col gap-6 p-8 group hover:border-[#FF6F91]/30 transition-all cursor-pointer" onClick={gated('to see your screening results', () => setActiveTab('health'))}>
+        {/* Resources takes this card from Results.
+
+            The fourth card was Latest Results, which opens a screen that is a hardcoded
+            empty state. The variable meant to hold screening encounters is declared and
+            never assigned, so the screen is empty by construction and not merely waiting
+            on data. From a quarter of the home page it promised blood pressure, vitals and
+            provider notes. Results keeps its place in the sidebar, because members seeing
+            their own results is the point of the Hub and it is coming, but it does not
+            keep a home card until there is something behind it.
+
+            Resources is the opposite case. It works today, it holds the directory and a
+            member's live referrals, and it had no card here at all. */}
+        <Card className="flex flex-col gap-6 p-8 group hover:border-[#FF6F91]/30 transition-all cursor-pointer" onClick={() => setActiveTab('resources')}>
            <div className="w-12 h-12 rounded-2xl bg-pink-50 flex items-center justify-center text-[#FF6F91] shadow-sm group-hover:bg-[#FF6F91] group-hover:text-white transition-all">
-              <Activity size={24} />
+              <ShieldCheck size={24} />
            </div>
            <div className="space-y-2">
-             <h3 className="text-xl font-semibold text-zinc-900">Latest Results</h3>
-             <p className="text-sm text-zinc-500 leading-relaxed">Securely access your blood pressure, vitals, and provider notes.</p>
+             <h3 className="text-xl font-semibold text-zinc-900">Resources &amp; Support</h3>
+             <p className="text-sm text-zinc-500 leading-relaxed">Food, housing, legal aid and mental health near you, and a real person if you want one.</p>
            </div>
-           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); gated('to see your screening results', () => setActiveTab('health'))(); }} className="w-full">{guest ? 'Sign in to open' : 'Open Results'}</ButtonSecondary>
+           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('resources'); }} className="w-full">Find support</ButtonSecondary>
         </Card>
       </div>
     </div>
@@ -821,9 +876,11 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
             <p className="text-sm text-zinc-500">{user.email || 'No email on file'}</p>
           </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t border-zinc-100">
+        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-zinc-100">
+          {/* One balance instead of two. "Wellness Points" sat here next to Health Credits
+              and was only a local-storage counter, which sometimes showed its own number
+              and sometimes fell through to the real credit balance. */}
           <div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Health Credits</p><p className="text-2xl font-semibold text-zinc-900">{me?.credits.balance ?? 0}</p></div>
-          <div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Wellness Points</p><p className="text-2xl font-semibold text-zinc-900">{user.wellnessPoints ?? 0}</p></div>
           <div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Zip</p><p className="text-2xl font-semibold text-zinc-900">{user.zipCode || '--'}</p></div>
         </div>
         {user.badges?.length > 0 && (

@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Bell, CalendarClock, Play, GraduationCap, Radio, Newspaper, Archive, CheckCheck, X,
+  Users, HeartPulse,
 } from 'lucide-react';
 import { PATHWAYS } from '../Academy/catalog';
-import { training as trainingApi } from '../../services/api';
+import { training as trainingApi, events as eventsApi } from '../../services/api';
 import {
   buildFeed, filterFor, unreadCount, relativeTime, kindLabel, TABS,
   type FeedItem, type TabId, type NotificationKind, type LibraryRow, type CourseRow,
+  type EventRow,
 } from './notificationFeed';
 
 /**
@@ -40,6 +42,10 @@ const writeList = (key: string, ids: string[]) => {
 };
 
 const ICON: Record<NotificationKind, React.ElementType> = {
+  fair: Users,
+  meetup: Users,
+  screening: HeartPulse,
+  event: CalendarClock,
   course: GraduationCap,
   training: GraduationCap,
   cohort: GraduationCap,
@@ -64,6 +70,7 @@ const Notifications: React.FC<Props> = ({ onNavigateTab }) => {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<TabId>('inbox');
   const [library, setLibrary] = useState<LibraryRow[]>([]);
+  const [events, setEvents] = useState<EventRow[]>([]);
   const [sessions, setSessions] = useState<{ id: string; courseId: string; title: string; startsAt: string }[]>([]);
   const [seen, setSeen] = useState<string[]>(() => readList(SEEN_KEY));
   const [archived, setArchived] = useState<string[]>(() => readList(ARCHIVED_KEY));
@@ -99,6 +106,20 @@ const Notifications: React.FC<Props> = ({ onNavigateTab }) => {
 
   useEffect(() => {
     let cancelled = false;
+    // The live calendar, which is the same source the Events tab reads. Without it the
+    // bell could only ever see the content library, and nothing updates that when an
+    // event is added in the Event Finder.
+    eventsApi.list()
+      .then((r) => {
+        if (cancelled) return;
+        const list = Array.isArray(r) ? r : (r.events || []);
+        setEvents(list.map((e) => ({
+          id: e.id, title: e.title, date: e.date, dateDisplay: e.dateDisplay,
+          time: e.time, location: e.location, description: e.description,
+          program: (e as any).program,
+        })));
+      })
+      .catch(() => { /* the bell falls back to what the library holds */ });
     fetch(LIBRARY_URL)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (!cancelled && d?.items) setLibrary(d.items as LibraryRow[]); })
@@ -115,8 +136,8 @@ const Notifications: React.FC<Props> = ({ onNavigateTab }) => {
   }, []);
 
   const items: FeedItem[] = useMemo(
-    () => buildFeed({ courses, knownCourseIds: knownCourses || courses.map((c) => c.id), sessions, library }),
-    [courses, knownCourses, sessions, library],
+    () => buildFeed({ courses, knownCourseIds: knownCourses || courses.map((c) => c.id), sessions, library, events }),
+    [courses, knownCourses, sessions, library, events],
   );
 
   const unread = unreadCount(items, seen, archived);
