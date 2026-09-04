@@ -6,6 +6,31 @@ import { sunny, context as ctxApi, toolLink, TOOLS, type SunnyTurn } from '../..
 // visitor), orchestrates the ecosystem (Check Yourself / Calm Kit / Events /
 // human handoff), and notices distress signals to surface grounding before crisis.
 
+/**
+ * Which kind of help a message is about, matched against the same words the
+ * next-action engine's needs rule looks for, so a category here produces the same
+ * card the raw text used to. Returns 'other' when nothing matches, which is a count
+ * worth having and tells us nothing about the person.
+ */
+// Ordered by urgency, because a message often matches more than one. Somebody saying
+// they are unsafe and also need work is a safety message.
+const NEED_PATTERNS: [string, RegExp][] = [
+  ['safety', /safe|abuse|violence|hurt|threat|assault/i],
+  ['housing', /housing|evict|rent|shelter|homeless|landlord|sleep/i],
+  ['food', /food|hungry|eat|meal|grocer|pantry|calfresh|snap/i],
+  ['mental health', /anxious|anxiety|depress|stress|overwhelm|therapy|counsel|sad|panic/i],
+  ['reentry', /re-?entry|parole|probation|incarcerat|justice/i],
+  ['healthcare', /doctor|clinic|insurance|medi-?cal|prescription|appointment|dental/i],
+  ['transport', /transport|bus|ride|get there|car|metro/i],
+  ['utilities', /utility|utilities|power|water|gas bill|diaper/i],
+  ['work', /job|work|employ|hire|resume|career/i],
+];
+
+export const needCategory = (message: string): string => {
+  for (const [name, re] of NEED_PATTERNS) if (re.test(message)) return name;
+  return 'other';
+};
+
 const DISTRESS = [
   'suicid', 'kill myself', 'end it', 'want to die', 'hurt myself', 'self harm',
   'hopeless', 'can\'t go on', 'cant go on', 'no reason to live', 'overdose',
@@ -51,7 +76,16 @@ const SunnyNavigator: React.FC<Props> = ({ visitorId, pageTitle, pageContext }) 
     setMsgs((m) => [...m, { role: 'user', content: message }]);
     setInput('');
     setBusy(true);
-    ctxApi.event('tool_search', { via: 'sunny', query: message.slice(0, 120) });
+    // The category, not the words.
+    //
+    // This used to send the first 120 characters of whatever somebody typed, into
+    // context_events, which has no retention limit and hangs off a visitor record
+    // carrying their linked email once they sign in. So "I'm being evicted next week"
+    // became a permanently retained, re-identifiable row in a store built for product
+    // analytics. Nothing needed the sentence: the engine's needs rule matches on exactly
+    // these words, and the monthly report counts categories, not prose. Classifying here
+    // means the sentence never leaves this browser and the personalisation is unchanged.
+    ctxApi.event('tool_search', { via: 'sunny', category: needCategory(message) });
 
     try {
       const res = await sunny.chat(message, {
