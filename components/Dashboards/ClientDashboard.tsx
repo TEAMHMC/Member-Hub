@@ -5,6 +5,7 @@ import { buildPlanFromScores } from '../../services/plan';
 import { context as ctxApi, client as clientApi, referrals as referralsApi, sunny as sunnyApi, toolLink, TOOLS, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
 import HealthCredits from './HealthCredits';
 import YourProgress from './YourProgress';
+import YourResults from './YourResults';
 import MemberReferrals from './MemberReferrals';
 import { isOpen as referralIsOpen } from './referralCopy';
 import { useEvents } from '../../services/hooks';
@@ -844,24 +845,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     </div>
   );
 
-  const renderHealthResults = () => (
-    <div className="max-w-4xl mx-auto py-10 space-y-10 animate-in fade-in duration-500 text-left">
-      <div className="text-center space-y-3">
-        <h2 className="text-4xl font-semibold tracking-tight">Latest Results</h2>
-        <p className="text-zinc-500 text-lg">Your clinical screening history and health metrics.</p>
-      </div>
-      <Card className="text-center py-24 space-y-6 bg-zinc-50/30 border-dashed border-zinc-200">
-         <div className="w-20 h-20 rounded-full bg-white border border-zinc-100 flex items-center justify-center text-zinc-200 mx-auto shadow-sm">
-            <Activity size={40} strokeWidth={1} />
-         </div>
-         <div className="space-y-2">
-            <p className="text-xl font-semibold text-zinc-900">No screenings recorded yet</p>
-            <p className="text-sm text-zinc-400 max-w-sm mx-auto leading-relaxed">Attend an HMC Health Fair to get your first official blood pressure and vitals reading.</p>
-         </div>
-         <ButtonPrimary onClick={() => setActiveTab('events')} className="px-12">Browse Fair Schedule</ButtonPrimary>
-      </Card>
-    </div>
-  );
+  const renderHealthResults = () => <YourResults onBrowseEvents={() => setActiveTab('events')} />;
 
   const renderEvents = () => (
     <div className="max-w-6xl mx-auto py-10 space-y-12 animate-in fade-in duration-500">
