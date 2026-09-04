@@ -208,7 +208,20 @@ const YourResults: React.FC<{ onBrowseEvents?: () => void }> = ({ onBrowseEvents
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               placeholder="Enter your code"
               maxLength={16}
-              className="flex-1 h-[52px] px-5 rounded-2xl border border-zinc-200 bg-white text-base font-semibold tracking-[0.2em] uppercase focus:ring-4 focus:ring-[#233DFF]/10 focus:border-[#233DFF]/30 outline-none transition-all placeholder:tracking-normal placeholder:font-medium placeholder:text-zinc-300"
+              // Wide tracking and caps are for a code being read back, and they were
+              // being applied to the whole field, so the placeholder rendered as
+              // spaced-out capitals instead of a sentence. text-transform cannot be
+              // undone by a placeholder: variant, so the styling is applied only once
+              // there is a value to style. onChange already uppercases the value.
+              // Letter spacing is an inline style, not tracking-[0.2em]. This app loads
+              // Tailwind from the CDN, whose JIT generates rules from classes it can see
+              // in the DOM, and an arbitrary value that only appears once a field has a
+              // value is not reliably picked up. Verified in the browser: the class
+              // produced letterSpacing "normal", the inline style produces 0.2em.
+              style={code ? { letterSpacing: '0.2em' } : undefined}
+              className={`flex-1 h-[52px] px-5 rounded-2xl border border-zinc-200 bg-white text-base focus:ring-4 focus:ring-[#233DFF]/10 focus:border-[#233DFF]/30 outline-none transition-all placeholder:text-zinc-400 placeholder:font-medium ${
+                code ? 'font-semibold uppercase' : 'font-medium'
+              }`}
             />
             <PrimaryButton onClick={submitCode} disabled={busy || code.trim().length < 6}>
               {busy ? 'Checking...' : 'Connect'}
