@@ -117,8 +117,8 @@ const Badge: React.FC<{ children: React.ReactNode; tone?: 'outline' | 'solid' }>
   <span
     className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold tracking-tight whitespace-nowrap ${
       tone === 'solid'
-        ? 'bg-zinc-900 text-white'
-        : 'border border-zinc-900/25 text-zinc-800'
+        ? 'bg-[#233DFF] text-white'
+        : 'border border-[#233DFF]/35 text-zinc-800'
     }`}
   >
     {children}
@@ -212,8 +212,11 @@ const CourseCard: React.FC<{
   done: boolean;
   onOpen: () => void;
 }> = ({ num, total, title, promise, minutes, delivery, ce, percent, done, onOpen }) => (
+  /* The outline is HMC blue at low opacity, the same hairline the site buttons carry,
+     so a card reads as part of the same system rather than as a floating panel. It
+     strengthens on hover instead of changing colour. */
   <article
-    className="relative flex flex-col rounded-3xl border border-zinc-900/15 overflow-hidden transition-all hover:border-zinc-900/35 hover:-translate-y-0.5"
+    className="relative flex flex-col rounded-3xl border border-[#233DFF]/25 overflow-hidden transition-all hover:border-[#233DFF]/60 hover:-translate-y-0.5"
     style={{
       background: done
         ? 'linear-gradient(175deg, #EDF6F1 0%, #F6FAF7 60%, #FBFCFB 100%)'
@@ -249,7 +252,7 @@ const CourseCard: React.FC<{
         )}
         <button
           onClick={onOpen}
-          className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-7 py-3 text-[12px] font-bold uppercase tracking-wider text-white transition-all hover:bg-zinc-800 active:scale-95"
+          className="inline-flex items-center justify-center rounded-full bg-[#233DFF] px-7 py-3 text-[12px] font-bold uppercase tracking-wider text-white shadow-md shadow-[#233DFF]/20 transition-all hover:bg-[#1a2acc] active:scale-95"
         >
           {done ? 'Review' : percent > 0 ? 'Continue' : 'Start'}
         </button>

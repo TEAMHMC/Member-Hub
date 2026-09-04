@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Bell, CalendarClock, Play, GraduationCap, Radio, Newspaper, Archive, CheckCheck, X,
+  Users, HeartPulse,
 } from 'lucide-react';
 import { PATHWAYS } from '../Academy/catalog';
 import { training as trainingApi, events as eventsApi } from '../../services/api';
@@ -41,6 +42,10 @@ const writeList = (key: string, ids: string[]) => {
 };
 
 const ICON: Record<NotificationKind, React.ElementType> = {
+  fair: Users,
+  meetup: Users,
+  screening: HeartPulse,
+  event: CalendarClock,
   course: GraduationCap,
   training: GraduationCap,
   cohort: GraduationCap,
@@ -111,6 +116,7 @@ const Notifications: React.FC<Props> = ({ onNavigateTab }) => {
         setEvents(list.map((e) => ({
           id: e.id, title: e.title, date: e.date, dateDisplay: e.dateDisplay,
           time: e.time, location: e.location, description: e.description,
+          program: (e as any).program,
         })));
       })
       .catch(() => { /* the bell falls back to what the library holds */ });

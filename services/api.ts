@@ -587,6 +587,18 @@ export interface MemberEventInput {
   metrics?: Record<string, number | string>;
 }
 
+/**
+ * Whether this member has anything clinical to be shown, and why not when they do not.
+ *
+ * The Hub asks before offering Results at all. Screening results only exist for somebody
+ * who was actually screened, at a health fair or an outreach event, which is a minority of
+ * members. Showing everyone a Results destination that can only ever say "nothing here"
+ * makes the Hub look broken to the many in order to serve the few.
+ */
+export const resultsAccess = {
+  check: () => req<{ allowed: boolean; reason: string }>('/api/member/results-access'),
+};
+
 export const memberActivity = {
   progress: () => req<MemberProgress>('/api/member/progress'),
   events: (limit = 50) => req<{ events: any[] }>(`/api/member/events?limit=${limit}`),

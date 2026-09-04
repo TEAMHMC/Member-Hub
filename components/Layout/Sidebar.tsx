@@ -21,11 +21,16 @@ interface SidebarProps {
   staff?: StaffStanding | null;
   staffView?: boolean;
   onToggleStaffView?: () => void;
+  /**
+   * Whether this member has screening results to look at. Undefined while the answer
+   * is still in flight, so Results does not appear and then vanish.
+   */
+  hasResults?: boolean;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   audience = 'care', activeTab, onTabChange, onLogout, guest = false, onSignIn,
-  staff = null, staffView = false, onToggleStaffView,
+  staff = null, staffView = false, onToggleStaffView, hasResults,
 }) => {
   // Navigation is the member's navigation, for everybody. It used to branch on
   // role, and the staff branch offered an Operations and a Tasks tab that no
@@ -55,12 +60,20 @@ const Sidebar: React.FC<SidebarProps> = ({
         { icon: <Coins size={18} />, label: 'Credits', id: 'credits' },
       ];
     }
+    /**
+     * Results appears only for a member who has some.
+     *
+     * A screening result exists for somebody who was seen at a health fair or an outreach
+     * event, which is a minority of members. It used to sit in the nav for everybody and
+     * open a permanently empty screen promising blood pressure, vitals and provider notes,
+     * so most people met a room that could never have anything in it.
+     */
     return [
       { icon: <Home size={18} />, label: 'Home', id: 'dash' },
       { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
       { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
       { icon: <Compass size={18} />, label: 'Playbook', id: 'game-plan' },
-      { icon: <Activity size={18} />, label: 'Results', id: 'health' },
+      ...(hasResults ? [{ icon: <Activity size={18} />, label: 'Results', id: 'health' }] : []),
       { icon: <ShieldCheck size={18} />, label: 'Resources', id: 'resources' },
       { icon: <Brain size={18} />, label: 'Snapshot', id: 'check-yourself' },
       { icon: <Coins size={18} />, label: 'Credits', id: 'credits' },

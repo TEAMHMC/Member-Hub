@@ -8,7 +8,7 @@ import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
 import Footer from './components/Layout/Footer';
 import SiteNotice from './components/Layout/SiteNotice';
-import { context as ctxApi, client as clientApi } from './services/api';
+import { context as ctxApi, client as clientApi, resultsAccess } from './services/api';
 import SunnyNavigator from './components/Navigator/SunnyNavigator';
 import TrainingRegistration from './components/Academy/TrainingRegistration';
 import { PATHWAYS } from './components/Academy/catalog';
@@ -99,6 +99,16 @@ const App: React.FC = () => {
   const [staffView, setStaffView] = useState(false);
 
   /**
+   * Whether this member has results worth offering.
+   *
+   * Results is a real destination for somebody screened at a health fair, and a permanent
+   * empty room for everybody else. Asking the server first means the nav offers it to the
+   * people it is for. Undefined until the answer arrives, so nothing flickers into view
+   * and straight back out.
+   */
+  const [hasResults, setHasResults] = useState<boolean | undefined>(undefined);
+
+  /**
    * The sign-in panel, and why it is a panel.
    *
    * The Hub answered every route with a sign-in form. Somebody sent a link to a course or
@@ -152,6 +162,9 @@ const App: React.FC = () => {
           shiftsRegistered: base.shiftsRegistered ?? 0,
         };
         adoptLocalProgress(restored.id);
+        resultsAccess.check()
+          .then((r) => setHasResults(!!r.allowed))
+          .catch(() => setHasResults(false));
         setCurrentUser(restored);
         localStorage.setItem('hmc_user', JSON.stringify(restored));
         setView('portal');
@@ -282,6 +295,7 @@ const App: React.FC = () => {
           <Sidebar
             role={currentUser?.role || UserRole.CLIENT}
             audience={currentUser?.audience}
+            hasResults={hasResults}
             guest={!currentUser}
             onSignIn={() => requireSignIn()}
             activeTab={activeTab}

@@ -20,7 +20,11 @@
 // maintains.
 
 export type NotificationKind =
-  | 'course' | 'training' | 'cohort' | 'workshop' | 'webinar' | 'office-hours' | 'recording' | 'news';
+  | 'course' | 'training' | 'cohort' | 'workshop' | 'webinar' | 'office-hours' | 'recording' | 'news'
+  // What HMC actually puts on a calendar. Everything coming off the events endpoint used
+  // to be labelled "Workshop" regardless of what it was, so a resource fair, a community
+  // meeting and a toy distribution all announced themselves as workshops.
+  | 'fair' | 'meetup' | 'screening' | 'event';
 
 /** Which tab an item belongs to. Trainings and events are the two things HMC actually runs. */
 export type NotificationGroup = 'training' | 'event';
@@ -48,6 +52,31 @@ const KIND_LABEL: Record<NotificationKind, string> = {
   'office-hours': 'Office hours',
   recording: 'Recording',
   news: 'News',
+  fair: 'Resource fair',
+  meetup: 'Meetup',
+  screening: 'Screening',
+  event: 'Event',
+};
+
+/**
+ * What kind of thing an event is, taken from the programme it belongs to.
+ *
+ * The events endpoint carries a `program` field, which is how HMC already classifies its
+ * own calendar: Community Fair, Community Wellness, Unstoppable Wellness Meetup. The bell
+ * ignored it and stamped every row "Workshop", so the December toy distribution announced
+ * itself as a workshop and so did a resource fair and an interfaith meeting.
+ *
+ * Matched loosely on purpose. Programme names are typed by hand in the Event Finder admin
+ * and a new one should read as a plain event rather than as the wrong specific thing.
+ */
+export const eventKind = (program?: string, title?: string): NotificationKind => {
+  const hay = `${program || ''} ${title || ''}`.toLowerCase();
+  if (/screening|health fair|blood pressure|vitals/.test(hay)) return 'screening';
+  if (/fair|distribution|celebration|drive/.test(hay)) return 'fair';
+  if (/meetup|meeting|collaboration|summit|circle/.test(hay)) return 'meetup';
+  if (/workshop|class|training/.test(hay)) return 'workshop';
+  if (/webinar|virtual|online/.test(hay)) return 'webinar';
+  return 'event';
 };
 
 export const kindLabel = (k: NotificationKind): string => KIND_LABEL[k] || 'Update';
@@ -144,6 +173,8 @@ export interface EventRow {
   time?: string;
   location?: string;
   description?: string;
+  /** HMC's own classification, e.g. "Community Fair". Drives the label on the card. */
+  program?: string;
 }
 
 const LIBRARY_KIND: Record<string, NotificationKind> = {
@@ -230,7 +261,7 @@ export const buildFeed = (input: {
     announced.add(identity(ev.title, ev.date));
     items.push({
       id: `event:${ev.id}`,
-      kind: 'workshop',
+      kind: eventKind(ev.program, ev.title),
       group: 'event',
       title: ev.title,
       detail: [ev.time, ev.location].filter(Boolean).join(' at ') || ev.description?.slice(0, 140),

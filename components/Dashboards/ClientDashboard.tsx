@@ -404,20 +404,26 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         {/* A visitor is greeted as one. The signed-in copy said "Hello, undefined" and
             "You're cleared to serve" to somebody who had not signed in and was not a
             volunteer, which is three wrong things in one line. */}
-        <div className="pill pill-blue mx-auto">{guest ? 'Free and open to everyone' : 'Member Portal Active'}</div>
+        <div className="pill pill-blue mx-auto">{guest ? 'Member Hub' : 'Member Portal Active'}</div>
         <h1 className="text-5xl font-semibold tracking-tight text-zinc-900">
           {guest ? 'Health Matters Clinic' : `Hello, ${user.firstName}.`}
         </h1>
-        <p className="text-zinc-500 max-w-md mx-auto leading-relaxed text-lg">
+        {/* A visitor is asked which of the two things they came for, because the Hub has
+            always served two people and showed them both the same page. Somebody here for
+            a course was offered a screening surface and a health playbook, and somebody
+            here because they cannot afford food had to find that through a course catalogue.
+            The signed-in line no longer says "You're cleared to serve", which is volunteer
+            copy that was being shown to members. */}
+        <p className="text-zinc-500 max-w-lg mx-auto leading-relaxed text-lg">
           {guest
-            ? 'Free screenings, community events, help with food, housing and care, and self-paced courses that open doors into health careers. Look around. You only need an account to save anything.'
-            : "You're cleared to serve. Everything you need to manage your wellness is right here."}
+            ? 'Free screenings, community events, and help with food, housing and care. Plus free courses that open doors into health careers. Everything here is free, and you only need an account to save anything.'
+            : 'Everything you need for your health and wellbeing is here.'}
         </p>
         <div className="flex flex-wrap gap-4 pt-6 justify-center">
              {guest ? (
                <>
-                 <ButtonPrimary onClick={() => setActiveTab('academy')}>Browse Courses</ButtonPrimary>
-                 <ButtonSecondary onClick={() => setActiveTab('events')}>Explore Events</ButtonSecondary>
+                 <ButtonPrimary onClick={() => setActiveTab('resources')}>Get support</ButtonPrimary>
+                 <ButtonSecondary onClick={() => setActiveTab('academy')}>Browse courses</ButtonSecondary>
                </>
              ) : (
                <>
