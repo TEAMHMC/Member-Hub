@@ -858,24 +858,23 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           </div>
         </section>
 
-        <section className="bg-white rounded-2xl border border-zinc-200/60 p-8 space-y-4">
-          <div className="flex items-center gap-2 text-zinc-400">
-            <ShieldCheck size={16} />
-            <h2 className="text-[10px] font-bold uppercase tracking-widest">Learning data and privacy</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-zinc-600 leading-relaxed">
-            <p>
-              The Academy records your enrollment, lesson completion, knowledge-check and assessment
-              results, applied assignment status, completion dates, and credential status. Progress is
-              reported as improvement from a baseline, not only as pass or fail.
-            </p>
-            <p>
-              Learning records are kept separately from clinical and client records. Participation in
-              Academy education does not create a clinician-patient relationship. You can request
-              correction or deletion of your learning record at any time.
-            </p>
-          </div>
-        </section>
+        {/* A link, not two paragraphs of policy parked on the page.
+            This was a full-width panel of retention and record-keeping prose sitting under
+            the catalogue, which is a policy document rendered as a page section. The text
+            has not changed, it lives on the privacy page where policy belongs, and the
+            Academy points at it in one line. */}
+        <p className="text-[13px] text-zinc-400 text-center">
+          Academy records are kept separately from clinical and client records, and enrolling does not
+          create a clinician-patient relationship.{' '}
+          <a
+            href="https://www.healthmatters.clinic/privacy#academy"
+            target="_blank"
+            rel="noreferrer"
+            className="font-semibold text-[#233DFF] hover:underline"
+          >
+            How your learning record is handled
+          </a>
+        </p>
       </div>
     );
   };
@@ -1385,18 +1384,31 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           </>
         )}
 
+        {/* Curriculum provenance, set as a footer rather than left loose at the bottom
+            of the page. Sources and a version line are the colophon of a syllabus. They
+            belong below a rule, in small type, folded away until somebody wants them,
+            and not stacked in the reading column as though they were course content. */}
         {p.sourceKey && (
-          <div className="border-t border-zinc-100 pt-6 space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Authoritative sources</p>
-            <ul className="space-y-1">
-              {p.sourceKey.map((s) => (
-                <li key={s.key} className="text-[12px] text-zinc-500">[{s.key}] {s.label}</li>
-              ))}
-            </ul>
-            <p className="text-[11px] text-zinc-400 pt-2">
-              Version {p.version} · Effective {p.effectiveDate} · Next review {p.nextReview}
-            </p>
-          </div>
+          <footer className="mt-4 border-t border-zinc-200 pt-6">
+            <details className="group">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[11px] font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-600">
+                <span>Sources and version</span>
+                <span className="text-base leading-none transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+              </summary>
+              <div className="pt-5 space-y-4">
+                <ul className="space-y-1.5">
+                  {p.sourceKey.map((src) => (
+                    <li key={src.key} className="text-[12.5px] leading-relaxed text-zinc-500">
+                      <span className="font-semibold text-zinc-600">[{src.key}]</span> {src.label}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-[11px] text-zinc-400">
+                  Version {p.version} &middot; Effective {p.effectiveDate} &middot; Next review {p.nextReview}
+                </p>
+              </div>
+            </details>
+          </footer>
         )}
       </div>
     );

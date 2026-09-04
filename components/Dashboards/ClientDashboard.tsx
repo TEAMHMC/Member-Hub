@@ -115,6 +115,30 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     connection: 0
   });
 
+  /**
+   * Reentry, asked once and optional.
+   *
+   * Deliberately not one of the scored questions above. Those run 0 to 3 by severity, and
+   * having been incarcerated is not a severity, it is a fact that changes which
+   * organisations can actually help. The directory already tags Justice-involved
+   * providers, so an answer here is immediately useful rather than filed away.
+   *
+   * Kept in this browser and turned into a resource search, never written to the client
+   * record. A criminal-legal history sitting in a record HMC holds is a liability to the
+   * person it describes, and nothing in the Hub needs it in order to point somebody at
+   * A New Way of Life.
+   */
+  const [reentry, setReentry] = useState<boolean | null>(null);
+
+  /**
+   * Whether the Playbook is showing its questions or the plan they produced.
+   *
+   * Folding the two nav items into one left the questions with no route of their own, so
+   * this is what decides which half of the Playbook a member sees. No plan yet means the
+   * questions. A plan means the plan, unless they asked to change their answers.
+   */
+  const [answering, setAnswering] = useState(false);
+
   const mapRef = useRef<any>(null);
 
   // ── Live ecosystem data (visitorId comes from App — single hello() handshake) ──
@@ -229,11 +253,29 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
         const center: [number, number] = [34.0522, -118.2437];
         mapInstance = L.map('event-map', { zoomControl: false }).setView(center, 11);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; OpenStreetMap'
+        // Esri's light grey canvas, not CARTO.
+        //
+        // CARTO's light_all tiles were free and unkeyed when this was written. They now
+        // require an API key, and rather than failing they serve a tile stamped "API KEY
+        // REQUIRED" over and over, so the map still rendered and still panned while every
+        // street was covered in a watermark. Nothing here changed; the provider did.
+        //
+        // The Event Finder hit this first and fixed it the same way in 6db0140. Esri's
+        // World Light Gray Canvas needs no key and is the closest match to the grey this
+        // design was built around. Attribution is required and given, and maxZoom is 16
+        // because the layer stops there and Leaflet would otherwise ask for blank tiles.
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+          attribution: '&copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors',
+          maxZoom: 16,
         }).addTo(mapInstance);
         // Plot real events that carry coordinates.
-        const geoEvents = liveEvents.filter((e) => typeof e.lat === 'number' && typeof e.lng === 'number');
+        // 0,0 is not a place. The events endpoint returns lat/lng 0 for anything nobody
+        // geocoded, and `typeof e.lat === 'number'` is true for 0, so every ungeocoded
+        // event was pinned in the Gulf of Guinea. The Event Finder already skips these
+        // rather than drawing an event somewhere it is not.
+        const geoEvents = liveEvents.filter(
+          (e) => typeof e.lat === 'number' && typeof e.lng === 'number' && e.lat !== 0 && e.lng !== 0,
+        );
         geoEvents.forEach((e) => {
           const m = L.marker([e.lat as number, e.lng as number]).addTo(mapInstance);
           m.bindPopup(`<strong>${e.title}</strong><br/>${[e.dateDisplay || e.date, e.time, e.location].filter(Boolean).join(' · ')}`);
@@ -268,6 +310,10 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     // auto-create referrals here — a referral only happens when the member
     // explicitly taps "Get connected" on a play (see connectPlay).
     ctxApi.event('screening_complete', { kind: 'sdoh', scores: sdohScores as any });
+    // Routed as a search, which is what it is. The word matches the directory's own
+    // Justice-involved tag and the engine's needs rule, so it produces real results and
+    // a real next step without recording anything about this person's history.
+    if (reentry) ctxApi.event('tool_search', { via: 'playbook', query: 'reentry justice involved' });
 
     try {
       // Structured plan is derived deterministically from the member's own answers.
@@ -310,6 +356,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       console.error(e);
     } finally {
       setLoadingAi(false);
+      setAnswering(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -435,7 +482,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
                </>
              ) : (
                <>
-                 <ButtonPrimary onClick={gated('to build and keep your Wellness Playbook', () => setActiveTab('game-plan'))}>Build my Playbook</ButtonPrimary>
+                 <ButtonPrimary onClick={gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })}>Build my Playbook</ButtonPrimary>
                  <ButtonSecondary onClick={() => setActiveTab('events')}>Explore Events</ButtonSecondary>
                </>
              )}
@@ -494,12 +541,12 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         {/* Two of these four open surfaces a visitor cannot reach. Rather than hiding them,
             which would make the Hub look emptier than it is, they say what an account is
             for and open the sign-in panel with that reason attached. */}
-        <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={gated('to build and keep your Wellness Playbook', () => setActiveTab('game-plan'))}>
+        <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })}>
            <div className="space-y-2">
              <h3 className="text-xl font-semibold text-zinc-900">Wellness Playbook</h3>
              <p className="text-sm text-zinc-500 leading-relaxed">Answer a few questions about how things are going and get a plan built from your answers, with a real person to call when you want one.</p>
            </div>
-           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); gated('to build and keep your Wellness Playbook', () => setActiveTab('game-plan'))(); }} className="w-full">{guest ? 'Sign in to open' : 'Open Playbook'}</ButtonSecondary>
+           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })(); }} className="w-full">{guest ? 'Sign in to open' : 'Open Playbook'}</ButtonSecondary>
         </Card>
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#FF6E40]/30 transition-all cursor-pointer" onClick={() => setActiveTab('events')}>
            <div className="space-y-2">
@@ -538,7 +585,15 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     <div className="max-w-6xl mx-auto py-10 space-y-12 animate-in fade-in duration-500">
       <div className="text-center space-y-3">
          <h2 className="text-4xl font-semibold tracking-tight text-zinc-900">Wellness Playbook</h2>
-         <p className="text-zinc-500 text-lg">A step-by-step guide to your unstoppable wellness.</p>
+         <p className="text-zinc-500 text-lg">Built from your own answers, and yours to change.</p>
+         {dynamicGoals.length > 0 && (
+           <button
+             onClick={() => { setAnswering(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+             className="text-xs font-bold uppercase tracking-widest text-[#233DFF] hover:underline"
+           >
+             Update my answers
+           </button>
+         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
@@ -560,7 +615,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
              <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Your next plays</h4>
              <div className="space-y-3">
                {[
-                 { title: 'Answer a few questions about how things are going', done: dynamicGoals.length > 0, tab: 'game-plan', cta: 'Start' },
+                 { title: 'Answer a few questions about how things are going', done: dynamicGoals.length > 0, tab: 'game-plan', cta: 'Start', ask: true },
                  { title: 'Get connected to support', done: (me?.referrals?.length || 0) > 0, tab: 'resources', cta: 'Get connected' },
                  { title: 'Find an event near you', done: false, tab: 'events', cta: 'Browse events' },
                ].map((s, i) => (
@@ -642,7 +697,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
                    <p className="text-sm font-semibold text-zinc-600">Answer a few questions to build your Playbook</p>
                    <p className="text-xs text-zinc-400 max-w-[180px] mx-auto leading-relaxed">This will unlock your personalized health insights and local resources.</p>
                  </div>
-                 <ButtonPrimary onClick={gated('to build and keep your Wellness Playbook', () => setActiveTab('game-plan'))} className="px-10">Build my Playbook</ButtonPrimary>
+                 <ButtonPrimary onClick={gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })} className="px-10">Build my Playbook</ButtonPrimary>
               </Card>
             )}
           </div>
@@ -706,6 +761,75 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
             </div>
           </div>
         ))}
+        
+        {/* Asked last, and easy to skip. Putting it before the everyday questions would
+        
+            make the whole form feel like an intake about somebody's record. */}
+        
+        <div className="space-y-4 pt-4">
+        
+          <div className="flex items-baseline justify-between gap-4 border-b border-zinc-100 pb-2">
+        
+            <h4 className="font-semibold text-xl text-zinc-900">Reentry support</h4>
+        
+            <span className="text-[11px] text-zinc-400 font-bold uppercase tracking-widest">Optional</span>
+        
+          </div>
+        
+          <p className="text-sm text-zinc-500 leading-relaxed max-w-2xl">
+        
+            Some organisations work specifically with people who have been incarcerated, on housing,
+        
+            work and legal help. If that is you, we can show you those first. You do not have to
+        
+            answer, and we do not keep this on your record.
+        
+          </p>
+        
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+            {[
+        
+              { label: 'Yes, show me reentry resources', value: true },
+        
+              { label: 'No, or I would rather not say', value: false },
+        
+            ].map((opt) => {
+        
+              const isSelected = reentry === opt.value;
+        
+              return (
+        
+                <button
+        
+                  key={String(opt.value)}
+        
+                  onClick={() => setReentry(opt.value)}
+        
+                  aria-pressed={isSelected}
+        
+                  className={`p-5 rounded-2xl border transition-all text-left flex items-center justify-between ${isSelected ? 'border-[#233DFF] bg-blue-50/50 shadow-sm ring-1 ring-[#233DFF]/10' : 'border-zinc-200 bg-white hover:border-zinc-300 shadow-sm'}`}
+        
+                >
+        
+                  <span className={`text-sm font-semibold ${isSelected ? 'text-[#233DFF]' : 'text-zinc-600'}`}>{opt.label}</span>
+        
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-[#233DFF] border-[#233DFF] text-white' : 'border-zinc-100 bg-zinc-50'}`}>
+        
+                    {isSelected && <Check size={12} strokeWidth={4} />}
+        
+                  </div>
+        
+                </button>
+        
+              );
+        
+            })}
+        
+          </div>
+        
+        </div>
+
         
         <div className="pt-12 border-t border-zinc-100 flex flex-col items-center gap-6">
           <ButtonPrimary onClick={finishAssessment} disabled={loadingAi} className="w-full md:w-auto px-16 h-[60px] text-lg">
@@ -846,7 +970,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
               <h3 className="text-xl font-semibold text-zinc-900">Request a warm handoff</h3>
               <p className="text-sm text-zinc-500 leading-relaxed">Answer a few questions and we will connect you with a real person for whatever you flag.</p>
             </div>
-            <ButtonPrimary onClick={gated('to build and keep your Wellness Playbook', () => setActiveTab('game-plan'))} className="w-full md:w-auto">Build my Playbook</ButtonPrimary>
+            <ButtonPrimary onClick={gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })} className="w-full md:w-auto">Build my Playbook</ButtonPrimary>
           </Card>
         </div>
       </div>
@@ -993,10 +1117,12 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       case 'academy': return renderAcademy();
       case 'events': return renderEvents();
       case 'health': return renderHealthResults();
-      case 'game-plan': return renderGamePlan();
+      case 'game-plan':
+        return dynamicGoals.length === 0 || answering ? renderScreener() : renderGamePlan();
       // The questions are a step inside the Playbook now, not a destination of
       // their own. A deep link to the old tab still lands somewhere sensible.
-      case 'check-yourself': return renderGamePlan();
+      case 'check-yourself':
+        return dynamicGoals.length === 0 || answering ? renderScreener() : renderGamePlan();
       case 'resources': return renderResources();
       case 'credits': return <HealthCredits />;
       case 'profile': return renderProfile();
