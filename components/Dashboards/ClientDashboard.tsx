@@ -10,6 +10,7 @@ import MemberReferrals from './MemberReferrals';
 import { isOpen as referralIsOpen } from './referralCopy';
 import { useEvents } from '../../services/hooks';
 import Academy from '../Academy/Academy';
+import SurfaceCard, { CardBadge } from '../Layout/SurfaceCard';
 import {
   Brain, Calendar, MapPin, Clock, ShieldCheck, GraduationCap,
   ArrowLeft, Users, Activity,
@@ -531,53 +532,65 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
           as a broken one. */}
       {!guest && <YourProgress />}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={() => setActiveTab('academy')}>
-           <div className="space-y-2">
-             <h3 className="text-xl font-semibold text-zinc-900">HMC Academy</h3>
-             <p className="text-sm text-zinc-500 leading-relaxed">Structured pathways into health careers, from first look to applied experience, with a completion record at the end. Self-paced, plus live trainings that carry CE credit.</p>
-           </div>
-           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('academy'); }} className="w-full">Start learning</ButtonSecondary>
-        </Card>
-        {/* Two of these four open surfaces a visitor cannot reach. Rather than hiding them,
-            which would make the Hub look emptier than it is, they say what an account is
-            for and open the sign-in panel with that reason attached. */}
-        <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })}>
-           <div className="space-y-2">
-             <h3 className="text-xl font-semibold text-zinc-900">Wellness Playbook</h3>
-             <p className="text-sm text-zinc-500 leading-relaxed">Answer a few questions about how things are going and get a plan built from your answers, with a real person to call when you want one.</p>
-           </div>
-           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })(); }} className="w-full">{guest ? 'Sign in to open' : 'Open Playbook'}</ButtonSecondary>
-        </Card>
-        <Card className="flex flex-col gap-6 p-8 group hover:border-[#FF6E40]/30 transition-all cursor-pointer" onClick={() => setActiveTab('events')}>
-           <div className="space-y-2">
-             <h3 className="text-xl font-semibold text-zinc-900">Upcoming Events</h3>
-             {/* This used to promise events "happening this week in your neighborhood".
-                 The list is filtered neither to this week nor to a zip, so it was a claim
-                 the page could not keep. */}
-             <p className="text-sm text-zinc-500 leading-relaxed">Screenings, health fairs and community events across LA County. RSVP and we will remind you.</p>
-           </div>
-           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('events'); }} className="w-full">View Calendar</ButtonSecondary>
-        </Card>
-        {/* Resources takes this card from Results.
+      {/* One card, used here and on the pathway and course lists.
 
-            The fourth card was Latest Results, which opens a screen that is a hardcoded
-            empty state. The variable meant to hold screening encounters is declared and
-            never assigned, so the screen is empty by construction and not merely waiting
-            on data. From a quarter of the home page it promised blood pressure, vitals and
-            provider notes. Results keeps its place in the sidebar, because members seeing
-            their own results is the point of the Hub and it is coming, but it does not
-            keep a home card until there is something behind it.
+          These four were plain white containers while the course list had a designed
+          card, so the first page a visitor sees looked like a cheaper product than the
+          one they came for. Labels are short on purpose: the shared button wraps rather
+          than clipping, so "Sign in to open" sized to its text inside a narrow card broke
+          across two lines. Full width and two words keeps it on one. */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <SurfaceCard
+          badges={<CardBadge>Learn</CardBadge>}
+          title="HMC Academy"
+          body="Structured pathways into health careers, from first look to applied experience, with a completion record at the end."
+          meta="Self-paced, plus live trainings that carry CE credit"
+          onClick={() => setActiveTab('academy')}
+          action={
+            <ButtonPrimary onClick={(e: any) => { e.stopPropagation(); setActiveTab('academy'); }} className="w-full">
+              Browse
+            </ButtonPrimary>
+          }
+        />
 
-            Resources is the opposite case. It works today, it holds the directory and a
-            member's live referrals, and it had no card here at all. */}
-        <Card className="flex flex-col gap-6 p-8 group hover:border-[#FF6F91]/30 transition-all cursor-pointer" onClick={() => setActiveTab('resources')}>
-           <div className="space-y-2">
-             <h3 className="text-xl font-semibold text-zinc-900">Resources &amp; Support</h3>
-             <p className="text-sm text-zinc-500 leading-relaxed">Search verified LA County organisations by what you need, where you are and who they serve, then reach them directly.</p>
-           </div>
-           <ButtonSecondary onClick={(e: any) => { e.stopPropagation(); setActiveTab('resources'); }} className="w-full">Find support</ButtonSecondary>
-        </Card>
+        <SurfaceCard
+          badges={<CardBadge>Plan</CardBadge>}
+          title="Wellness Playbook"
+          body="Answer a few questions about how things are going and get a plan built from your answers, with a real person to call when you want one."
+          onClick={gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })}
+          action={
+            <ButtonPrimary
+              onClick={(e: any) => { e.stopPropagation(); gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })(); }}
+              className="w-full"
+            >
+              {guest ? 'Sign in' : 'Open'}
+            </ButtonPrimary>
+          }
+        />
+
+        <SurfaceCard
+          badges={<CardBadge>Attend</CardBadge>}
+          title="Upcoming Events"
+          body="Screenings, health fairs and community events across LA County. RSVP and we will remind you."
+          onClick={() => setActiveTab('events')}
+          action={
+            <ButtonPrimary onClick={(e: any) => { e.stopPropagation(); setActiveTab('events'); }} className="w-full">
+              See dates
+            </ButtonPrimary>
+          }
+        />
+
+        <SurfaceCard
+          badges={<CardBadge>Find</CardBadge>}
+          title="Resources &amp; Support"
+          body="Search verified LA County organisations by what you need, where you are and who they serve, then reach them directly."
+          onClick={() => setActiveTab('resources')}
+          action={
+            <ButtonPrimary onClick={(e: any) => { e.stopPropagation(); setActiveTab('resources'); }} className="w-full">
+              Find help
+            </ButtonPrimary>
+          }
+        />
       </div>
     </div>
   );
