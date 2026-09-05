@@ -162,8 +162,8 @@ console.log('Open cohorts');
   const open = buildFeed({ ...base, openCohorts: [
     { pathwayId: 'fbch', title: 'Field-Based CHW', state: 'open' },
   ]});
-  ok(/Enrolment is open: Field-Based CHW/.test(open[0].title), 'an open cohort says enrolment');
-  ok(open[0].action?.label === 'Enrol', 'and offers to enrol');
+  ok(/Enrollment is open: Field-Based CHW/.test(open[0].title), 'an open cohort says enrolment');
+  ok(open[0].action?.label === 'Enroll', 'and offers to enrol');
 
   // The bug this whole change exists to fix.
   const none = buildFeed(base);

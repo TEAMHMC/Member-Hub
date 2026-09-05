@@ -228,19 +228,19 @@ export const buildFeed = (input: {
   }
 
   for (const c of input.openCohorts || []) {
-    // An open pathway says enrol; an upcoming one says save a spot. Both are things a
+    // An open pathway says enroll; an upcoming one says save a spot. Both are things a
     // member can do today, which is the whole reason this belongs in the bell.
     const open = c.state === 'open';
     items.push({
       id: `cohort:${c.pathwayId}`,
       kind: 'cohort',
       group: 'training',
-      title: open ? `Enrolment is open: ${c.title}` : `Registration is open: ${c.title}`,
+      title: open ? `Enrollment is open: ${c.title}` : `Registration is open: ${c.title}`,
       detail: c.cohortLabel
-        ? `${c.cohortLabel}. ${open ? 'Enrol when you are ready.' : 'Saving a spot holds your place.'}`
-        : open ? 'Enrol when you are ready.' : 'Saving a spot holds your place.',
+        ? `${c.cohortLabel}. ${open ? 'Enroll when you are ready.' : 'Saving a spot holds your place.'}`
+        : open ? 'Enroll when you are ready.' : 'Saving a spot holds your place.',
       date: null,
-      action: { label: open ? 'Enrol' : 'Save my spot', tab: 'academy' },
+      action: { label: open ? 'Enroll' : 'Save my spot', tab: 'academy' },
       // Above a new course, below a dated session: something you can act on outranks a
       // catalogue addition, and a thing with a date outranks both.
       weight: 5,
