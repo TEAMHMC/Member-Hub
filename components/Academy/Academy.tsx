@@ -26,6 +26,7 @@ import {
   pathwayHasContent,
 } from './catalog';
 import { CAMP_WEEKS, CAMP_TEMPLATE } from './programStemCollab';
+import { startEngagementClock, minutesSpent, timeRequirementMet, timeProgressLabel } from './engagement';
 import type { Block, KnowledgeCheck } from './blocks';
 import TrainingRegistration from './TrainingRegistration';
 import { training as trainingApi, chw as trainingApi_chw, curriculumApi, type ScheduledSession } from '../../services/api';
@@ -33,6 +34,7 @@ import { reviewedProse, preservedBlocks, extraSections, type OverrideMap } from 
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
+  courseGates, isCourseEarned,
   isArtifactComplete, type LearnerState,
 } from './progress';
 import { PERSONAS, CREDENTIALS, CREDENTIAL_FAQ } from './credentials';
@@ -579,6 +581,27 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     return vis(p.id).state === 'open' || p.status === 'published';
   };
   const [showCert, setShowCert] = useState<string | null>(null);
+
+  /**
+   * The engagement clock, keyed to the course rather than the lesson.
+   *
+   * It has to survive moving between lessons inside a course, so it is started when the
+   * course a learner is looking at changes and not when a lesson component mounts. A
+   * clock that reset on every lesson would let somebody click through twelve lessons in a
+   * minute and still show twelve minutes.
+   */
+  const openCourseId =
+    view.name === 'course' || view.name === 'lesson' || view.name === 'activity' || view.name === 'artifact'
+      ? view.courseId
+      : null;
+  const [minutesOnCourse, setMinutesOnCourse] = useState(0);
+  useEffect(() => {
+    if (!openCourseId) return;
+    const clock = startEngagementClock(userId, openCourseId);
+    setMinutesOnCourse(minutesSpent(userId, openCourseId));
+    const shown = setInterval(() => setMinutesOnCourse(minutesSpent(userId, openCourseId)), 15000);
+    return () => { clearInterval(shown); clock.stop(); };
+  }, [openCourseId, userId]);
   // Which course the learner is registering for, plus the session if one exists.
   const [registering, setRegistering] = useState<{ course: Course; session?: Session } | null>(null);
 
@@ -711,6 +734,27 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
   const completeLesson = (lessonId: string) =>
     set((s) => (s.lessons.includes(lessonId) ? s : { ...s, lessons: [...s.lessons, lessonId] }));
+
+  /**
+   * The completion statement, for courses that carry a requirement worth attesting to.
+   *
+   * Typed rather than ticked. A checkbox records that a mouse moved; a name typed by the
+   * person whose name it is, shown back to them afterwards, records that somebody
+   * asserted something. It is the last step before a course counts, which is the order
+   * that makes it mean anything: attesting that you completed something you have not
+   * finished is a harder thing to do by accident.
+   */
+  const [attestName, setAttestName] = useState('');
+  const signAttestation = (courseId: string) => {
+    const name = attestName.trim();
+    if (!name) return;
+    set((s) => ({
+      ...s,
+      attestation: { ...(s.attestation || {}), [courseId]: { name, at: new Date().toISOString() } },
+    }));
+    onSignal?.('academy_attestation_signed', { courseId });
+    setAttestName('');
+  };
 
   // ── Catalog ────────────────────────────────────────────────────────────
 
@@ -1762,6 +1806,70 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                       </div>
                     ))}
                   </div>
+                </section>
+              );
+            })()}
+
+            {/* What is still outstanding on this course, and the statement that closes it.
+                Only rendered where the course actually carries a requirement, so an
+                ordinary self-paced course is unchanged. */}
+            {(() => {
+              const gates = courseGates(p, c.id, state, minutesOnCourse);
+              const extra = gates.filter((g) => g.id !== 'content');
+              if (!extra.length) return null;
+              const signed = state.attestation?.[c.id];
+              const readyToSign = gates.filter((g) => g.id !== 'attestation').every((g) => g.met);
+              return (
+                <section className="space-y-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h2 className="text-xl font-semibold text-zinc-900">What this course needs</h2>
+                    <p className="text-[12px] font-semibold text-zinc-400">
+                      {gates.filter((g) => g.met).length} of {gates.length} done
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-[#0f0f0f]/20 bg-white divide-y divide-zinc-100">
+                    {gates.map((g) => (
+                      <div key={g.id} className="flex items-center justify-between gap-4 p-5">
+                        <div className="min-w-0">
+                          <p className={`text-sm font-semibold ${g.met ? 'text-zinc-400' : 'text-zinc-900'}`}>{g.label}</p>
+                          {g.detail && <p className="text-[12px] text-zinc-400 mt-0.5">{g.detail}</p>}
+                        </div>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shrink-0 ${g.met ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-500'}`}>
+                          {g.met ? 'Done' : 'To do'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {signed ? (
+                    <p className="text-[13px] text-zinc-500 leading-relaxed">
+                      Signed by {signed.name} on{' '}
+                      {new Date(signed.at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}.
+                    </p>
+                  ) : readyToSign ? (
+                    <div className="rounded-2xl border border-[#0f0f0f]/20 bg-white p-6 space-y-4">
+                      <p className="text-sm font-semibold text-zinc-900">Completion statement</p>
+                      <p className="text-[13.5px] text-zinc-600 leading-relaxed">
+                        By typing your name below you are certifying that you personally completed
+                        this course, that the work submitted is your own, and that the time recorded
+                        against it is time you spent in the material.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <input
+                          value={attestName}
+                          onChange={(e) => setAttestName(e.target.value)}
+                          placeholder="Type your full name"
+                          aria-label="Your full name"
+                          className="flex-1 px-5 py-3 bg-white border border-zinc-200 rounded-full outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 text-sm font-medium"
+                        />
+                        <Btn onClick={() => signAttestation(c.id)} disabled={!attestName.trim()}>Sign and finish</Btn>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-[13px] text-zinc-400 leading-relaxed">
+                      The completion statement opens once everything above is done.
+                    </p>
+                  )}
                 </section>
               );
             })()}
