@@ -85,6 +85,34 @@ const Notifications: React.FC<Props> = ({ onNavigateTab }) => {
   );
 
   /**
+   * Which cohorts are open, read the same way the Academy reads it so the bell and the
+   * page cannot disagree. Absence of a staff decision means open only for a pathway the
+   * catalogue marks published; anything still in development is upcoming, which is a
+   * save-my-spot rather than an enrolment.
+   */
+  const [visibility, setVisibility] = useState<Record<string, { state: string; cohortLabel?: string }>>({});
+  useEffect(() => {
+    let cancelled = false;
+    fetch('https://volunteer.healthmatters.clinic/api/public/academy-visibility')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled && d?.overrides) setVisibility(d.overrides); })
+      .catch(() => { /* defaults apply, same as the Academy */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  const openCohorts = useMemo(
+    () => PATHWAYS
+      .map((p) => {
+        const set = visibility[p.id];
+        const state = set?.state || (p.status === 'published' ? 'open' : 'upcoming');
+        if (state !== 'open' && state !== 'upcoming') return null;
+        return { pathwayId: p.id, title: p.title, state: state as 'open' | 'upcoming', cohortLabel: set?.cohortLabel };
+      })
+      .filter(Boolean) as { pathwayId: string; title: string; state: 'open' | 'upcoming'; cohortLabel?: string }[],
+    [visibility],
+  );
+
+  /**
    * What this browser has seen before.
    *
    * Seeded on first run with every course that currently exists, so somebody opening the
@@ -136,8 +164,8 @@ const Notifications: React.FC<Props> = ({ onNavigateTab }) => {
   }, []);
 
   const items: FeedItem[] = useMemo(
-    () => buildFeed({ courses, knownCourseIds: knownCourses || courses.map((c) => c.id), sessions, library, events }),
-    [courses, knownCourses, sessions, library, events],
+    () => buildFeed({ courses, knownCourseIds: knownCourses || courses.map((c) => c.id), sessions, library, events, openCohorts }),
+    [courses, knownCourses, sessions, library, events, openCohorts],
   );
 
   const unread = unreadCount(items, seen, archived);

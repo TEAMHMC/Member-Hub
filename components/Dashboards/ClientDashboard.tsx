@@ -563,7 +563,13 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
               onClick={(e: any) => { e.stopPropagation(); gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })(); }}
               className="w-full"
             >
-              {guest ? 'Sign in' : 'Open'}
+              {/* Names the thing you get, not the door you go through. "Sign in" is a
+                  mechanism, and it was the only card of the four whose button described
+                  one: the others say Browse, See dates and Find help. Signed out, the
+                  gate still explains why signing in is needed, so nothing is hidden by
+                  promising the outcome here. Both paths start the questions, so this
+                  reads true either way. */}
+              Build my plan
             </ButtonPrimary>
           }
         />

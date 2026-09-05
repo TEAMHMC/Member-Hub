@@ -142,5 +142,43 @@ for (const k of ['course', 'training', 'cohort', 'workshop', 'webinar', 'office-
   ok(!/[—–]/.test(kindLabel(k)), `${k} label has no em dash`);
 }
 
+console.log('Open cohorts');
+{
+  // The Trainings tab was empty for a new visitor: they are seeded as having seen every
+  // existing course, correctly, and nothing else ever produced a training item. An open
+  // cohort is the thing a member can actually act on, so it belongs in the bell.
+  const base = { courses: [], knownCourseIds: [], sessions: [], library: [], now: NOW };
+
+  const upcoming = buildFeed({ ...base, openCohorts: [
+    { pathwayId: 'hce', title: 'Health Careers Exploration', state: 'upcoming', cohortLabel: 'New cohort, fall 2026' },
+  ]});
+  ok(upcoming.length === 1, 'an upcoming cohort appears');
+  ok(/Registration is open: Health Careers Exploration/.test(upcoming[0].title), 'it says registration is open');
+  ok(/New cohort, fall 2026/.test(upcoming[0].detail), 'it carries the cohort label');
+  ok(upcoming[0].action?.label === 'Save my spot', 'it offers to save a spot');
+  ok(upcoming[0].group === 'training', 'it files under trainings');
+  ok(filterFor('training', upcoming, [], []).length === 1, 'the trainings tab shows it');
+
+  const open = buildFeed({ ...base, openCohorts: [
+    { pathwayId: 'fbch', title: 'Field-Based CHW', state: 'open' },
+  ]});
+  ok(/Enrolment is open: Field-Based CHW/.test(open[0].title), 'an open cohort says enrolment');
+  ok(open[0].action?.label === 'Enrol', 'and offers to enrol');
+
+  // The bug this whole change exists to fix.
+  const none = buildFeed(base);
+  ok(filterFor('training', none, [], []).length === 0, 'no cohorts means no training items');
+
+  // An opening should outrank a catalogue addition but sit under a dated session.
+  const mixed = buildFeed({
+    ...base,
+    courses: [course('c9', 'Some new course')],
+    openCohorts: [{ pathwayId: 'hce', title: 'Health Careers Exploration', state: 'upcoming' }],
+  });
+  const cohortIdx = mixed.findIndex((i) => i.kind === 'cohort');
+  const courseIdx = mixed.findIndex((i) => i.kind === 'course');
+  ok(cohortIdx < courseIdx, 'an opening outranks a new course');
+}
+
 console.log(`\n${checks - failures}/${checks} passed${failures ? `, ${failures} FAILED` : ''}\n`);
 process.exit(failures ? 1 : 0);
