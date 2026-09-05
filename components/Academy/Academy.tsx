@@ -26,6 +26,8 @@ import {
   pathwayHasContent,
 } from './catalog';
 import { CAMP_WEEKS, CAMP_TEMPLATE } from './programStemCollab';
+import { startEngagementClock, minutesSpent, timeRequirementMet, timeProgressLabel } from './engagement';
+import SurfaceCard, { CardBadge } from '../Layout/SurfaceCard';
 import type { Block, KnowledgeCheck } from './blocks';
 import TrainingRegistration from './TrainingRegistration';
 import { training as trainingApi, chw as trainingApi_chw, curriculumApi, type ScheduledSession } from '../../services/api';
@@ -33,6 +35,7 @@ import { reviewedProse, preservedBlocks, extraSections, type OverrideMap } from 
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
+  courseGates, isCourseEarned,
   isArtifactComplete, type LearnerState,
 } from './progress';
 import { PERSONAS, CREDENTIALS, CREDENTIAL_FAQ } from './credentials';
@@ -216,8 +219,10 @@ const CourseCard: React.FC<{
   priceUsd?: number;
   percent: number;
   done: boolean;
+  /** Readable, but its lessons are not open yet. Shows what unlocks it rather than hiding it. */
+  locked?: boolean;
   onOpen: () => void;
-}> = ({ num, total, title, promise, minutes, delivery, ce, priceUsd, percent, done, onOpen }) => (
+}> = ({ num, total, title, promise, minutes, delivery, ce, priceUsd, percent, done, locked, onOpen }) => (
   /* The outline is the same #0f0f0f hairline the site buttons carry, so a card and a
      button read as the same system. It darkens on hover rather than changing colour. */
   <article
@@ -251,15 +256,20 @@ const CourseCard: React.FC<{
       <div className="mt-auto space-y-4 pt-2">
         <div className="flex items-center gap-3 text-[11px] font-semibold text-zinc-600">
           {minutes ? <span>{minutes} min</span> : null}
-          <span>{done ? 'Complete' : percent > 0 ? `${percent}% done` : 'Not started'}</span>
+          {/* A locked course says what opens it. Hiding the syllabus from somebody deciding
+              whether to enrol asks them to commit to something they cannot see. */}
+          <span className={locked ? 'inline-flex items-center gap-1.5' : ''}>
+            {locked && <Lock size={12} />}
+            {locked ? 'Opens when you enrol' : done ? 'Complete' : percent > 0 ? `${percent}% done` : 'Not started'}
+          </span>
         </div>
         {percent > 0 && !done && (
           <div className="h-1 w-full rounded-full bg-zinc-900/10 overflow-hidden">
             <div className="h-full rounded-full bg-zinc-900/70 transition-all duration-500" style={{ width: `${percent}%` }} />
           </div>
         )}
-        <button onClick={onOpen} className="hmc-btn hmc-btn-primary justify-center">
-          {done ? 'Review' : percent > 0 ? 'Continue' : 'Start'}
+        <button onClick={onOpen} className={`hmc-btn justify-center ${locked ? 'hmc-btn-secondary' : 'hmc-btn-primary'}`}>
+          {locked ? 'See lessons' : done ? 'Review' : percent > 0 ? 'Continue' : 'Start'}
         </button>
       </div>
     </div>
@@ -579,6 +589,27 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     return vis(p.id).state === 'open' || p.status === 'published';
   };
   const [showCert, setShowCert] = useState<string | null>(null);
+
+  /**
+   * The engagement clock, keyed to the course rather than the lesson.
+   *
+   * It has to survive moving between lessons inside a course, so it is started when the
+   * course a learner is looking at changes and not when a lesson component mounts. A
+   * clock that reset on every lesson would let somebody click through twelve lessons in a
+   * minute and still show twelve minutes.
+   */
+  const openCourseId =
+    view.name === 'course' || view.name === 'lesson' || view.name === 'activity' || view.name === 'artifact'
+      ? view.courseId
+      : null;
+  const [minutesOnCourse, setMinutesOnCourse] = useState(0);
+  useEffect(() => {
+    if (!openCourseId) return;
+    const clock = startEngagementClock(userId, openCourseId);
+    setMinutesOnCourse(minutesSpent(userId, openCourseId));
+    const shown = setInterval(() => setMinutesOnCourse(minutesSpent(userId, openCourseId)), 15000);
+    return () => { clearInterval(shown); clock.stop(); };
+  }, [openCourseId, userId]);
   // Which course the learner is registering for, plus the session if one exists.
   const [registering, setRegistering] = useState<{ course: Course; session?: Session } | null>(null);
 
@@ -712,6 +743,27 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
   const completeLesson = (lessonId: string) =>
     set((s) => (s.lessons.includes(lessonId) ? s : { ...s, lessons: [...s.lessons, lessonId] }));
 
+  /**
+   * The completion statement, for courses that carry a requirement worth attesting to.
+   *
+   * Typed rather than ticked. A checkbox records that a mouse moved; a name typed by the
+   * person whose name it is, shown back to them afterwards, records that somebody
+   * asserted something. It is the last step before a course counts, which is the order
+   * that makes it mean anything: attesting that you completed something you have not
+   * finished is a harder thing to do by accident.
+   */
+  const [attestName, setAttestName] = useState('');
+  const signAttestation = (courseId: string) => {
+    const name = attestName.trim();
+    if (!name) return;
+    set((s) => ({
+      ...s,
+      attestation: { ...(s.attestation || {}), [courseId]: { name, at: new Date().toISOString() } },
+    }));
+    onSignal?.('academy_attestation_signed', { courseId });
+    setAttestName('');
+  };
+
   // ── Catalog ────────────────────────────────────────────────────────────
 
   const renderCatalog = () => {
@@ -732,16 +784,12 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             <Btn onClick={() => setView({ name: 'credentials' })}>Browse credentials</Btn>
             <Btn variant="secondary" onClick={() => setView({ name: 'transcript' })}>My transcript</Btn>
           </div>
-          <div className="flex flex-wrap justify-center gap-2 pt-2">
-            {LEARNING_MODEL.map((step, i) => (
-              <React.Fragment key={step}>
-                <span className="px-4 py-2 rounded-full bg-white border border-zinc-200 text-[11px] font-bold uppercase tracking-wider text-zinc-600">
-                  {step}
-                </span>
-                {i < LEARNING_MODEL.length - 1 && <span className="self-center text-zinc-300">›</span>}
-              </React.Fragment>
-            ))}
-          </div>
+          {/* The arc of the Academy, set as a line of text rather than six pills.
+              A pill on a white ground with a border is a button, so readers tried to press
+              these and nothing happened. This says the same thing and asks for nothing. */}
+          <p className="pt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-400">
+            {LEARNING_MODEL.join('  \u00b7  ')}
+          </p>
         </div>
 
         {enrolledPaths.length > 0 && (
@@ -799,64 +847,56 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               // pushed the course title and the enroll action below the fold on a
               // phone. The badge and the title now sit in the card itself, where a
               // reader is already looking.
-              const badge =
-                v.state === 'past' ? { text: 'Past cohort', cls: 'bg-zinc-100 text-zinc-600' }
-                : v.state === 'upcoming' ? { text: v.cohortLabel || 'Upcoming', cls: 'bg-[#F9C74F] text-zinc-900' }
-                : ready ? { text: 'Open now', cls: 'bg-emerald-50 text-emerald-700' }
-                : { text: 'In curriculum review', cls: 'bg-zinc-100 text-zinc-500' };
+              // Tone rather than a colour class, so the badge belongs to the card system
+              // instead of carrying its own palette. Warm is the one that means "act soon".
+              const badge: { text: string; tone: 'outline' | 'solid' | 'warm' } =
+                v.state === 'past' ? { text: 'Past cohort', tone: 'outline' }
+                : v.state === 'upcoming' ? { text: v.cohortLabel || 'Upcoming', tone: 'warm' }
+                : ready ? { text: 'Open now', tone: 'solid' }
+                : { text: 'In curriculum review', tone: 'outline' };
 
               return (
-                <article key={p.id} className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm overflow-hidden flex flex-col hover:border-[#233DFF]/40 hover:shadow-md transition-all">
-                  <div className="p-6 flex flex-col gap-3 flex-1">
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">{p.level}</p>
-                      <span className={`text-[10px] font-bold tracking-wide px-2.5 py-1 rounded-full shrink-0 ${badge.cls}`}>
-                        {badge.text}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold leading-tight text-zinc-900">{p.title}</h3>
-                      <p className="text-[12px] text-zinc-500 mt-1.5">
-                        {ready
-                          ? `${p.courses.length} ${p.courses.length === 1 ? 'course' : 'courses'}${lessons ? ` \u00b7 ${lessons} lessons` : ''}${hours ? ` \u00b7 about ${hours} ${hours === 1 ? 'hour' : 'hours'}` : ''}`
-                          : 'Courses available soon'}
-                      </p>
-                    </div>
-                    <p className="text-sm text-zinc-600 leading-relaxed flex-1">{p.purpose}</p>
-                    {pct > 0 && <Bar percent={pct} />}
-
-                    <div className="flex flex-wrap items-center gap-2 mt-auto pt-1">
-                      {enrollable && (
-                        <Btn onClick={() => { if (enroll(p)) setView({ name: 'pathway', pathwayId: p.id }); }}>
-                          {state.enrolled.includes(p.id) ? 'Continue' : 'Enroll'}
-                        </Btn>
-                      )}
-                      {v.state === 'upcoming' && (
-                        <Btn onClick={() => { if (enroll(p)) setView({ name: 'pathway', pathwayId: p.id }); }}>
-                          Save my spot
-                        </Btn>
-                      )}
-                      <button
-                        onClick={() => setView({ name: 'pathway', pathwayId: p.id })}
-                        className="text-sm font-semibold text-[#233DFF] hover:underline px-1"
-                      >
-                        {v.state === 'past' ? 'See what was covered' : 'See the lessons'}
-                      </button>
-                    </div>
-
-                    {v.state === 'past' && (
-                      <p className="text-xs text-zinc-500">
-                        This cohort has finished. The coursework stays readable, and the next cohort
-                        will appear here when it is scheduled.
-                      </p>
-                    )}
-                    {v.state === 'upcoming' && (
-                      <p className="text-xs text-zinc-500">
-                        Saving a spot holds your place and sends one reminder before it starts.
-                      </p>
-                    )}
-                  </div>
-                </article>
+                <SurfaceCard
+                  key={p.id}
+                  tone={v.state === 'past' ? 'quiet' : ready ? 'default' : 'quiet'}
+                  badges={<CardBadge tone={badge.tone}>{badge.text}</CardBadge>}
+                  eyebrow={p.level}
+                  title={p.title}
+                  meta={
+                    ready
+                      ? `${p.courses.length} ${p.courses.length === 1 ? 'course' : 'courses'}${lessons ? ` \u00b7 ${lessons} lessons` : ''}${hours ? ` \u00b7 about ${hours} ${hours === 1 ? 'hour' : 'hours'}` : ''}`
+                      : 'Courses available soon'
+                  }
+                  body={p.purpose}
+                  action={
+                    enrollable ? (
+                      <Btn className="w-full" onClick={() => { if (enroll(p)) setView({ name: 'pathway', pathwayId: p.id }); }}>
+                        {state.enrolled.includes(p.id) ? 'Continue' : 'Enrol'}
+                      </Btn>
+                    ) : v.state === 'upcoming' ? (
+                      <Btn className="w-full" onClick={() => { if (enroll(p)) setView({ name: 'pathway', pathwayId: p.id }); }}>
+                        Save my spot
+                      </Btn>
+                    ) : undefined
+                  }
+                  secondary={
+                    <button
+                      onClick={() => setView({ name: 'pathway', pathwayId: p.id })}
+                      className="w-full text-center text-[12px] font-bold uppercase tracking-widest text-zinc-600 hover:text-zinc-900"
+                    >
+                      {v.state === 'past' ? 'What was covered' : 'See lessons'}
+                    </button>
+                  }
+                  note={
+                    v.state === 'past'
+                      ? 'This cohort has finished. The coursework stays readable, and the next cohort will appear here when it is scheduled.'
+                      : v.state === 'upcoming'
+                      ? 'Saving a spot holds your place and sends one reminder before it starts.'
+                      : undefined
+                  }
+                >
+                  {pct > 0 && <Bar percent={pct} />}
+                </SurfaceCard>
               );
             })}
           </div>
@@ -1261,9 +1301,9 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           </div>
         )}
 
-        {registered && hasCourses && (
+        {hasCourses && (
           <>
-            {pre && p.postTest && (
+            {registered && pre && p.postTest && (
               <div className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-7 space-y-4">
                 <div className="flex items-center gap-2 text-zinc-400">
                   <TrendingUp size={16} />
@@ -1303,6 +1343,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     delivery={c.delivery}
                     ce={!!c.ce}
                     priceUsd={c.price?.amountUsd}
+                    locked={!registered}
                     percent={coursePercent(p, c.id, state)}
                     done={isCourseComplete(p, c.id, state)}
                     onOpen={() => setView({ name: 'course', pathwayId: p.id, courseId: c.id })}
@@ -1312,7 +1353,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             </div>
 
             {/* Assessment + capstone */}
-            {p.postTest && (
+            {registered && p.postTest && (
             <div className="space-y-3">
               <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Assessment</h2>
               <div className="bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1434,27 +1475,6 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
    * refusing, and everything above the lesson list stays readable either way.
    */
   const lessonsUnlocked = (pathwayId: string) => !guest && state.enrolled.includes(pathwayId);
-
-  const LockedLessons: React.FC<{ pathwayId: string; pathway: Pathway }> = ({ pathwayId, pathway }) => (
-    <div className="rounded-2xl border border-[#0f0f0f]/20 bg-white p-8 space-y-4 text-center">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Course content</p>
-      <p className="text-lg font-semibold text-zinc-900">
-        {guest ? 'Create a free account to start this course' : 'Enrol to start this course'}
-      </p>
-      <p className="text-sm text-zinc-500 max-w-md mx-auto leading-relaxed">
-        {guest
-          ? 'Your place, your progress and your completion record are all kept against your account, so you can stop and pick it up on any device.'
-          : 'Enrolling records your progress against your account and puts this pathway on your transcript.'}
-      </p>
-      <div className="flex justify-center pt-1">
-        {guest ? (
-          <Btn onClick={() => onRequireSignIn?.('to start this course and keep your progress')}>Create an account</Btn>
-        ) : (
-          <Btn onClick={() => { enroll(pathway); }}>Enrol and start</Btn>
-        )}
-      </div>
-    </div>
-  );
 
   const renderCourse = (pathwayId: string, courseId: string) => {
     const p = pathwayById(pathwayId);
@@ -1766,6 +1786,70 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               );
             })()}
 
+            {/* What is still outstanding on this course, and the statement that closes it.
+                Only rendered where the course actually carries a requirement, so an
+                ordinary self-paced course is unchanged. */}
+            {(() => {
+              const gates = courseGates(p, c.id, state, minutesOnCourse);
+              const extra = gates.filter((g) => g.id !== 'content');
+              if (!extra.length) return null;
+              const signed = state.attestation?.[c.id];
+              const readyToSign = gates.filter((g) => g.id !== 'attestation').every((g) => g.met);
+              return (
+                <section className="space-y-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h2 className="text-xl font-semibold text-zinc-900">What this course needs</h2>
+                    <p className="text-[12px] font-semibold text-zinc-400">
+                      {gates.filter((g) => g.met).length} of {gates.length} done
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-[#0f0f0f]/20 bg-white divide-y divide-zinc-100">
+                    {gates.map((g) => (
+                      <div key={g.id} className="flex items-center justify-between gap-4 p-5">
+                        <div className="min-w-0">
+                          <p className={`text-sm font-semibold ${g.met ? 'text-zinc-400' : 'text-zinc-900'}`}>{g.label}</p>
+                          {g.detail && <p className="text-[12px] text-zinc-400 mt-0.5">{g.detail}</p>}
+                        </div>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shrink-0 ${g.met ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-500'}`}>
+                          {g.met ? 'Done' : 'To do'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {signed ? (
+                    <p className="text-[13px] text-zinc-500 leading-relaxed">
+                      Signed by {signed.name} on{' '}
+                      {new Date(signed.at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}.
+                    </p>
+                  ) : readyToSign ? (
+                    <div className="rounded-2xl border border-[#0f0f0f]/20 bg-white p-6 space-y-4">
+                      <p className="text-sm font-semibold text-zinc-900">Completion statement</p>
+                      <p className="text-[13.5px] text-zinc-600 leading-relaxed">
+                        By typing your name below you are certifying that you personally completed
+                        this course, that the work submitted is your own, and that the time recorded
+                        against it is time you spent in the material.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <input
+                          value={attestName}
+                          onChange={(e) => setAttestName(e.target.value)}
+                          placeholder="Type your full name"
+                          aria-label="Your full name"
+                          className="flex-1 px-5 py-3 bg-white border border-zinc-200 rounded-full outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 text-sm font-medium"
+                        />
+                        <Btn onClick={() => signAttestation(c.id)} disabled={!attestName.trim()}>Sign and finish</Btn>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-[13px] text-zinc-400 leading-relaxed">
+                      The completion statement opens once everything above is done.
+                    </p>
+                  )}
+                </section>
+              );
+            })()}
+
             <section className="space-y-4">
               <h2 className="text-xl font-semibold text-zinc-900">This course contains the following modules</h2>
               <div className="space-y-3">
@@ -1782,6 +1866,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                         setView({ name: 'lesson', pathwayId, courseId, index: i });
                       }}
                       aria-label={locked ? `${l.title}. Available once you enrol.` : l.title}
+                      title={locked ? 'Available as soon as you enrol. Enrolling is free.' : undefined}
                       className={`w-full text-left flex items-start gap-5 p-6 rounded-2xl border transition-all ${done ? 'bg-zinc-50/60 border-zinc-100' : locked ? 'bg-zinc-50/40 border-zinc-150 hover:border-[#233DFF]/30' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40 hover:shadow-sm'}`}
                     >
                       <span className={`w-11 h-11 rounded-2xl flex items-center justify-center border shrink-0 ${done ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : locked ? 'bg-zinc-100 text-zinc-400 border-zinc-200' : 'bg-blue-50 text-[#233DFF] border-blue-100'}`}>
@@ -1791,7 +1876,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                         <span className="block text-[15px] font-semibold text-zinc-900 leading-snug">{l.title}</span>
                         <span className="block text-[13px] text-zinc-500 leading-relaxed">{l.summary}</span>
                         <span className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 pt-0.5">
-                          {l.minutes} minutes{done ? ' · Complete' : locked ? ' · Opens when you enroll' : ''}
+                          {l.minutes} minutes{done ? ' · Complete' : locked ? ' · Available as soon as you enrol' : ''}
                         </span>
                       </span>
                     </button>

@@ -172,6 +172,25 @@ export interface Course {
    * catalogue edit and not a deployment of new payment logic.
    */
   price?: { amountUsd: number; payUrl: string; note?: string };
+  /**
+   * Minutes a learner must actually spend in this course before it can be completed.
+   *
+   * Absent for almost every course, and that is the point: time is measured everywhere
+   * and enforced only where somebody decided it should be. Continuing education sets it
+   * to fifty per credit hour because a regulator requires exactly that. An ordinary
+   * course leaves it unset and simply gets an honest number on its completion record.
+   */
+  minMinutes?: number;
+  /**
+   * An exam belonging to this course, rather than to the pathway it sits in.
+   *
+   * Knowledge checks are formative: they teach, they explain the answer, and getting one
+   * wrong costs nothing. A pathway post-test is summative but sits at the end of eight
+   * courses, so it cannot say whether any single course was learned. Where a course
+   * grants credit on its own, the thing that decides whether it was earned has to be
+   * attached to the course.
+   */
+  exam?: { questions: Check[]; passPercent: number };
   /** Used instead of preTest/postTest where HMC's instrument is retrospective. */
   retroEval?: RetroPrePost;
   /** Ordered completion requirements, including work done outside the platform. */

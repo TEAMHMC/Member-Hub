@@ -36,6 +36,23 @@ export interface LearnerState {
   capstone: Record<string, string>;
   /** Pathway id -> ISO issue date. Only set when every gate passes. */
   credentials: Record<string, string>;
+  /**
+   * Course id -> that course's own exam result, where it has one.
+   *
+   * Separate from postTest, which is the pathway's. A course that grants credit on its
+   * own needs the thing that decides whether it was earned attached to it, because a
+   * post-test sitting at the end of eight courses cannot say whether any single one of
+   * them was learned.
+   */
+  courseExam: Record<string, TestResult>;
+  /**
+   * Course id -> the learner's signed statement that they completed it themselves.
+   *
+   * Typed rather than clicked. The point is not the keystrokes, it is that a person is
+   * asserting something in their own words and can be shown it again afterwards. A
+   * completion record that nobody attested to is a record of clicks.
+   */
+  attestation: Record<string, { name: string; at: string }>;
   last?: { pathwayId: string; courseId: string };
 }
 
@@ -50,6 +67,8 @@ const EMPTY: LearnerState = {
   postAttempts: {},
   capstone: {},
   credentials: {},
+  courseExam: {},
+  attestation: {},
 };
 
 const key = (userId: string) => `hmc_academy_v2_${userId}`;
@@ -108,6 +127,77 @@ export function coursePercent(
 
 export const isCourseComplete = (p: Pathway, courseId: string, s: LearnerState) =>
   coursePercent(p, courseId, s) === 100;
+
+/**
+ * Everything still standing between a learner and finishing this course.
+ *
+ * Kept separate from isCourseComplete, which answers a narrower question: have they read
+ * and done everything. That is still the right question for a progress bar. Earning a
+ * course can require more, and where it does, a learner is owed a plain list of what is
+ * outstanding rather than a button that refuses.
+ *
+ * Minutes are passed in rather than read here, because they live in the browser and this
+ * module stays pure so it can be tested without one.
+ */
+export interface CourseGate { id: string; label: string; met: boolean; detail?: string }
+
+export function courseGates(
+  p: Pathway,
+  courseId: string,
+  s: LearnerState,
+  minutesSpent: number,
+): CourseGate[] {
+  const c = p.courses.find((x) => x.id === courseId);
+  if (!c) return [];
+  const gates: CourseGate[] = [
+    {
+      id: 'content',
+      label: 'Work through every lesson and activity',
+      met: isCourseComplete(p, courseId, s),
+      detail: `${coursePercent(p, courseId, s)}% done`,
+    },
+  ];
+
+  if (c.minMinutes) {
+    gates.push({
+      id: 'time',
+      label: `Spend ${c.minMinutes} minutes in the material`,
+      met: minutesSpent >= c.minMinutes,
+      detail: `${Math.min(minutesSpent, c.minMinutes)} of ${c.minMinutes} minutes`,
+    });
+  }
+
+  if (c.exam) {
+    const score = s.courseExam?.[courseId]?.score ?? null;
+    gates.push({
+      id: 'exam',
+      label: `Pass the course exam at ${c.exam.passPercent}%`,
+      met: score !== null && score >= c.exam.passPercent,
+      detail: score === null ? 'Not taken yet' : `Scored ${score}%`,
+    });
+  }
+
+  // Asked for wherever a course carries a requirement worth attesting to. A course with
+  // neither a clock nor an exam is not asking anybody to swear to anything.
+  if (c.minMinutes || c.exam) {
+    gates.push({
+      id: 'attestation',
+      label: 'Sign the completion statement',
+      met: !!s.attestation?.[courseId],
+      detail: s.attestation?.[courseId] ? 'Signed' : 'Last step',
+    });
+  }
+
+  return gates;
+}
+
+/** Whether every gate on this course is met. */
+export const isCourseEarned = (
+  p: Pathway,
+  courseId: string,
+  s: LearnerState,
+  minutesSpent: number,
+): boolean => courseGates(p, courseId, s, minutesSpent).every((g) => g.met);
 
 export function pathwayPercent(p: Pathway, s: LearnerState): number {
   if (!p.courses.length) return 0;

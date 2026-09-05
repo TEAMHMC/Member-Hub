@@ -82,6 +82,18 @@ export const UNSTOPPABLE_CE: Course = {
     payUrl: PAYPAL_CEU_URL,
     note: 'Covers your seat and your CE certificate. Every other HMC course is free.',
   },
+  /**
+   * Fifty minutes for one credit hour.
+   *
+   * Not a number chosen here. Approval agencies set the ratio, and CDPH states it
+   * explicitly for online continuing education: fifty minutes of active participation per
+   * CE hour, with the participant unable to go straight to the exam. This course is
+   * currently delivered as a scheduled live session where attendance is the record, so
+   * the clock is belt and braces today. It becomes the requirement the moment any part of
+   * it is offered on demand, and having it already there is what makes that possible
+   * without rebuilding the course.
+   */
+  minMinutes: 50,
   sessions: [],
   retroEval: {
     conductedFor: 'Los Angeles County Department of Mental Health',
