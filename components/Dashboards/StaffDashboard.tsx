@@ -1,10 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   SlidersHorizontal, LifeBuoy, Megaphone, Users, ShieldCheck,
-  Check, X, Search, Trash2, AlertTriangle, ExternalLink,
+  Check, X, Search, Trash2, AlertTriangle, ExternalLink, FileText, Plus,
 } from 'lucide-react';
 import type { StaffStanding } from '../../types';
-import { staffApi, type HubStaffOverview, type MemberLookup } from '../../services/api';
+import {
+  staffApi,
+  type HubStaffOverview, type MemberLookup,
+  type HubPerson, type HubTier,
+  type HubCurriculumCourse, type HubCurriculumDetail,
+} from '../../services/api';
 import { PATHWAYS } from '../Academy/catalog';
 
 /**
@@ -28,7 +33,7 @@ import { PATHWAYS } from '../Academy/catalog';
  * admin additionally sees who holds Hub access.
  */
 
-type Tab = 'academy' | 'content' | 'support' | 'staffAdmin';
+type Tab = 'academy' | 'curriculum' | 'content' | 'support' | 'staffAdmin';
 
 const ACADEMY_STATES: { value: string; label: string; help: string }[] = [
   { value: 'open', label: 'Open', help: 'Members can see it and enroll now.' },
@@ -39,6 +44,7 @@ const ACADEMY_STATES: { value: string; label: string; help: string }[] = [
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'academy', label: 'Courses', icon: <SlidersHorizontal size={16} /> },
+  { id: 'curriculum', label: 'Curriculum', icon: <FileText size={16} /> },
   { id: 'content', label: 'Announcements', icon: <Megaphone size={16} /> },
   { id: 'support', label: 'Member support', icon: <LifeBuoy size={16} /> },
   { id: 'staffAdmin', label: 'Hub access', icon: <Users size={16} /> },
@@ -51,10 +57,13 @@ const primary = 'px-5 py-3 rounded-full bg-[#233DFF] text-white text-[11px] font
 
 interface Props {
   staff: StaffStanding;
+  /** The address this session signed in with. StaffStanding carries a name and a role but
+      not an address, and self-removal has to be recognisable before the button is drawn. */
+  selfEmail: string;
   onExit: () => void;
 }
 
-const StaffDashboard: React.FC<Props> = ({ staff, onExit }) => {
+const StaffDashboard: React.FC<Props> = ({ staff, selfEmail, onExit }) => {
   const allowed = useMemo(() => TABS.filter((t) => staff.capabilities.includes(t.id)), [staff.capabilities]);
   const [tab, setTab] = useState<Tab>(allowed[0]?.id || 'support');
   const [overview, setOverview] = useState<HubStaffOverview | null>(null);
@@ -109,7 +118,8 @@ const StaffDashboard: React.FC<Props> = ({ staff, onExit }) => {
       {tab === 'academy' && <AcademyPanel overview={overview} onChanged={load} />}
       {tab === 'content' && <AnnouncementsPanel overview={overview} onChanged={load} />}
       {tab === 'support' && <SupportPanel />}
-      {tab === 'staffAdmin' && <AccessPanel />}
+      {tab === 'curriculum' && <CurriculumPanel />}
+      {tab === 'staffAdmin' && <AccessPanel selfEmail={selfEmail} />}
     </div>
   );
 };
@@ -377,59 +387,431 @@ const Row: React.FC<{ ok: boolean; yes: string; no: string }> = ({ ok, yes, no }
 );
 
 /** Who can maintain the Hub. Read only, on purpose. */
-const AccessPanel: React.FC = () => {
-  const [rows, setRows] = useState<Array<{ name: string; email: string; role: string; isAdmin: boolean; capabilities: string[] }> | null>(null);
-  const [err, setErr] = useState(false);
+/**
+ * Who maintains the Hub, managed from the Hub.
+ *
+ * This was a read-only list with a line telling whoever read it to go and change somebody's
+ * role in the volunteer portal. That was accurate and it was the problem: Hub standing came
+ * from the volunteers collection alone, so giving an employee the console meant first
+ * enrolling them as a volunteer. Staff are not volunteers, and the Hub could not be handed
+ * over without handing over the portal too.
+ *
+ * The Hub now keeps its own roster. Somebody added here needs no volunteer record and no
+ * portal account; they sign in to the Hub with their own address and the console is there.
+ * Anybody still reaching the console through a portal role keeps doing so, and is listed
+ * separately below so it is obvious which list a person is on.
+ */
+/**
+ * Reviewing and correcting what a course says, without leaving the Hub.
+ *
+ * The review queue and the editor have always been in the volunteer portal, so the person
+ * who approves a course worked in a different application from everybody reading it, and
+ * needed a portal account and a volunteer record to fix a sentence. This is the same work,
+ * against the same records, on the Hub session they already have.
+ *
+ * A course with no correction is showing the Hub's own catalogue text. That is not the
+ * same as unreviewed, and the list says which it is rather than leaving a reviewer to
+ * guess from an empty editor.
+ */
+const CurriculumPanel: React.FC = () => {
+  const [courses, setCourses] = useState<HubCurriculumCourse[] | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [detail, setDetail] = useState<HubCurriculumDetail | null>(null);
+  const [sections, setSections] = useState<{ heading: string; body: string }[]>([]);
+  const [intro, setIntro] = useState('');
+  const [note, setNote] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [done, setDone] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
 
-  useEffect(() => {
-    staffApi.roster().then((r) => setRows(r.staff)).catch(() => setErr(true));
-  }, []);
+  const load = () => {
+    staffApi.curriculum()
+      .then((r) => setCourses(r.courses))
+      .catch(() => setErr('The course list could not load.'));
+  };
+  useEffect(load, []);
+
+  const open = (id: string) => {
+    setOpenId(id); setDetail(null); setErr(null); setDone(null); setNote('');
+    staffApi.course(id)
+      .then((d) => {
+        setDetail(d);
+        setIntro(d.content || '');
+        setSections(d.sections.length ? d.sections : [{ heading: '', body: '' }]);
+      })
+      .catch(() => setErr('That course could not be opened.'));
+  };
+
+  const release = async () => {
+    if (!detail) return;
+    const clean = sections
+      .map((x) => ({ heading: x.heading.trim(), body: x.body.trim() }))
+      .filter((x) => x.heading || x.body);
+    if (!clean.length) { setErr('A course needs at least one section.'); return; }
+    const incomplete = clean.find((x) => !x.heading || !x.body);
+    if (incomplete) { setErr('Every section needs both a heading and a body.'); return; }
+
+    setBusy(true); setErr(null); setDone(null);
+    try {
+      const r = await staffApi.releaseCourse(detail.id, intro.trim(), clean, note.trim());
+      setDone(`Released as version ${r.version}. Members reading this course see it now.`);
+      load();
+      staffApi.course(detail.id).then(setDetail).catch(() => {});
+    } catch (e) {
+      setErr('That could not be released. Nothing was changed.');
+    } finally { setBusy(false); }
+  };
+
+  const setSection = (i: number, patch: Partial<{ heading: string; body: string }>) =>
+    setSections((xs) => xs.map((x, n) => (n === i ? { ...x, ...patch } : x)));
+
+  const filtered = (courses || []).filter((c) =>
+    !query.trim() || c.title.toLowerCase().includes(query.trim().toLowerCase()));
+
+  if (openId && detail) {
+    return (
+      <div className="space-y-3">
+        <button
+          onClick={() => { setOpenId(null); setDetail(null); }}
+          className="text-[11px] font-black uppercase tracking-wider text-zinc-500 hover:text-zinc-900"
+        >
+          &larr; All courses
+        </button>
+
+        <div className={card}>
+          <p className={label}>{detail.hasCorrection ? `Released version ${detail.version}` : 'No correction released'}</p>
+          <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 mt-1">{detail.title}</h2>
+          {!detail.hasCorrection && (
+            <p className="text-sm text-zinc-600 mt-3 leading-relaxed">
+              This course is showing the text built into the Hub. Anything you write here is
+              released over it, and members see it as soon as you release it. Nothing is
+              published while you are typing.
+            </p>
+          )}
+        </div>
+
+        <div className={card}>
+          <label className={label} htmlFor="curr-intro">Opening</label>
+          <textarea
+            id="curr-intro"
+            className={`${input} mt-2 min-h-[90px]`}
+            value={intro}
+            onChange={(e) => setIntro(e.target.value)}
+            placeholder="The first thing a learner reads. Optional."
+          />
+        </div>
+
+        {sections.map((sec, i) => (
+          <div key={i} className={card}>
+            <div className="flex items-center justify-between gap-3">
+              <label className={label} htmlFor={`curr-h-${i}`}>Section {i + 1}</label>
+              {sections.length > 1 && (
+                <button
+                  onClick={() => setSections((xs) => xs.filter((_, n) => n !== i))}
+                  className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-zinc-400 hover:text-[#FF6E40]"
+                >
+                  <Trash2 size={12} /> Remove
+                </button>
+              )}
+            </div>
+            <input
+              id={`curr-h-${i}`}
+              className={`${input} mt-2 font-semibold`}
+              value={sec.heading}
+              placeholder="Heading"
+              onChange={(e) => setSection(i, { heading: e.target.value })}
+            />
+            <textarea
+              className={`${input} mt-2 min-h-[160px]`}
+              value={sec.body}
+              placeholder="What this section teaches."
+              onChange={(e) => setSection(i, { body: e.target.value })}
+            />
+          </div>
+        ))}
+
+        <button
+          onClick={() => setSections((xs) => [...xs, { heading: '', body: '' }])}
+          className="flex items-center gap-2 px-5 py-3 rounded-full border border-zinc-300 text-[11px] font-black uppercase tracking-wider text-zinc-600 hover:bg-white"
+        >
+          <Plus size={14} /> Add a section
+        </button>
+
+        <div className={card}>
+          <label className={label} htmlFor="curr-note">What changed, and why</label>
+          <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
+            Kept with the version. A CE audit asks what was corrected and on whose authority,
+            and a blank note a year from now cannot answer it.
+          </p>
+          <input
+            id="curr-note"
+            className={`${input} mt-3`}
+            value={note}
+            placeholder="Corrected the GAD-7 severity bands to match the validated source."
+            onChange={(e) => setNote(e.target.value)}
+          />
+          {err && <p className="text-sm font-semibold text-[#FF6F91] mt-4">{err}</p>}
+          {done && <p className="text-sm font-semibold text-emerald-700 mt-4">{done}</p>}
+          <button onClick={release} className={`${primary} mt-5`} disabled={busy}>
+            {busy ? 'Releasing' : 'Release to members'}
+          </button>
+        </div>
+
+        {detail.history.length > 0 && (
+          <div className={card}>
+            <p className={label}>Earlier versions</p>
+            <div className="mt-3 divide-y divide-zinc-100">
+              {detail.history.map((h) => (
+                <div key={h.version} className="py-2.5">
+                  <p className="text-sm text-zinc-700">
+                    Version {h.version}{h.note ? ` — ${h.note}` : ''}
+                  </p>
+                  <p className="text-[11px] text-zinc-400 mt-0.5">
+                    {h.archivedBy || 'unknown'}{h.archivedAt ? ` · ${h.archivedAt.slice(0, 10)}` : ''}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
       <div className={card}>
-        <div className="flex items-start gap-3">
-          <ShieldCheck size={18} className="text-[#233DFF] mt-0.5 shrink-0" />
-          <div>
-            <p className="text-sm font-semibold text-zinc-900">Hub access follows the volunteer portal roster</p>
-            <p className="text-sm text-zinc-600 mt-2 leading-relaxed">
-              There is no separate list to keep. Someone who holds an admin flag or a coordinator
-              role in the portal can maintain the Hub, and removing that role removes this access on
-              their next request. To change who appears here, change their role in the portal.
-            </p>
-            <a
-              href="https://volunteer.healthmatters.clinic"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 mt-3 text-[11px] font-black uppercase tracking-wider text-[#233DFF] hover:underline"
-            >
-              Open the portal <ExternalLink size={12} />
-            </a>
-          </div>
+        <p className={label}>Course content</p>
+        <p className="text-sm text-zinc-600 mt-2 leading-relaxed">
+          Open a course to read what a learner reads, correct it, and release the correction.
+          Every release keeps the version before it, so nothing is lost and the history says
+          who changed what.
+        </p>
+        <div className="relative mt-4">
+          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" />
+          <input
+            className={`${input} pl-11`}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Find a course"
+            aria-label="Find a course"
+          />
         </div>
       </div>
 
-      {err && <div className={card}><p className="text-sm text-zinc-500">The roster could not load.</p></div>}
+      {err && <div className={card}><p className="text-sm text-zinc-500">{err}</p></div>}
 
-      {rows && (
+      {courses && (
         <div className={card}>
-          <p className={label}>{rows.length} with hub access</p>
+          <p className={label}>{filtered.length} {filtered.length === 1 ? 'course' : 'courses'}</p>
           <div className="mt-3 divide-y divide-zinc-100">
-            {rows.map((r) => (
-              <div key={r.email} className="flex flex-wrap items-center justify-between gap-3 py-3">
+            {filtered.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => open(c.id)}
+                className="w-full flex flex-wrap items-center justify-between gap-3 py-3.5 text-left group"
+              >
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-zinc-900 truncate">{r.name}</p>
-                  <p className="text-[11px] text-zinc-400 mt-0.5 truncate">{r.role}</p>
+                  <p className="text-sm font-semibold text-zinc-900 group-hover:text-[#233DFF] truncate">{c.title}</p>
+                  <p className="text-[11px] text-zinc-400 mt-0.5">
+                    {c.corrected
+                      ? `Version ${c.version}${c.updatedByName ? ` · ${c.updatedByName}` : ''}${c.updatedAt ? ` · ${c.updatedAt.slice(0, 10)}` : ''}`
+                      : 'Showing the text built into the Hub'}
+                  </p>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {r.capabilities.map((c) => (
-                    <span key={c} className="px-2.5 py-1 rounded-full bg-zinc-100 text-[9px] font-black uppercase tracking-wider text-zinc-600">
-                      {c === 'staffAdmin' ? 'access' : c}
-                    </span>
-                  ))}
+                <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider shrink-0 ${
+                  c.corrected ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-500'
+                }`}>
+                  {c.corrected ? 'Corrected' : 'Unchanged'}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const AccessPanel: React.FC<{ selfEmail: string }> = ({ selfEmail }) => {
+  const [tiers, setTiers] = useState<HubTier[]>([]);
+  const [people, setPeople] = useState<HubPerson[] | null>(null);
+  const [portalRoster, setPortalRoster] = useState<Array<{ name: string; email: string; role: string; capabilities: string[] }> | null>(null);
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [tier, setTier] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [done, setDone] = useState<string | null>(null);
+
+  const load = () => {
+    staffApi.people()
+      .then((r) => { setPeople(r.people); setTiers(r.tiers); if (!tier && r.tiers[0]) setTier(r.tiers[0].id); })
+      .catch(() => setErr('The Hub roster could not load.'));
+    staffApi.roster().then((r) => setPortalRoster(r.staff)).catch(() => setPortalRoster([]));
+  };
+  useEffect(load, []);
+
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
+  const add = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailValid || !name.trim() || !tier) return;
+    setBusy(true); setErr(null); setDone(null);
+    try {
+      await staffApi.grantAccess(email.trim().toLowerCase(), name.trim(), tier);
+      setDone(`${name.trim()} can now sign in to the Hub and open this console.`);
+      setEmail(''); setName('');
+      load();
+    } catch {
+      setErr('That could not be saved. Check the address and try again.');
+    } finally { setBusy(false); }
+  };
+
+  const remove = async (person: HubPerson) => {
+    setBusy(true); setErr(null); setDone(null);
+    try {
+      await staffApi.revokeAccess(person.email);
+      setDone(`${person.name || person.email} no longer has Hub access.`);
+      load();
+    } catch {
+      setErr('That could not be removed just then.');
+    } finally { setBusy(false); }
+  };
+
+  const active = (people || []).filter((p) => p.active);
+  const removed = (people || []).filter((p) => !p.active);
+  const chosen = tiers.find((t) => t.id === tier);
+
+  return (
+    <div className="space-y-3">
+      <form onSubmit={add} className={card}>
+        <p className={label}>Give someone access to the hub</p>
+        <p className="text-sm text-zinc-600 mt-2 leading-relaxed">
+          They sign in at the Hub with this address, by email code or with Google. No volunteer
+          record and no portal account is needed.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+          <div>
+            <label className={label} htmlFor="hub-access-name">Full name</label>
+            <input id="hub-access-name" className={`${input} mt-2`} value={name} placeholder="Chloe Adeyemi"
+                   onChange={(e) => setName(e.target.value)} />
+          </div>
+          <div>
+            <label className={label} htmlFor="hub-access-email">Email they sign in with</label>
+            <input id="hub-access-email" type="email" className={`${input} mt-2`} value={email} placeholder="name@healthmatters.clinic"
+                   onChange={(e) => setEmail(e.target.value)} />
+          </div>
+        </div>
+
+        <p className={`${label} mt-5`}>What they can do</p>
+        <div className="grid grid-cols-1 gap-2 mt-2">
+          {tiers.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setTier(t.id)}
+              aria-pressed={tier === t.id}
+              className={`text-left rounded-2xl border p-4 transition-all ${
+                tier === t.id ? 'border-[#233DFF] bg-blue-50/60 ring-4 ring-[#233DFF]/10' : 'border-zinc-200 bg-white hover:border-zinc-300'
+              }`}
+            >
+              <p className="text-sm font-semibold text-zinc-900">{t.label}</p>
+              <p className="text-xs text-zinc-500 leading-relaxed mt-1">{t.describes}</p>
+            </button>
+          ))}
+        </div>
+
+        {err && <p className="text-sm font-semibold text-[#FF6F91] mt-4">{err}</p>}
+        {done && <p className="text-sm font-semibold text-emerald-700 mt-4">{done}</p>}
+
+        <button type="submit" className={`${primary} mt-5`} disabled={busy || !emailValid || !name.trim() || !tier}>
+          {busy ? 'Saving' : `Add as ${chosen?.label || 'staff'}`}
+        </button>
+      </form>
+
+      {active.length > 0 && (
+        <div className={card}>
+          <p className={label}>{active.length} with hub access</p>
+          <div className="mt-3 divide-y divide-zinc-100">
+            {active.map((p) => (
+              <div key={p.email} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-zinc-900 truncate">{p.name || p.email}</p>
+                  <p className="text-[11px] text-zinc-400 mt-0.5 truncate">{p.tierLabel} · {p.email}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap gap-1.5">
+                    {p.capabilities.map((c) => (
+                      <span key={c} className="px-2.5 py-1 rounded-full bg-zinc-100 text-[9px] font-black uppercase tracking-wider text-zinc-600">
+                        {c === 'staffAdmin' ? 'access' : c}
+                      </span>
+                    ))}
+                  </div>
+                  {/* Nobody removes their own access. An administrator who does it by accident
+                      leaves the Hub with no administrator and no way to appoint another. */}
+                  {p.email.toLowerCase() !== selfEmail.trim().toLowerCase() && (
+                    <button
+                      onClick={() => remove(p)}
+                      disabled={busy}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-full border border-zinc-300 text-[10px] font-black uppercase tracking-wider text-zinc-500 hover:text-[#FF6E40] hover:border-[#FF6E40] disabled:opacity-50"
+                    >
+                      <Trash2 size={12} /> Remove
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {removed.length > 0 && (
+        <div className={card}>
+          <p className={label}>Previously had access</p>
+          <p className="text-xs text-zinc-500 mt-2">
+            Kept rather than deleted, so there is a record of who was let in and who took it away.
+          </p>
+          <div className="mt-3 divide-y divide-zinc-100">
+            {removed.map((p) => (
+              <div key={p.email} className="flex items-center justify-between gap-3 py-2.5">
+                <p className="text-sm text-zinc-500 truncate">{p.name || p.email}</p>
+                <p className="text-[11px] text-zinc-400 shrink-0">removed {p.revokedAt ? p.revokedAt.slice(0, 10) : ''}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {portalRoster && portalRoster.length > 0 && (
+        <div className={card}>
+          <div className="flex items-start gap-3">
+            <ShieldCheck size={18} className="text-zinc-400 mt-0.5 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-zinc-900">Also here through a volunteer portal role</p>
+              <p className="text-sm text-zinc-600 mt-2 leading-relaxed">
+                These {portalRoster.length} reach the console because of the role they hold in the
+                portal, not because they were added above. Change it there, or add them here to give
+                them Hub access that stands on its own.
+              </p>
+              <div className="mt-3 divide-y divide-zinc-100">
+                {portalRoster.map((r) => (
+                  <div key={r.email} className="flex items-center justify-between gap-3 py-2.5">
+                    <p className="text-sm text-zinc-700 truncate">{r.name}</p>
+                    <p className="text-[11px] text-zinc-400 shrink-0 truncate">{r.role}</p>
+                  </div>
+                ))}
+              </div>
+              <a
+                href="https://volunteer.healthmatters.clinic"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 mt-3 text-[11px] font-black uppercase tracking-wider text-[#233DFF] hover:underline"
+              >
+                Open the portal <ExternalLink size={12} />
+              </a>
+            </div>
           </div>
         </div>
       )}

@@ -19,7 +19,8 @@
     "test:notifications": "tsx tests/notifications.test.ts",
     "test:signals": "tsx tests/signals.test.ts",
     "test:engagement": "tsx tests/engagement.test.ts",
-    "test:event-time": "tsx tests/event-time.test.ts"
+    "test:event-time": "tsx tests/event-time.test.ts",
+    "test:render:console": "node tests/browser/staff-console.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.562.0",

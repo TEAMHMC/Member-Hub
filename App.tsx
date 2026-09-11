@@ -275,7 +275,7 @@ const App: React.FC = () => {
 
   const renderPortalContent = () => {
     if (staffView && currentUser?.staff) {
-      return <StaffDashboard staff={currentUser.staff} onExit={() => setStaffView(false)} />;
+      return <StaffDashboard staff={currentUser.staff} selfEmail={currentUser.email} onExit={() => setStaffView(false)} />;
     }
 
     return (
