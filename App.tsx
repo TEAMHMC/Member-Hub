@@ -120,12 +120,25 @@ const App: React.FC = () => {
   const [signIn, setSignIn] = useState<{ open: boolean; reason?: string }>({ open: false });
   const requireSignIn = (reason?: string) => setSignIn({ open: true, reason });
 
-  // Restore a session by validating the httpOnly cookie with the backend
-  // (source of truth), not by trusting localStorage alone. localStorage only
-  // caches non-sensitive UI fields (name, zip, badges) for a fast first paint.
-  useEffect(() => {
+  /**
+   * Ask the server who this is, and build the session from its answer.
+   *
+   * Pulled out of the mount effect because signing in has to do exactly the same thing.
+   * It did not. handleLogin asserted UserRole.CLIENT from the client and never asked,
+   * so somebody on the staff roster signed in, was handed a member session, and found no
+   * Manage hub button anywhere. It appeared on the next full page load, when this ran
+   * for real, which is not a thing anybody would think to try. The Hub looked like it had
+   * no staff access at all.
+   *
+   * `signOutOnFailure` is false when called straight after a sign-in. On first load a
+   * failure means there is no session and the right answer is the sign-in panel. Straight
+   * after a sign-in it means one request did not come back, and dropping somebody out of
+   * an account they have just proved they own, over a moment of bad signal, is a worse
+   * answer than leaving them in the member view they would have had anyway.
+   */
+  const loadSession = React.useCallback((signOutOnFailure = true) => {
     const cached = localStorage.getItem('hmc_user');
-    clientApi.me()
+    return clientApi.me()
       .then((me) => {
         const base: User = cached ? JSON.parse(cached) : ({} as User);
         // The role comes from the server. This used to be hardcoded to CLIENT,
@@ -168,14 +181,20 @@ const App: React.FC = () => {
         setCurrentUser(restored);
         localStorage.setItem('hmc_user', JSON.stringify(restored));
         setView('portal');
+        return restored;
       })
       .catch(() => {
         // No valid session — require sign-in and drop any stale cache.
-        localStorage.removeItem('hmc_user');
-        setCurrentUser(null);
-        setView('login');
+        if (signOutOnFailure) {
+          localStorage.removeItem('hmc_user');
+          setCurrentUser(null);
+          setView('login');
+        }
+        return null;
       });
   }, []);
+
+  useEffect(() => { loadSession(); }, [loadSession]);
 
   const handleLogin = (userData: Partial<User>, role: UserRole = UserRole.CLIENT) => {
     const activeUser: User = {
@@ -199,6 +218,21 @@ const App: React.FC = () => {
     localStorage.setItem('hmc_user', JSON.stringify(activeUser));
     setView('portal');
     setActiveTab('dash');
+
+    /**
+     * Then ask the server who they actually are.
+     *
+     * The object above is what this browser knows: an email, and whatever the onboarding
+     * form just collected. It is enough to show the Hub immediately instead of holding
+     * somebody on a spinner, and it is not enough to decide what they may do. Role and
+     * staff standing are the server's to say, and asserting CLIENT here while never asking
+     * is why somebody on the staff roster signed in and found a member's Hub with no way
+     * into the console. The answer lands a moment later and fills in the rest.
+     *
+     * A failure here changes nothing. They are signed in, and they see the member Hub,
+     * which is what they saw before this call existed.
+     */
+    loadSession(false).catch(() => {});
   };
 
   const handleUpdateUser = (data: Partial<User>) => {
