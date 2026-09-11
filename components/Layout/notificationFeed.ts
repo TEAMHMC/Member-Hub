@@ -19,6 +19,8 @@
 // their phone and sees it unread on a laptop is a smaller problem than a table nobody
 // maintains.
 
+import { formatEventTime } from '../../services/eventTime';
+
 export type NotificationKind =
   | 'course' | 'training' | 'cohort' | 'workshop' | 'webinar' | 'office-hours' | 'recording' | 'news'
   // What HMC actually puts on a calendar. Everything coming off the events endpoint used
@@ -264,7 +266,7 @@ export const buildFeed = (input: {
       kind: eventKind(ev.program, ev.title),
       group: 'event',
       title: ev.title,
-      detail: [ev.time, ev.location].filter(Boolean).join(' at ') || ev.description?.slice(0, 140),
+      detail: [formatEventTime(ev.time), ev.location].filter(Boolean).join(' at ') || ev.description?.slice(0, 140),
       date: ev.date || null,
       action: { label: 'See the event', tab: 'events' },
       weight: 4,

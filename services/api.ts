@@ -163,7 +163,7 @@ export interface ClientMe {
 }
 
 // ── Staff (people who maintain the Hub) ──────────────────────────────────
-export type HubCapability = 'academy' | 'content' | 'support' | 'staffAdmin';
+export type HubCapability = 'academy' | 'content' | 'support' | 'staffAdmin' | 'review' | 'curriculum';
 
 export interface HubStaff {
   role: string;
@@ -228,8 +228,72 @@ export const curriculumApi = {
   },
 };
 
+/** Somebody who maintains the Hub, on the Hub's own roster rather than the volunteers one. */
+export interface HubPerson {
+  email: string;
+  name: string;
+  tier: string;
+  tierLabel: string;
+  role: string;
+  capabilities: HubCapability[];
+  active: boolean;
+  grantedAt: string | null;
+  grantedBy: string | null;
+  revokedAt: string | null;
+}
+
+export interface HubTier {
+  id: string;
+  label: string;
+  describes: string;
+}
+
+/** One Academy course, as the review list shows it. */
+export interface HubCurriculumCourse {
+  id: string;
+  title: string;
+  /** A correction has been released over the built-in text. Not the same as reviewed. */
+  corrected: boolean;
+  version: number;
+  updatedAt: string | null;
+  updatedByName: string | null;
+  note: string | null;
+}
+
+export interface HubCurriculumDetail {
+  id: string;
+  title: string;
+  content: string;
+  sections: { heading: string; body: string }[];
+  version: number;
+  hasCorrection: boolean;
+  history: Array<{ version: number; note: string | null; archivedAt: string | null; archivedBy: string | null }>;
+}
+
 export const staffApi = {
   overview: () => req<HubStaffOverview>('/api/hub/staff/overview'),
+
+  // ── Who maintains the Hub ──────────────────────────────────────────────
+  people: () => req<{ tiers: HubTier[]; people: HubPerson[] }>('/api/hub/staff/people'),
+  grantAccess: (email: string, name: string, tier: string) =>
+    req<{ success: boolean; email: string; tier: string; capabilities: HubCapability[] }>(
+      '/api/hub/staff/people',
+      { method: 'PUT', body: JSON.stringify({ email, name, tier }) },
+    ),
+  revokeAccess: (email: string) =>
+    req<{ success: boolean; email: string }>(
+      `/api/hub/staff/people/${encodeURIComponent(email)}`,
+      { method: 'DELETE' },
+    ),
+
+  // ── Curriculum review ──────────────────────────────────────────────────
+  curriculum: () => req<{ courses: HubCurriculumCourse[]; note?: string }>('/api/hub/staff/curriculum'),
+  course: (id: string) => req<HubCurriculumDetail>(`/api/hub/staff/curriculum/${encodeURIComponent(id)}`),
+  releaseCourse: (id: string, content: string, sections: { heading: string; body: string }[], note: string) =>
+    req<{ success: boolean; version: number; updatedAt: string }>(
+      `/api/hub/staff/curriculum/${encodeURIComponent(id)}`,
+      { method: 'PUT', body: JSON.stringify({ content, sections, note }) },
+    ),
   setAcademyVisibility: (pathwayId: string, state: string, cohortLabel?: string) =>
     req<{ success: boolean; pathwayId: string; state: string; cohortLabel: string | null }>(
       `/api/hub/staff/academy-visibility/${encodeURIComponent(pathwayId)}`,
