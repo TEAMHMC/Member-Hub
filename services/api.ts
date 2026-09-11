@@ -163,7 +163,7 @@ export interface ClientMe {
 }
 
 // ── Staff (people who maintain the Hub) ──────────────────────────────────
-export type HubCapability = 'academy' | 'content' | 'support' | 'staffAdmin';
+export type HubCapability = 'academy' | 'content' | 'support' | 'staffAdmin' | 'review';
 
 export interface HubStaff {
   role: string;

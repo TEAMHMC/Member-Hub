@@ -53,6 +53,16 @@ interface AcademyProps {
   guest?: boolean;
   /** Opens the sign-in panel with a line saying what it is for. */
   onRequireSignIn?: (reason?: string) => void;
+  /**
+   * Whether this session maintains or reviews the curriculum.
+   *
+   * The only thing it changes is whether the governance line under a lesson is shown:
+   * version, effective date and next review. That line is a real record and a clinical
+   * reviewer needs it, but it is written in HMC's own build language ("Four of eleven
+   * courses written", "1.0 partial"), and a member reading a lesson was being shown the
+   * state of our internal work instead of the material.
+   */
+  curriculumStaff?: boolean;
 }
 
 type View =
@@ -502,7 +512,7 @@ const BlockView: React.FC<{
   }
 };
 
-const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal, initialView = 'catalog', member = null, guest = false, onRequireSignIn }) => {
+const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal, initialView = 'catalog', member = null, guest = false, onRequireSignIn, curriculumStaff = false }) => {
   const [state, setState] = useState<LearnerState>(() => loadState(userId));
   const [view, setView] = useState<View>({ name: initialView } as View);
 
@@ -853,7 +863,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                 v.state === 'past' ? { text: 'Past cohort', tone: 'outline' }
                 : v.state === 'upcoming' ? { text: v.cohortLabel || 'Upcoming', tone: 'warm' }
                 : ready ? { text: 'Open now', tone: 'solid' }
-                : { text: 'In curriculum review', tone: 'outline' };
+                : { text: 'Coming soon', tone: 'outline' };
 
               return (
                 <SurfaceCard
@@ -1011,7 +1021,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     <button onClick={() => setView({ name: 'pathway', pathwayId: c.pathwayId })} className="text-left group">
                       <span className="block text-[13.5px] font-semibold text-zinc-900 group-hover:text-[#233DFF] leading-snug">{c.title}</span>
                       <span className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mt-1.5">
-                        {c.level} · {isAvailable(c.pathwayId) ? 'Open for enrollment' : 'In development'}
+                        {c.level} · {isAvailable(c.pathwayId) ? 'Open for enrollment' : 'Coming soon'}
                       </span>
                     </button>
                   </td>
@@ -1041,7 +1051,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${LEVEL_ACCENT[c.level].bg} ${LEVEL_ACCENT[c.level].text}`}>{c.level}</span>
                     <span className="pill pill-neutral">{c.type}</span>
-                    {!isAvailable(c.pathwayId) && <span className="pill pill-neutral">In development</span>}
+                    {!isAvailable(c.pathwayId) && <span className="pill pill-neutral">Coming soon</span>}
                   </div>
                   <h3 className="text-xl font-semibold text-zinc-900 leading-snug">{c.title}</h3>
                 </div>
@@ -1180,11 +1190,12 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     const published = hasContent && (adminOpen || p.status === 'published');
     // Distinguishes "nearly finished" from "nothing here yet", which the single
     // In development label could not.
-    const buildLabel = !hasContent
-      ? 'Not yet available'
-      : !published
-        ? 'In development'
-        : null;
+    // Only the state a member can act on. A pathway with courses open is not labelled
+    // at all, because the courses below already say what is open; labelling it told a
+    // member the work was unfinished when what they needed to know was that they could
+    // start today. "In development" and "In curriculum review" are how HMC tracks its own
+    // build, and neither belongs on a page a member reads.
+    const buildLabel = !hasContent ? 'Coming soon' : null;
     // Registration needs something to read, not merely a course object.
     const hasCourses = hasContent;
     const { gates, eligible } = evaluateGates(p, state);
@@ -1201,7 +1212,6 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${accent.bg} ${accent.text}`}>
               {p.level}
             </span>
-            <span className="pill pill-neutral">Version {p.version}</span>
             {buildLabel && <span className="pill pill-neutral">{buildLabel}</span>}
           </div>
           <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">{p.title}</h1>
@@ -1260,7 +1270,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               <p className="text-sm text-zinc-500 mt-1">
                 {published
                   ? 'Self-paced. Start any time.'
-                  : 'Start the courses that are open now. More are added as they are released, and the completion record opens when the pathway is published.'}
+                  : 'Start the courses that are open now. More are added over time, and your completion record opens once the full pathway is available.'}
               </p>
             </div>
             <Btn onClick={() => {
@@ -1281,8 +1291,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
         {!published && (
           <div className="bg-white rounded-2xl border border-dashed border-zinc-300 p-8 space-y-5">
             <p className="text-sm text-zinc-600 leading-relaxed">
-              This pathway is under curriculum review. The courses below are open now. More are
-              released as curriculum review completes them.
+              These courses are open now. You can start any of them today.
             </p>
             {p.courses.length > 0 && (
               <ol className="space-y-2">
@@ -1296,7 +1305,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               </ol>
             )}
             <p className="text-sm text-zinc-500">
-              {p.courses.length > 0 ? 'More courses available soon.' : 'Courses available soon.'}
+              {p.courses.length > 0 ? 'More courses are added to this pathway over time.' : 'Courses are coming soon.'}
             </p>
           </div>
         )}
@@ -1438,7 +1447,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           <footer className="mt-4 border-t border-zinc-200 pt-6">
             <details className="group">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[11px] font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-600">
-                <span>Sources and version</span>
+                <span>{curriculumStaff ? 'Sources and version' : 'Sources'}</span>
                 <span className="text-base leading-none transition-transform group-open:rotate-45" aria-hidden="true">+</span>
               </summary>
               <div className="pt-5 space-y-4">
@@ -1449,9 +1458,11 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     </li>
                   ))}
                 </ul>
-                <p className="text-[11px] text-zinc-400">
-                  Version {p.version} &middot; Effective {p.effectiveDate} &middot; Next review {p.nextReview}
-                </p>
+                {curriculumStaff && (
+                  <p className="text-[11px] text-zinc-400">
+                    Version {p.version} &middot; Effective {p.effectiveDate} &middot; Next review {p.nextReview}
+                  </p>
+                )}
               </div>
             </details>
           </footer>

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Shift, Resource, ServiceEncounter, Referral, Assessment } from '../../types';
 import { buildPlanFromScores } from '../../services/plan';
+import { formatEventTime } from '../../services/eventTime';
 import { context as ctxApi, client as clientApi, referrals as referralsApi, sunny as sunnyApi, toolLink, TOOLS, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
 import HealthCredits from './HealthCredits';
 import YourProgress from './YourProgress';
@@ -280,7 +281,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         );
         geoEvents.forEach((e) => {
           const m = L.marker([e.lat as number, e.lng as number]).addTo(mapInstance);
-          m.bindPopup(`<strong>${e.title}</strong><br/>${[e.dateDisplay || e.date, e.time, e.location].filter(Boolean).join(' · ')}`);
+          m.bindPopup(`<strong>${e.title}</strong><br/>${[e.dateDisplay || e.date, formatEventTime(e.time), e.location].filter(Boolean).join(' · ')}`);
         });
         if (geoEvents.length) {
           const bounds = L.latLngBounds(geoEvents.map((e) => [e.lat, e.lng]));
@@ -920,7 +921,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
                         <div>
                           <p className="text-sm font-semibold text-zinc-900">{ev.title}</p>
                           <p className="text-xs text-zinc-500 mt-1">
-                            {[ev.dateDisplay || ev.date, ev.time, ev.location].filter(Boolean).join(' · ') || 'See details'}
+                            {[ev.dateDisplay || ev.date, formatEventTime(ev.time), ev.location].filter(Boolean).join(' · ') || 'See details'}
                           </p>
                         </div>
                       </div>
@@ -1019,6 +1020,10 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       onSignal={(type, payload) => ctxApi.event(type, payload)}
       guest={guest}
       onRequireSignIn={onRequireSignIn}
+      // Whoever maintains or reviews the curriculum sees the governance line under a
+      // lesson. Nobody else does: it is written in HMC's own build language and a member
+      // was being shown the state of our internal work in place of the material.
+      curriculumStaff={Boolean(user.staff?.capabilities.includes('academy') || user.staff?.capabilities.includes('review'))}
     />
   );
 
