@@ -207,7 +207,16 @@ export const CMHW_FACILITATOR: Course = {
   id: 'cmhw-facilitator',
   num: 3,
   standard: 'v2',
-  delivery: 'blended',
+  /**
+   * Self-paced, because the training itself is two recordings.
+   *
+   * This was 'blended', which in the Academy means part of it happens at a scheduled time,
+   * and it does not. Dr. Bounds recorded both parts and they are watched on demand. What is
+   * scheduled is what comes after the watching: the homework, and the workshop a candidate
+   * co-facilitates. Calling the whole course blended told people to wait for a date that
+   * was never coming for the part they could start today.
+   */
+  delivery: 'self-paced',
   title: 'Community Mental Health Worker and Facilitator Training',
   promise:
     'Complete HMC\'s existing two-part community mental health training and the facilitator readiness sequence.',
@@ -221,8 +230,11 @@ export const CMHW_FACILITATOR: Course = {
     'Apply a de-escalation technique and identify when to use it in community health work.',
     'Describe the boundaries of the community mental health worker role and when to escalate.',
   ],
-  minutes: 51,
-  prerequisites: 'HMC orientation. Facilitator readiness additionally requires program leadership approval.',
+  // 52 + 28 watching, plus 8 reading what certification takes. This said 51, built from a
+  // 23-minute Part 1 that does not exist; the recording is 52 minutes. A learner planning
+  // an evening around it was being told it was less than half its real length.
+  minutes: 88,
+  prerequisites: 'None to start watching. Certification additionally requires program leadership approval.',
   whoFor:
     'Community health workers, medical students, educators, social workers, HMC volunteers, and anyone preparing to facilitate community mental health education.',
   lessons: [
@@ -231,7 +243,7 @@ export const CMHW_FACILITATOR: Course = {
       title: 'Community Mental Health Worker Training, Part 1',
       summary:
         'Foundations of community mental health work, trauma-informed principles, and working with vulnerable populations.',
-      minutes: 23,
+      minutes: 52,
       blocks: [
         {
           kind: 'why',
@@ -240,9 +252,21 @@ export const CMHW_FACILITATOR: Course = {
           ],
         },
         {
-          kind: 'prose',
+          kind: 'video',
+          title: 'Community Mental Health Worker Training, Part 1',
+          embed: 'https://www.youtube.com/embed/xEoJ4FmBUG8',
+          watchUrl: 'https://youtu.be/xEoJ4FmBUG8',
+          minutes: 52,
+          presenter: 'Dr. Dawn Bounds, PhD, PMHNP-BC, FAAN',
           text: [
-            'This is the existing HMC training video. It runs about 23 minutes. The knowledge check that follows is the same one used in the Volunteer Portal, so a volunteer who has already completed it does not repeat it.',
+            'Watch whenever suits you, and come back to it. Nothing here is scheduled.',
+          ],
+        },
+        {
+          kind: 'fieldnote',
+          title: 'If you have already done this in the volunteer portal',
+          text: [
+            'This is the same recording and the same knowledge check. A volunteer who has completed it there does not repeat it here.',
           ],
         },
       ],
@@ -261,9 +285,76 @@ export const CMHW_FACILITATOR: Course = {
           ],
         },
         {
+          kind: 'video',
+          title: 'Community Mental Health Worker Training, Part 2',
+          embed: 'https://www.youtube.com/embed/FCDOH6KNep4',
+          watchUrl: 'https://youtu.be/FCDOH6KNep4',
+          minutes: 28,
+          presenter: 'Dr. Dawn Bounds, PhD, PMHNP-BC, FAAN',
+        },
+      ],
+    },
+    {
+      id: 'cmhw-l3',
+      title: 'Getting certified',
+      summary: 'What the certification is, who it is open to, and the five steps to hold it.',
+      minutes: 8,
+      blocks: [
+        {
           kind: 'prose',
           text: [
-            'The second existing HMC training video, about 28 minutes, followed by its applied assessment.',
+            'The Community Mental Health Education and Facilitation Certification is for people who want to lead mental health discussions and workshops, not only attend them.',
+            'It is grounded in trauma-informed practice, and it was co-developed and co-delivered with Dr. Dawn Bounds of the CYFER Lab at UC Irvine.',
+          ],
+        },
+        {
+          kind: 'list',
+          title: 'Who it is open to',
+          items: [
+            'Community health workers',
+            'Medical students',
+            'Educators',
+            'Social workers',
+            'HMC volunteers',
+            'Anyone interested in mental health facilitation and education, at HMC or any other community organisation',
+          ],
+        },
+        {
+          kind: 'list',
+          title: 'What you will learn',
+          items: [
+            'Understanding mental health across populations, with a particular focus on the intersectionality of race, disability and mental health.',
+            'Addressing systemic barriers to care, particularly for historically marginalised groups.',
+            'Building community and family support systems, and strategies for fostering a supportive network for healing and wellbeing.',
+            'Connecting individuals to mental health resources and advocacy opportunities.',
+          ],
+        },
+        {
+          kind: 'steps',
+          title: 'How to get certified',
+          items: [
+            { label: 'Register', text: 'Register for the training through Health Matters Clinic.' },
+            { label: 'Watch both parts', text: 'Both recordings above, on demand. Watch them in your own time.' },
+            { label: 'Complete the facilitator homework', text: 'Submitted by the published due date.' },
+            { label: 'Lead or co-facilitate a community workshop', text: 'Using the Unstoppable curriculum. This is the applied requirement.' },
+            { label: 'Receive your certification', text: 'Issued on successful completion.' },
+          ],
+        },
+        {
+          kind: 'concept',
+          title: 'Who teaches it',
+          text: [
+            'Instructor: Dawn Bounds, PhD, PMHNP-BC, FAAN. Director of the CYFER Lab, Centering Youth and Families for Empowerment and Resilience. Board Certified Psychiatric-Mental Health Nurse Practitioner. Sue and Bill Gross School of Nursing, University of California, Irvine.',
+            'Planners: Erica Robinson, Executive Director, Health Matters Clinic. Jenny Fotang, THRIVE Project Coordinator, CYFER Lab. Brianna Johnston, BA, THRIVE Project Coordinator, CYFER Lab.',
+            'The training is developed and delivered by a team of educators, community health workers and mental health professionals who bring knowledge in mental health education, community engagement, trauma-informed care, and lived experience.',
+          ],
+        },
+        {
+          kind: 'takeaways',
+          items: [
+            'Both training parts are recordings. Nothing about starting this is scheduled.',
+            'What is scheduled is the workshop you co-facilitate, which is the applied requirement and the last step before the certificate.',
+            'The certificate recognises you as prepared to lead this work, and it is free.',
           ],
         },
       ],
@@ -297,9 +388,23 @@ export const CMHW_FACILITATOR: Course = {
   ],
   requirements: [
     { id: 'register', kind: 'attend', label: 'Register for the training through Health Matters Clinic' },
-    { id: 'sessions', kind: 'attend', label: 'Attend all required training sessions and participate in discussions', detail: 'Includes the introduction and facilitation techniques session, optional co-working review of community presentation slides and resources, and office hours with Dr. Bounds for final practice, questions and feedback.' },
+    { id: 'sessions', kind: 'assignment', label: 'Watch both training parts', detail: 'Recorded by Dr. Bounds and available on demand. 80 minutes in total, in whatever sittings suit you.' },
     { id: 'homework', kind: 'assignment', label: 'Complete the facilitator homework', detail: 'Submitted by the published due date.' },
     { id: 'cofacilitate', kind: 'practicum', label: 'Lead or co-facilitate a community workshop using the Unstoppable Curriculum', detail: 'This is the applied requirement. Certification is issued after it is completed.' },
+  ],
+  /**
+   * Where a facilitator goes after the recordings.
+   *
+   * Required of a self-paced v2 course, and it earns its place here: somebody preparing to
+   * hold a room on this material will be asked questions the two recordings do not answer,
+   * and the honest response to most of them is a good source rather than an opinion.
+   */
+  furtherLearning: [
+    { name: 'CYFER Lab, University of California, Irvine', use: 'Dr. Bounds\'s lab, Centering Youth and Families for Empowerment and Resilience. The research this certification was co-developed against.', url: 'https://sites.uci.edu/cyferlab/' },
+    { name: 'SAMHSA, Practical Guide for Implementing a Trauma-Informed Approach', use: 'The trauma-informed principles this training is grounded in, written for people delivering services rather than for clinicians.', url: 'https://www.samhsa.gov/resource/dbhis/practical-guide-implementing-trauma-informed-approach' },
+    { name: 'National Alliance on Mental Illness (NAMI)', use: 'Peer-led support groups and education programmes to refer participants to, and the source for the misdiagnosis findings taught in Module 1.', url: 'https://www.nami.org/' },
+    { name: 'Los Angeles County Department of Mental Health', use: 'The ACCESS line and local district clinics, which is what a participant most often needs at the end of a workshop.', url: 'https://dmh.lacounty.gov/get-help-now/' },
+    { name: 'Disability Rights California', use: 'Legal advocacy for disabled people facing discrimination, for the barriers raised in Module 3 that are not a clinical problem.', url: 'https://www.disabilityrightsca.org/' },
   ],
   artifact: {
     id: 'facilitator-readiness',
