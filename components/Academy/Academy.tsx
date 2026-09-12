@@ -471,6 +471,49 @@ const BlockView: React.FC<{
           </dl>
         </BlockCallout>
       );
+    case 'video':
+      /**
+       * The recording itself, not a description of it.
+       *
+       * 16:9 via aspect-ratio rather than a padding-top box, so the frame keeps its shape
+       * at every width without a wrapper whose height has to be calculated. max-w-full on
+       * the box matters: an aspect-ratio element will happily overflow its column
+       * otherwise, and the lesson column is narrower than the video's natural width.
+       *
+       * A plain link sits under it. If the frame is blocked, by a network filter or a
+       * browser setting, the learner still has a way to the material instead of a blank
+       * rectangle with no explanation.
+       */
+      return (
+        <section className="space-y-3">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <h3 className="text-lg font-semibold text-zinc-900">{block.title}</h3>
+            <span className="text-[12px] font-bold uppercase tracking-wider text-zinc-400">
+              {block.minutes} min{block.presenter ? ` \u00b7 ${block.presenter}` : ''}
+            </span>
+          </div>
+          {block.text?.length ? <P items={block.text} /> : null}
+          <div className="w-full max-w-full aspect-video overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-900">
+            <iframe
+              src={block.embed}
+              title={block.title}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className="w-full h-full block"
+            />
+          </div>
+          {block.watchUrl && (
+            <p className="text-[13px] text-zinc-500">
+              Cannot see the video?{' '}
+              <a href={block.watchUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-[#233DFF] hover:underline">
+                Open it in a new tab
+              </a>
+              .
+            </p>
+          )}
+        </section>
+      );
     case 'activity':
       return (
         <BlockCallout label="Try it" tone="orange">
