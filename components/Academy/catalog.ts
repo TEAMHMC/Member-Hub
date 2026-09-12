@@ -156,6 +156,16 @@ export interface Course {
   /** Who this is written for. Drives reading level, not just tone. */
   readingLevel?: ReadingLevel;
   delivery?: Delivery;
+  /**
+   * How a live course is delivered, when every session of it is delivered the same way.
+   *
+   * Sessions each carry their own modality, which is right for a course that sometimes runs
+   * in a room and sometimes on a call. It is not enough on its own: a course with no
+   * session scheduled yet still has to be able to tell somebody how it is run, and the
+   * Unstoppable material referenced a partner venue HMC no longer uses long after it had
+   * moved to virtual delivery.
+   */
+  modality?: Modality;
   /** Populated for live and blended courses. */
   sessions?: Session[];
   ce?: CeApproval;
@@ -787,13 +797,16 @@ export const PATHWAYS: Pathway[] = [
 PATHWAYS.push({
   family: 'Mental Health + Community Education',
   id: 'unstoppable-mental-health',
-  title: 'Unstoppable Continuing Education and Facilitator Training',
+  title: 'Unstoppable: Healing, Growth and Facilitation',
   level: 'Leadership',
-  status: 'in-development',
+  // Published. The five modules, the Experience session format and the facilitation method
+  // are written, so the thing this flag used to be protecting members from no longer
+  // exists. healthmatters.clinic already sends people here to book these.
+  status: 'published',
   purpose:
-    'HMC\'s existing mental health education, migrated into the Academy so members and volunteers take one canonical training rather than separate copies. Continuing education for licensed professionals, and facilitator preparation for people who will deliver Unstoppable programming.',
-  format: 'Scheduled sessions for continuing education, blended video and written curriculum for facilitator training',
-  credentialTitle: 'HMC Unstoppable Facilitator — Completion',
+    'HMC\'s flagship mental health education, for three different people. A free monthly session anyone can join. Continuing education for licensed professionals, approved by LACDMH. And the certification for people who want to facilitate it themselves.',
+  format: 'Live virtual sessions, with the written curriculum here to read before and after | 3 courses',
+  credentialTitle: 'HMC Unstoppable Facilitator, Completion',
   credentialType: 'Course Completion',
   gates: [
     'Both community mental health worker training parts complete',
@@ -804,12 +817,11 @@ PATHWAYS.push({
   // Only what is still to come. Both of the first two titles were listed here while also
   // shipping as written courses, so the pathway advertised outstanding work that was
   // already done and a member reading the list could not tell what was missing.
-  plannedCourses: [
-    'Unstoppable Community Learning (participant facing)',
-  ],
-  version: '2.0 migration',
-  effectiveDate: 'Migrated from the Volunteer Portal training system',
-  nextReview: 'Asset inventory pending confirmation of the required follow-up sequence',
+  // Nothing outstanding. The participant-facing course that sat here as planned work is
+  // written and is the first course in the pathway.
+  version: '2.1',
+  effectiveDate: 'Five modules, the Experience session format and the LACDMH objectives migrated from the approved 2025 workshop materials, September 12, 2026',
+  nextReview: 'Before the CE approval renews on February 27, 2027',
 });
 
 export const LEARNING_MODEL = ['Discover', 'Learn', 'Practice', 'Serve', 'Demonstrate', 'Advance'];
