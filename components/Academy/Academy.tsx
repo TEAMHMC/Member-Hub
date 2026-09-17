@@ -921,7 +921,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           Academy records are kept separately from clinical and client records, and enrolling does not
           create a clinician-patient relationship.{' '}
           <a
-            href="https://www.healthmatters.clinic/privacy#academy"
+            href="https://www.healthmatters.clinic/privacy-policy#academy"
             target="_blank"
             rel="noreferrer"
             className="font-semibold text-[#233DFF] hover:underline"
