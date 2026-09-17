@@ -160,7 +160,7 @@ const COMMUNITY_HEALTH_EQUITY: Course = {
         { kind: 'steps', title: 'Plainly', items: [
           { label: 'It is', text: 'Evidence that you completed HMC coursework, passed the assessments, and were signed off on the required practicals by a named supervisor. It is a real record with real hours behind it.' },
           { label: 'It is not a state certification', text: 'California has no state community health worker certification, and the Department of Health Care Services does not approve certificates. Anybody telling you otherwise is selling something.' },
-          { label: 'It is not clinical scope', text: 'It does not authorise you to assess, diagnose, treat, determine eligibility, or enrol anybody in anything.' },
+          { label: 'It is not clinical scope', text: 'It does not authorise you to assess, diagnose, treat, determine eligibility, or enroll anybody in anything.' },
           { label: 'It is not employment', text: 'It is a qualification for HMC roles and a piece of evidence elsewhere. It is not a job and it is not a guarantee of one.' },
         ] },
         { kind: 'myths', items: [
@@ -260,7 +260,7 @@ const SOCIAL_DETERMINANTS: Course = {
             'Social and community context',
           ],
           answer: 2,
-          rationale: 'Coverage is present, so the coverage domain is not where the obstacle sits. Naming the operative domain matters because it decides what would actually help: a transport benefit or a closer provider, not enrolment assistance.',
+          rationale: 'Coverage is present, so the coverage domain is not where the obstacle sits. Naming the operative domain matters because it decides what would actually help: a transport benefit or a closer provider, not enrollment assistance.',
         } },
       ],
     },
@@ -820,7 +820,7 @@ export const FBCH_PRE: Check[] = [
     q: 'A member has coverage but has not been seen in three years because the nearest clinic accepting patients is two bus transfers away. Which determinant domain is operative?',
     options: ['Economic stability', 'Health care access and quality', 'Neighbourhood and built environment', 'Social and community context'],
     answer: 2,
-    why: 'Coverage is present, so the barrier is transport. Naming the right domain decides what would help: a transport benefit or a closer provider, not enrolment assistance.',
+    why: 'Coverage is present, so the barrier is transport. Naming the right domain decides what would help: a transport benefit or a closer provider, not enrollment assistance.',
   },
   {
     id: 'fbch-t5',

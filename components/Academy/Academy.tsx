@@ -267,10 +267,10 @@ const CourseCard: React.FC<{
         <div className="flex items-center gap-3 text-[11px] font-semibold text-zinc-600">
           {minutes ? <span>{minutes} min</span> : null}
           {/* A locked course says what opens it. Hiding the syllabus from somebody deciding
-              whether to enrol asks them to commit to something they cannot see. */}
+              whether to enroll asks them to commit to something they cannot see. */}
           <span className={locked ? 'inline-flex items-center gap-1.5' : ''}>
             {locked && <Lock size={12} />}
-            {locked ? 'Opens when you enrol' : done ? 'Complete' : percent > 0 ? `${percent}% done` : 'Not started'}
+            {locked ? 'Opens when you enroll' : done ? 'Complete' : percent > 0 ? `${percent}% done` : 'Not started'}
           </span>
         </div>
         {percent > 0 && !done && (
@@ -718,7 +718,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
    *
    * renderLesson has always refused to render for somebody not enrolled. The hole was
    * here: enrolling wrote to this browser's local storage and asked nobody for anything,
-   * so a visitor could press Enrol, clear the gate and read every module without ever
+   * so a visitor could press Enroll, clear the gate and read every module without ever
    * having an account. The Academy could not then record who learned what, could not
    * issue a completion record, and had nobody to follow up with.
    *
@@ -727,7 +727,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
    */
   const enroll = (p: Pathway): boolean => {
     if (guest) {
-      onRequireSignIn?.('to enrol and keep your progress');
+      onRequireSignIn?.('to enroll and keep your progress');
       return false;
     }
     if (!state.enrolled.includes(p.id)) {
@@ -881,7 +881,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                   action={
                     enrollable ? (
                       <Btn className="w-full" onClick={() => { if (enroll(p)) setView({ name: 'pathway', pathwayId: p.id }); }}>
-                        {state.enrolled.includes(p.id) ? 'Continue' : 'Enrol'}
+                        {state.enrolled.includes(p.id) ? 'Continue' : 'Enroll'}
                       </Btn>
                     ) : v.state === 'upcoming' ? (
                       <Btn className="w-full" onClick={() => { if (enroll(p)) setView({ name: 'pathway', pathwayId: p.id }); }}>
@@ -1482,7 +1482,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
    * learned what, could not issue a completion record, and could not follow up with
    * anybody, since none of it was attached to a person.
    *
-   * Two gates, in order. Sign in, then enrol. Both state what they are for rather than
+   * Two gates, in order. Sign in, then enroll. Both state what they are for rather than
    * refusing, and everything above the lesson list stays readable either way.
    */
   const lessonsUnlocked = (pathwayId: string) => !guest && state.enrolled.includes(pathwayId);
@@ -1519,7 +1519,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                 // Only pathways with a published baseline check start on one.
                 if (p.preTest?.length) setView({ name: 'test', pathwayId: p.id, kind: 'pre' });
               }}>
-                  Enrol
+                  Enroll
                 </Btn>
               )}
               <span className="text-[11px] text-zinc-400 font-semibold">
@@ -1876,8 +1876,8 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                         if (locked) { enroll(p); return; }
                         setView({ name: 'lesson', pathwayId, courseId, index: i });
                       }}
-                      aria-label={locked ? `${l.title}. Available once you enrol.` : l.title}
-                      title={locked ? 'Available as soon as you enrol. Enrolling is free.' : undefined}
+                      aria-label={locked ? `${l.title}. Available once you enroll.` : l.title}
+                      title={locked ? 'Available as soon as you enroll. Enrolling is free.' : undefined}
                       className={`w-full text-left flex items-start gap-5 p-6 rounded-2xl border transition-all ${done ? 'bg-zinc-50/60 border-zinc-100' : locked ? 'bg-zinc-50/40 border-zinc-150 hover:border-[#233DFF]/30' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40 hover:shadow-sm'}`}
                     >
                       <span className={`w-11 h-11 rounded-2xl flex items-center justify-center border shrink-0 ${done ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : locked ? 'bg-zinc-100 text-zinc-400 border-zinc-200' : 'bg-blue-50 text-[#233DFF] border-blue-100'}`}>
@@ -1887,7 +1887,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                         <span className="block text-[15px] font-semibold text-zinc-900 leading-snug">{l.title}</span>
                         <span className="block text-[13px] text-zinc-500 leading-relaxed">{l.summary}</span>
                         <span className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 pt-0.5">
-                          {l.minutes} minutes{done ? ' · Complete' : locked ? ' · Available as soon as you enrol' : ''}
+                          {l.minutes} minutes{done ? ' · Complete' : locked ? ' · Available as soon as you enroll' : ''}
                         </span>
                       </span>
                     </button>
