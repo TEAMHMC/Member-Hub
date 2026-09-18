@@ -536,11 +536,18 @@ export const client = {
    *   issues a code to any existing member without it, and to a new address only
    *   with it, so this has to travel or a genuinely invited person is refused.
    */
-  requestLink: (email: string, invite?: string) =>
+  requestLink: (email: string, invite?: string, ref?: string) =>
     req<{ ok: boolean }>('/api/client/auth/request-link', {
       method: 'POST',
-      body: JSON.stringify(invite ? { email, invite } : { email }),
+      // A volunteer's QR code travels too: somebody a volunteer signed up at an event
+      // counts as invited if the Hub is ever switched to invite-only.
+      body: JSON.stringify({ email, ...(invite ? { invite } : {}), ...(ref ? { ref } : {}) }),
     }),
+  /** Who signed this person up, for the greeting: a volunteer first name and an event. */
+  navigatorRef: (code: string, eventId?: string) =>
+    req<{ valid: boolean; volunteerFirstName?: string | null; eventTitle?: string | null }>(
+      `/api/public/navigator-ref/${encodeURIComponent(code)}${eventId ? `?event=${encodeURIComponent(eventId)}` : ''}`,
+    ),
   verifyLink: (email: string, code: string) =>
     req<{ ok: boolean; identified: boolean; email: string }>('/api/client/auth/verify-link', {
       method: 'POST',
@@ -575,6 +582,10 @@ export const client = {
     audience?: 'care' | 'learner' | 'both';
     consentToShare?: boolean;
     consentToContact?: boolean;
+    /** Broad categories the person tapped. Stored apart from intake needs. */
+    onboardingNeeds?: string[];
+    /** The volunteer code and event from the QR they scanned. First touch only. */
+    referral?: { code: string; eventId?: string };
   }) =>
     req<{ ok: boolean; identified: boolean; audience: string | null }>('/api/client/profile', {
       method: 'POST',

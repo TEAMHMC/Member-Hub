@@ -25,6 +25,31 @@ const INVITE_CODES: string[] = String((import.meta as any).env?.VITE_INVITE_CODE
   .map((c) => c.trim().toLowerCase())
   .filter(Boolean);
 const INVITE_CLEARED_KEY = 'hmc.inviteCleared';
+
+/**
+ * The volunteer and event from a QR code, kept for this visit.
+ *
+ * A volunteer's QR opens the Hub with ?ref=CODE&event=ID. Sign-in takes a few steps and
+ * an email round trip, so the pair is held in sessionStorage until the profile is saved,
+ * which is where the server attributes the person to the volunteer who met them.
+ */
+const NAV_REF_KEY = 'hmc.navRef';
+type NavRef = { code: string; eventId?: string };
+const readNavRef = (): NavRef | null => {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const code = (params.get('ref') || '').trim().toUpperCase();
+    if (/^[A-Z2-9]{6}$/.test(code)) {
+      const eventId = params.get('event') || '';
+      const ref: NavRef = /^[A-Za-z0-9-]{1,64}$/.test(eventId) ? { code, eventId } : { code };
+      sessionStorage.setItem(NAV_REF_KEY, JSON.stringify(ref));
+      return ref;
+    }
+    const saved = sessionStorage.getItem(NAV_REF_KEY);
+    return saved ? (JSON.parse(saved) as NavRef) : null;
+  } catch { return null; }
+};
+const clearNavRef = () => { try { sessionStorage.removeItem(NAV_REF_KEY); } catch { /* private mode */ } };
 // Storage throws in some private modes, and a member who cleared the gate should
 // not be sent back to it by a failed read.
 const inviteAlreadyCleared = (): boolean => {
@@ -88,6 +113,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
    * is the wrong trade, and the Snapshot asks properly later on.
    */
   const [needs, setNeeds] = useState<string[]>([]);
+  const [navRef] = useState<NavRef | null>(() => readNavRef());
+  const [metLine, setMetLine] = useState<string | null>(null);
   const toggleNeed = (id: string) =>
     setNeeds((n) => (n.includes(id) ? n.filter((x) => x !== id) : [...n, id]));
   const [consentData, setConsentData] = useState(false);
@@ -106,11 +133,32 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       .then((cfg) => {
         if (cancelled) return;
         setGoogleClientId(cfg.googleClientId);
-        if (cfg.signupMode === 'invite' && !inviteAlreadyCleared()) setStep('invite');
+        if (cfg.signupMode === 'invite' && !inviteAlreadyCleared() && !navRef) setStep('invite');
       })
       .catch(() => { /* email sign-in still works; nothing to show differently */ });
     return () => { cancelled = true; };
   }, []);
+
+  // "You met Marcus at the Community Health Fair." Only when the code is real.
+  useEffect(() => {
+    if (!navRef) return;
+    let cancelled = false;
+    clientApi.navigatorRef(navRef.code, navRef.eventId)
+      .then((r) => {
+        if (cancelled || !r?.valid) return;
+        const who = r.volunteerFirstName ? `You met ${r.volunteerFirstName}` : 'You met one of our volunteers';
+        setMetLine(`${who}${r.eventTitle ? ` at ${r.eventTitle}` : ''}. Sign in so we can stay in touch.`);
+      })
+      .catch(() => { /* the sign-in still works without the greeting */ });
+    return () => { cancelled = true; };
+  }, [navRef]);
+
+  // A returning member who scans a volunteer's code skips onboarding, so the attribution
+  // is sent on its own. The server keeps whoever met them first.
+  const attributeReturningMember = () => {
+    if (!navRef) return;
+    clientApi.saveProfile({ referral: navRef }).catch(() => {}).finally(clearNavRef);
+  };
 
   // Google Identity Services, loaded only if the server gave us a client id.
   // Rendered into the button container below once the script is ready.
@@ -130,6 +178,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           setErr(null);
           try {
             const r = await clientApi.googleSignIn(resp.credential);
+            if (r.identified) attributeReturningMember();
             onLogin({ email: r.email }, UserRole.CLIENT);
           } catch {
             setErr('Google could not sign you in. You can use a code instead.');
@@ -174,7 +223,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setBusy(true);
     setErr(null);
     try {
-      await clientApi.requestLink(email.trim().toLowerCase(), invite.trim() || undefined);
+      await clientApi.requestLink(email.trim().toLowerCase(), invite.trim() || undefined, navRef?.code);
       setStep('code');
     } catch {
       setErr('We could not send a code to that email. Please check it and try again.');
@@ -192,6 +241,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       const res = await clientApi.verifyLink(email.trim().toLowerCase(), code.trim());
       if (res.identified) {
         // Existing client record — go straight in.
+        attributeReturningMember();
         onLogin({ email: email.trim().toLowerCase() }, UserRole.CLIENT);
       } else {
         setStep('onboarding');
@@ -240,7 +290,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         audience,
         consentToShare: consentData,
         consentToContact: consentSms,
+        ...(needs.length ? { onboardingNeeds: needs } : {}),
+        ...(navRef ? { referral: navRef } : {}),
       });
+      clearNavRef();
     } catch {
       // Not fatal to the sign-in. They are already authenticated, and blocking entry on a
       // profile write would lock somebody out of the Hub over a saved name. They will be
@@ -288,8 +341,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Member Hub</h1>
           </div>
           <p className="text-zinc-500 text-sm leading-relaxed max-w-xs mx-auto">
-            Free screenings, community events, help with food, housing and care, and self-paced
-            courses that open doors into health careers. All in one place, at no cost.
+            Screenings, community events, help with food, housing and care, and self-paced
+            courses that open doors into health careers. All in one place.
           </p>
           {step === 'invite' && (
             <p className="text-[11px] font-bold uppercase tracking-widest text-[#233DFF]">
@@ -297,6 +350,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             </p>
           )}
         </div>
+
+        {metLine && (step === 'email' || step === 'code') && (
+          <p className="text-sm font-semibold text-[#233DFF] bg-[#233DFF]/5 rounded-2xl px-4 py-3 text-center leading-relaxed">
+            {metLine}
+          </p>
+        )}
 
         {step === 'invite' && (
           <form onSubmit={handleInviteSubmit} className="space-y-6">
@@ -400,7 +459,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 setBusy(true);
                 setErr(null);
                 try {
-                  await clientApi.requestLink(email.trim().toLowerCase(), invite.trim() || undefined);
+                  await clientApi.requestLink(email.trim().toLowerCase(), invite.trim() || undefined, navRef?.code);
                   setCode('');
                   setResent(true);
                 } catch {
@@ -510,6 +569,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     { id: 'mental health', label: 'Feeling overwhelmed' },
                     { id: 'transport', label: 'Getting around' },
                     { id: 'safety', label: 'Safety' },
+                    { id: 'job training employment', label: 'Finding work' },
                   ] as const).map((n) => (
                     <button
                       key={n.id}
