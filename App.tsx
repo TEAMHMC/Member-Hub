@@ -161,8 +161,15 @@ const App: React.FC = () => {
           role: staff ? (staff.isAdmin ? UserRole.ADMIN : UserRole.STAFF) : UserRole.CLIENT,
           staff,
           email: me.email || base.email || '',
-          firstName: me.profile?.firstName || base.firstName || (staff ? staff.name : 'Member'),
-          lastName: base.lastName || '',
+          // 'Member' is the placeholder handleLogin writes when nothing better is known. It
+          // was winning over the staff roster's name on every reload, so an administrator
+          // saw "Member" in the header instead of their own name. A placeholder is not a name.
+          firstName: me.profile?.firstName
+            || (base.firstName && base.firstName !== 'Member' ? base.firstName : '')
+            || (staff?.name ? staff.name.trim().split(/\s+/)[0] : '')
+            || 'Member',
+          lastName: (base.lastName || '')
+            || (staff?.name && !me.profile?.firstName ? staff.name.trim().split(/\s+/).slice(1).join(' ') : ''),
           phone: base.phone || '',
           zipCode: base.zipCode || '',
           badges: base.badges || ['Member'],

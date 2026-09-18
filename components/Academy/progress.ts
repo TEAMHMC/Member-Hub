@@ -272,7 +272,9 @@ export function evaluateGates(p: Pathway, s: LearnerState): {
     gates.push({
       label: 'Pathway published and open for credentialing',
       met: false,
-      detail: `${p.courses.length} of ${p.plannedCourses?.length ?? 0} courses released so far`,
+      // plannedCourses holds the courses NOT yet released, so the total is both lists.
+      // It read "2 of 1 courses released" on a pathway with two released and one planned.
+      detail: `${p.courses.length} of ${p.courses.length + (p.plannedCourses?.length ?? 0)} courses released so far`,
     });
   }
   gates.push(

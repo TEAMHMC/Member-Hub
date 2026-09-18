@@ -332,7 +332,7 @@ const SupportPanel: React.FC = () => {
       <div className={card}>
         <p className={label}>Can this person sign in</p>
         <p className="text-sm text-zinc-600 mt-2 leading-relaxed">
-          Sign-in status only. Care records stay in the volunteer portal, behind the stronger login.
+          Look up whether someone has a Hub account and can sign in.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <input
