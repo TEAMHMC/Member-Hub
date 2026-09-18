@@ -31,7 +31,7 @@ import SurfaceCard, { CardBadge } from '../Layout/SurfaceCard';
 import type { Block, KnowledgeCheck } from './blocks';
 import TrainingRegistration from './TrainingRegistration';
 import { training as trainingApi, chw as trainingApi_chw, curriculumApi, type ScheduledSession } from '../../services/api';
-import { reviewedProse, preservedBlocks, extraSections, type OverrideMap } from './overrides';
+import { reviewedProse, preservedBlocks, extraSections, mergedCourse, type OverrideMap } from './overrides';
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
@@ -1341,7 +1341,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             <div className="space-y-4">
               <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Courses</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {p.courses.map((c) => (
+                {p.courses.map((raw) => mergedCourse(raw, overrides[raw.id])).map((c) => (
                   <CourseCard
                     key={c.id}
                     num={c.num}
@@ -1489,7 +1489,11 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
   const renderCourse = (pathwayId: string, courseId: string) => {
     const p = pathwayById(pathwayId);
-    const c = p?.courses.find((x) => x.id === courseId);
+    // The catalogue entry with any released page correction over it, merged once so the
+    // card, the promise, About, the objectives, the prerequisites, who it is for and what
+    // completion requires all read from the same place.
+    const raw = p?.courses.find((x) => x.id === courseId);
+    const c = raw ? mergedCourse(raw, overrides[raw.id]) : undefined;
     if (!p || !c) return renderCatalog();
     const firstUnfinished = c.lessons.findIndex((l) => !state.lessons.includes(l.id));
     const activityDone = !!(state.activities[c.id] || '').trim();

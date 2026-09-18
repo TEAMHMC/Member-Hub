@@ -260,11 +260,22 @@ export interface HubCurriculumCourse {
   note: string | null;
 }
 
+export interface CoursePageOverride {
+  promise?: string;
+  about?: string[];
+  objectives?: string[];
+  prerequisites?: string;
+  whoFor?: string;
+  requirements?: { id: string; label: string; detail?: string; kind: 'attend' | 'assignment' | 'practicum' | 'evaluation' }[];
+}
+
 export interface HubCurriculumDetail {
   id: string;
   title: string;
   content: string;
   sections: { heading: string; body: string }[];
+  /** The rest of the course page, when a correction to it has been released. */
+  page?: CoursePageOverride | null;
   version: number;
   hasCorrection: boolean;
   history: Array<{ version: number; note: string | null; archivedAt: string | null; archivedBy: string | null }>;
@@ -288,6 +299,17 @@ export const staffApi = {
 
   // ── Curriculum review ──────────────────────────────────────────────────
   curriculum: () => req<{ courses: HubCurriculumCourse[]; note?: string }>('/api/hub/staff/curriculum'),
+  /**
+   * Release a correction: lesson text, the rest of the course page, or both.
+   *
+   * Sending no `sections` key at all is what tells the server this is a page-only release,
+   * so the lesson text already released is kept rather than blanked.
+   */
+  releaseCourseFull: (id: string, body: Record<string, unknown>) =>
+    req<{ success: boolean; version: number; updatedAt: string }>(
+      `/api/hub/staff/curriculum/${encodeURIComponent(id)}`,
+      { method: 'PUT', body: JSON.stringify(body) },
+    ),
   course: (id: string) => req<HubCurriculumDetail>(`/api/hub/staff/curriculum/${encodeURIComponent(id)}`),
   releaseCourse: (id: string, content: string, sections: { heading: string; body: string }[], note: string) =>
     req<{ success: boolean; version: number; updatedAt: string }>(

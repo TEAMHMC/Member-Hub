@@ -31,9 +31,20 @@
 import type { Course, Lesson } from './catalog';
 import type { Block } from './blocks';
 
+export interface CoursePageOverride {
+  promise?: string;
+  about?: string[];
+  objectives?: string[];
+  prerequisites?: string;
+  whoFor?: string;
+  requirements?: { id: string; label: string; detail?: string; kind: 'attend' | 'assignment' | 'practicum' | 'evaluation' }[];
+}
+
 export interface CourseOverride {
   content: string;
   sections: { heading: string; body: string }[];
+  /** The rest of the course page, rewritten in the Hub's Curriculum tab. */
+  page?: CoursePageOverride;
   version: number;
 }
 
@@ -106,12 +117,43 @@ export const extraSections = (
     .filter((s) => s.heading && s.paragraphs.length);
 };
 
+/**
+ * The course as a learner should read it: the catalogue entry with any released page
+ * correction over it.
+ *
+ * Merged in one place and used everywhere the page renders, so a correction cannot reach
+ * About this course and miss the card, which is how these drift. An empty value means the
+ * editor cleared the field, and the catalogue is what shows then, because a course page
+ * with no "Who this is for" is better than one with a blank heading.
+ */
+export const mergedCourse = <T extends Pick<Course, 'promise' | 'about' | 'objectives' | 'prerequisites' | 'whoFor' | 'requirements'>>(
+  course: T,
+  override: CourseOverride | undefined,
+): T => {
+  const page = override?.page;
+  if (!page) return course;
+  const text = (v: unknown, fallback: string): string =>
+    typeof v === 'string' && v.trim() ? v.trim() : fallback;
+  const list = <L,>(v: unknown, fallback: L[]): L[] =>
+    Array.isArray(v) && v.length ? (v as L[]) : fallback;
+  return {
+    ...course,
+    promise: text(page.promise, course.promise),
+    about: list(page.about, course.about),
+    objectives: list(page.objectives, course.objectives),
+    prerequisites: text(page.prerequisites, course.prerequisites),
+    whoFor: text(page.whoFor, course.whoFor),
+    requirements: list(page.requirements, course.requirements || []),
+  };
+};
+
 /** Whether any part of this course is currently reading from a published correction. */
 export const hasReviewedContent = (
   course: Pick<Course, 'lessons'>,
   override: CourseOverride | undefined,
 ): boolean => {
   if (!override) return false;
+  if (override.page && Object.values(override.page).some((v) => (Array.isArray(v) ? v.length : String(v || '').trim()))) return true;
   if (extraSections(course, override).length) return true;
   return course.lessons.some((l) => reviewedProse(l, override) !== null);
 };
