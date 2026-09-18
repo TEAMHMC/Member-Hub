@@ -1,6 +1,10 @@
 
 import React from 'react';
 import { UserRole, type Audience, type StaffStanding } from '../../types';
+
+// Health Credits is not fully built, so it stays out of the navigation until it is.
+// Flip this to show it again; the screen and its route are untouched.
+const SHOW_CREDITS = false;
 import {
   Home, Calendar,
   LogOut, LogIn, Compass, ShieldCheck, Activity, Brain, GraduationCap,
@@ -57,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         { icon: <Home size={18} />, label: 'Home', id: 'dash' },
         { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
         { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
-        { icon: <Coins size={18} />, label: 'Credits', id: 'credits' },
+        ...(SHOW_CREDITS ? [{ icon: <Coins size={18} />, label: 'Credits', id: 'credits' }] : []),
       ];
     }
     /**
@@ -82,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       { icon: <Compass size={18} />, label: 'Playbook', id: 'game-plan' },
       ...(hasResults ? [{ icon: <Activity size={18} />, label: 'Results', id: 'health' }] : []),
       { icon: <ShieldCheck size={18} />, label: 'Resources', id: 'resources' },
-      { icon: <Coins size={18} />, label: 'Credits', id: 'credits' },
+      ...(SHOW_CREDITS ? [{ icon: <Coins size={18} />, label: 'Credits', id: 'credits' }] : []),
     ];
   };
 
