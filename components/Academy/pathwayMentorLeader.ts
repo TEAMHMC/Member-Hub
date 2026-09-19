@@ -46,7 +46,7 @@ const ROLE_OF_A_MENTOR: Course = {
   minutes: 34,
   prerequisites: 'None. Experience in the work you will be mentoring in is assumed, not taught here.',
   whoFor:
-    'Volunteers, coordinators, and professionals who will mentor a learner, a new volunteer, or a peer at HMC or anywhere else.',
+    'Volunteers, coordinators, and staff who will mentor a student, a new volunteer, or a peer.',
   lessons: [
     {
       id: 'ml-1-l1',
@@ -243,7 +243,7 @@ const TRUST_AND_SAFETY: Course = {
   delivery: 'self-paced',
   title: 'Building Trust + Psychological Safety',
   promise:
-    'Make it safe enough to hear the truth, without confusing safety for comfort.',
+    'Make it safe enough to hear the truth, without mistaking safe for easy.',
   about: [
     'A mentor is only as useful as the accuracy of what they are told. Everything else in the relationship rests on whether the learner will say the real thing, and that is a condition you build rather than a personality you have.',
     'This course separates two ideas that get treated as one. Safety is the condition where somebody can say a hard thing without being punished for it. Comfort is the absence of hard things. Mentors who chase the second lose the first.',
@@ -256,7 +256,7 @@ const TRUST_AND_SAFETY: Course = {
   ],
   minutes: 26,
   prerequisites: 'None. Course 1 first is recommended, since this assumes the relationship has a stated purpose.',
-  whoFor: 'Anyone mentoring, facilitating a group, or leading peers.',
+  whoFor: 'Anyone mentoring, running a group, or leading peers.',
   lessons: [
     {
       id: 'ml-2-l1',
@@ -443,7 +443,7 @@ const COACHING_ADVISING_SUPERVISING: Course = {
   ],
   minutes: 27,
   prerequisites: 'None.',
-  whoFor: 'Mentors, coordinators, supervisors, and anyone who holds more than one of those roles at once.',
+  whoFor: 'Mentors, coordinators, supervisors, and anyone wearing more than one of those hats.',
   lessons: [
     {
       id: 'ml-3-l1',
@@ -627,7 +627,7 @@ const EFFECTIVE_FEEDBACK: Course = {
   delivery: 'self-paced',
   title: 'Giving Effective Feedback',
   promise:
-    'Say the useful thing in a way that can be acted on, and notice when feedback is really an escalation.',
+    'Say the useful thing in a way someone can act on, and notice when feedback is really a warning sign.',
   about: [
     'Feedback fails in two directions. It is softened until nobody can tell what was being asked, or it is delivered as a verdict on the person and defended against rather than used.',
     'This course treats feedback as information about a gap between what happened and what was needed. That framing does most of the work, and the structure that follows is short enough to use under pressure.',
@@ -640,7 +640,7 @@ const EFFECTIVE_FEEDBACK: Course = {
   ],
   minutes: 27,
   prerequisites: 'None. Courses 2 and 3 first are recommended.',
-  whoFor: 'Mentors, coordinators, leads, and anyone whose feedback somebody is waiting for.',
+  whoFor: 'Mentors, coordinators, leads, and anyone whose feedback someone is waiting on.',
   lessons: [
     {
       id: 'ml-4-l1',
@@ -817,7 +817,7 @@ const RISK_AND_ESCALATION: Course = {
   delivery: 'self-paced',
   title: 'Recognizing Risk + Escalating Concerns',
   promise:
-    'Recognise the disclosures that leave the mentoring relationship, and hand them over the same day without making them worse.',
+    'Know which things you cannot keep between the two of you, and pass them on the same day without making it worse.',
   about: [
     'A mentoring relationship that is working will eventually be told something serious. The purpose of this course is that the moment finds you already decided.',
     'One rule runs through all of it: a mentor notices and hands over. You do not assess how serious it is, you do not investigate, and you do not hold it alone until you are sure. Each of those is a judgement that belongs to somebody trained and accountable for making it.',
@@ -830,9 +830,9 @@ const RISK_AND_ESCALATION: Course = {
   ],
   minutes: 30,
   prerequisites:
-    'None. HMC assigns any additional safeguarding requirements by role, including where an assignment involves minors or sensitive access.',
+    'None. HMC adds any extra safety requirements based on your role, including work with young people.',
   whoFor:
-    'Every mentor, peer leader and group facilitator, before their first meeting rather than after it.',
+    'Every mentor, peer leader, and group lead, before the first meeting rather than after.',
   freshness:
     'Whether you personally are a mandated reporter under California law depends on your role, and HMC tells you which you are. Confirm your current status with your coordinator before you rely on anything here, and again if your role changes.',
   lessons: [

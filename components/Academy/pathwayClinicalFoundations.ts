@@ -37,7 +37,7 @@ const TEAM_ROLES_AND_SCOPE: Course = {
   delivery: 'self-paced',
   title: 'Healthcare Team Roles + Scope',
   promise:
-    'Know who does what in a clinical team, what each role may legally do, and where a learner stops.',
+    'Know who does what on a care team, what each role is allowed to do, and where your part ends.',
   about: [
     'A learner walking into a clinical setting sees a room of people whose roles are not obvious and whose authority is not interchangeable. Getting that wrong is how an observer ends up doing something nobody authorised.',
     'This course covers the roles, the difference between licensure and certification, and the scope question that a learner has to be able to answer about themselves.',
@@ -49,9 +49,9 @@ const TEAM_ROLES_AND_SCOPE: Course = {
     'State your own scope as a learner, including what you must decline.',
   ],
   minutes: 25,
-  prerequisites: 'None. Required before any clinical observation placement.',
+  prerequisites: 'None. You need this before any time in a clinic.',
   whoFor:
-    'Health-professions learners preparing for clinical exposure, and volunteers working alongside clinical staff.',
+    'Students getting ready for time in a clinic, and volunteers working next to clinical staff.',
   lessons: [
     {
       id: 'ces-1-l1',
@@ -225,7 +225,7 @@ const MEDICAL_TERMINOLOGY: Course = {
   delivery: 'self-paced',
   title: 'Medical Terminology Foundations',
   promise:
-    'Follow a clinical conversation without misreading it, and know which terms you must never guess at.',
+    'Follow a medical conversation without getting it wrong, and know which words you must never guess at.',
   about: [
     'Terminology is built from parts, which means a learner can decode most of what they hear without memorising lists. This course teaches the parts and the decoding habit.',
     'It also teaches the opposite skill, which matters more: recognising the terms where a near-miss changes the meaning entirely, and where guessing is worse than admitting you did not catch it.',
@@ -238,7 +238,7 @@ const MEDICAL_TERMINOLOGY: Course = {
   ],
   minutes: 20,
   prerequisites: 'None.',
-  whoFor: 'Health-professions learners, scribing and administrative volunteers, and anyone who will hear clinical language and be expected to record or relay it.',
+  whoFor: 'Students, scribes, office volunteers, and anyone who will hear medical words and have to write them down or pass them on.',
   lessons: [
     {
       id: 'ces-2-l1',
@@ -408,7 +408,7 @@ const PATIENT_COMMUNICATION: Course = {
   ],
   minutes: 20,
   prerequisites: 'Healthcare Team Roles + Scope, because this course depends on knowing where your scope ends.',
-  whoFor: 'Health-professions learners, navigators, and volunteers who speak with patients or members.',
+  whoFor: 'Students, navigators, and volunteers who talk with patients or members.',
   lessons: [
     {
       id: 'ces-3-l1',

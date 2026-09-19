@@ -43,8 +43,8 @@ export const UNSTOPPABLE_CE: Course = {
   promise:
     'Earn 1.0 continuing education hour in a disability-inclusive, culturally affirming framework for mental wellness.',
   about: [
-    'This is HMC\'s approved continuing education course for licensed professionals. It is delivered as a scheduled session, virtually or in person, and is followed by an evaluation and a certificate that meets the requirements of the approving agency.',
-    'The course presents the Unstoppable framework for mental wellness with an explicit focus on disability inclusion and cultural affirmation, drawn from the curriculum HMC already delivers in the community.',
+    'A live session you book, online or in person, followed by a short evaluation and your certificate.',
+    'It covers the Unstoppable approach to mental wellness, with a focus on disability and culture, taken from the workshop HMC already runs in the community.',
   ],
   objectives: [
     'Describe the Unstoppable framework and the population needs it responds to.',
@@ -52,9 +52,9 @@ export const UNSTOPPABLE_CE: Course = {
     'Identify culturally affirming approaches appropriate to your own practice context.',
   ],
   minutes: 60,
-  prerequisites: 'An active professional license in one of the recognized boards. Your license number is required for the certificate.',
+  prerequisites: 'A current licence from one of the boards we list. We need your licence number for the certificate.',
   whoFor:
-    'Licensed professionals seeking continuing education: LCSW, LMFT, LPCC, LEP, registered nurses, CCAPP-credentialed professionals, and psychologists.',
+    'Licensed staff earning CE hours: LCSW, LMFT, LPCC, LEP, nurses, CCAPP counsellors, and psychologists.',
   ce: {
     agency: 'Los Angeles County Department of Mental Health, Quality Outcomes and Training Division',
     hours: '1.0',
@@ -138,11 +138,11 @@ export const CMHW_FACILITATOR: Course = {
   delivery: 'blended',
   title: 'Community Mental Health Worker and Facilitator Training',
   promise:
-    'Complete HMC\'s existing two-part community mental health training and the facilitator readiness sequence.',
+    'Finish both parts of the community mental health training, then get ready to lead a session yourself.',
   about: [
-    'This is the training HMC already requires of community mental health workers, migrated so members and volunteers take the same canonical course rather than separate copies that drift apart.',
+    'This is the training HMC asks every community mental health worker to complete.',
     'Part 1 covers foundations of community mental health work, trauma-informed principles, and working with vulnerable populations. Part 2 covers applied engagement, de-escalation, communication skills, and field-based mental health work.',
-    'Facilitator readiness requires more than watching both parts. Certification requires attending the training sessions, completing the facilitator homework, and leading or co-facilitating a community workshop using the Unstoppable Curriculum.',
+    'Watching both parts is not enough. To be certified you also finish the homework, then lead or help lead a real community workshop.',
   ],
   objectives: [
     'Explain what trauma-informed care means and why it matters with vulnerable populations.',
@@ -150,9 +150,9 @@ export const CMHW_FACILITATOR: Course = {
     'Describe the boundaries of the community mental health worker role and when to escalate.',
   ],
   minutes: 51,
-  prerequisites: 'HMC orientation. Facilitator readiness additionally requires program leadership approval.',
+  prerequisites: 'HMC orientation. Your program lead signs off before you lead a session.',
   whoFor:
-    'Community health workers, medical students, educators, social workers, HMC volunteers, and anyone preparing to facilitate community mental health education.',
+    'Community health workers, students, teachers, social workers, HMC volunteers, and anyone getting ready to lead mental health sessions.',
   lessons: [
     {
       id: 'cmhw-l1',

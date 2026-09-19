@@ -391,7 +391,7 @@ import { CES_FOUNDATION_COURSES, CES_PRE, CES_POST } from './pathwayClinicalFoun
 import { MENTOR_LEADER_COURSES, MENTOR_PRE, MENTOR_POST } from './pathwayMentorLeader';
 import { INTERNSHIP_COURSES } from './pathwayInternships';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
-import { MENTAL_HEALTH_COURSES } from './pathwayMentalHealth';
+import { CMHW_FACILITATOR, UNSTOPPABLE_CE } from './pathwayMentalHealth';
 import { STEM_CAMP } from './programStemCollab';
 import { COURSE_1_V2 } from './course1V2';
 import { COURSE_2_V2 } from './course2V2';
@@ -531,14 +531,14 @@ export const PATHWAYS: Pathway[] = [
     level: 'Discover',
     status: 'published',
     purpose:
-      'Understand the health-professions ecosystem, connect interests and strengths to possible career families, verify education and licensure requirements, build meaningful experience, strengthen professional skills, and leave with an individualized next-step plan.',
-    format: 'Self-paced | 8 courses | Approximately 8 to 12 hours | Optional career panels and mentor sessions | Final personal pathway plan',
-    credentialTitle: 'HMC Health Careers Exploration — Pathway Completion',
+      'Find out what health careers exist and which ones fit you. Check what each one really takes. Leave with a plan for your next step.',
+    format: '8 courses at your own pace, about 8 to 12 hours. Ends with a plan you write.',
+    credentialTitle: 'HMC Health Careers Exploration',
     credentialType: 'Course Completion',
     gates: [
-      'Complete all 8 courses and their required activities',
+      'Finish all 8 courses and their activities',
       'Score 80% or higher on the pathway post-test',
-      'Submit a career roadmap meeting the capstone threshold of 15 of 20',
+      'Hand in your career plan and score at least 15 out of 20',
     ],
     guidedStart: 'September 1, 12:00 PM PT',
     courses: HCE_COURSES,
@@ -589,15 +589,15 @@ export const PATHWAYS: Pathway[] = [
     level: 'Discover',
     status: 'in-development',
     purpose:
-      'Help young people explore health, science, technology, community problem-solving, and health careers through projects and mentoring.',
+      'Young people explore health, science, and tech through hands-on projects, with a mentor beside them.',
     format: 'Self-paced with mentor sessions | 8 courses | Capstone project',
-    credentialTitle: 'HMC Youth Mentorship + STEAM — Pathway Completion',
+    credentialTitle: 'HMC Youth Mentorship and STEAM',
     credentialType: 'Course Completion',
     gates: [
       '8 courses complete',
       'Post-test 80% or higher',
       'Capstone at or above threshold',
-      'Youth account, consent and safeguarding requirements satisfied',
+      'Youth account set up, with consent and safety checks done',
     ],
     plannedCourses: [
       'Health Starts Here',
@@ -624,18 +624,18 @@ export const PATHWAYS: Pathway[] = [
     level: 'Foundations',
     status: 'in-development',
     purpose:
-      'Build readiness for community health, outreach, navigation, prevention, street-medicine support, and field-based service.',
-    format: 'Self-paced core plus required practicals and supervised practicum | 15 courses',
-    credentialTitle: 'HMC Field-Based Community Health — Applied Pathway Completion',
+      'Get ready for outreach, navigation, and street medicine work in the field.',
+    format: '15 courses at your own pace, plus hands-on shifts with a supervisor.',
+    credentialTitle: 'HMC Field-Based Community Health',
     credentialType: 'Applied Pathway Completion',
     gates: [
-      'Shared Foundations or approved equivalency',
+      'Finish Shared Foundations, or show you have done the same elsewhere',
       '8 pathway courses',
       'Post-test 80% or higher',
       'Integrated case lab pass',
-      'All role-required practicals',
-      'Assigned practicum or service requirement',
-      'Supervisor readiness sign-off',
+      'Finish the hands-on work your role needs',
+      'Finish your assigned shifts or service hours',
+      'Your supervisor signs off that you are ready',
     ],
     // Five written of the fifteen. Care Navigation and Coverage is the approved coverage
     // course; the four below it are the written core. What remains listed is what remains
@@ -671,16 +671,16 @@ export const PATHWAYS: Pathway[] = [
     level: 'Applied',
     status: 'in-development',
     purpose:
-      'Give eligible health-professions learners structured exposure to clinical communication, team-based care, simulation, community-centered care, and field workflows without exceeding learner scope.',
-    format: 'Self-paced core plus scheduled simulation and practical competency review | 15 courses',
-    credentialTitle: 'HMC Clinical + Community Health Experience — Pathway Completion',
+      'See how care teams work. Practice in simulation. Learn where a learner role stops and a professional one begins.',
+    format: '15 courses at your own pace, plus simulation days and a skills check.',
+    credentialTitle: 'HMC Clinical and Community Health Experience',
     credentialType: 'Applied Pathway Completion',
     gates: [
-      'Shared Foundations or approved equivalency',
+      'Finish Shared Foundations, or show you have done the same elsewhere',
       '8 pathway courses',
       'Post-test 80% or higher',
       'Required simulations',
-      'Assigned practical competency review',
+      'Pass your skills check',
       'Reflection and debrief',
     ],
     // Three written, and the three that teach nothing clinical. Everything left below either
@@ -715,14 +715,14 @@ export const PATHWAYS: Pathway[] = [
     level: 'Advanced',
     status: 'in-development',
     purpose:
-      'Provide sustained, supervised, project-based professional experience tied to learning objectives and portfolio outcomes.',
-    format: 'Term-based placement with supervisor, learning agreement, midpoint review and capstone | 11 core courses',
-    credentialTitle: 'HMC [Concentration] Internship / Fellowship — Completion',
+      'Spend a term on real project work with a supervisor. Leave with proof of what you did.',
+    format: '11 courses and a placement that lasts one term, with a supervisor and a final project.',
+    credentialTitle: 'HMC Internship and Fellowship',
     credentialType: 'Fellowship / Internship Completion',
     gates: [
       'Professional core complete',
       'Learning agreement',
-      'Required project or placement work',
+      'Finish your project or placement work',
       'Midpoint review',
       'Capstone at threshold',
       'Final supervisor evaluation',
@@ -752,16 +752,16 @@ export const PATHWAYS: Pathway[] = [
     level: 'Leadership',
     status: 'in-development',
     purpose:
-      'Prepare experienced participants and professionals to mentor, facilitate, lead teams, and support learner development.',
+      'Learn to mentor one person, lead a group, and help others grow.',
     format: 'Self-paced core plus mentor practice case | 12 courses',
-    credentialTitle: 'HMC Mentor + Peer Leader — Pathway Completion',
+    credentialTitle: 'HMC Mentor and Peer Leader',
     credentialType: 'Course Completion',
     gates: [
       '8 courses complete',
       'Post-test 80% or higher',
       'Mentor practice case pass',
       'Readiness acknowledgement',
-      'Additional eligibility checks if the assignment involves minors, supervision, or sensitive access',
+      'Extra checks if you will work with young people or sensitive information',
     ],
     // Five of the twelve are written. The seven below are the ones still to write, so this
     // list reads as a plan rather than as a promise: a planned title next to a written
@@ -784,15 +784,23 @@ export const PATHWAYS: Pathway[] = [
   },
 ];
 
+// These are two different programmes for two different people, and they were one
+// pathway. The continuing education course is for licensed professionals and needs a
+// licence number; the facilitator training is for community health workers, students
+// and volunteers and needs no licence at all. Bundled together, the facilitator
+// credential required finishing a course its own audience is not eligible to take, and
+// a clinician wanting one CE hour was put on a facilitator track they never asked for.
+// Only the workshop carries the LACDMH approval. The facilitator training never has.
+
 PATHWAYS.push({
   family: 'Mental Health + Community Education',
-  id: 'unstoppable-mental-health',
-  title: 'Unstoppable Continuing Education and Facilitator Training',
+  id: 'unstoppable-facilitator',
+  title: 'Unstoppable Facilitator Training',
   level: 'Leadership',
   status: 'in-development',
   purpose:
-    'Learn to lead Unstoppable workshops in your community. Have a license? You can earn CE hours here too.',
-  format: 'Live online sessions, plus videos and reading you do on your own time.',
+    'Learn to lead Unstoppable workshops where you live. No licence needed.',
+  format: 'Videos and reading you do on your own time, then a workshop you help lead.',
   credentialTitle: 'HMC Unstoppable Facilitator',
   credentialType: 'Course Completion',
   gates: [
@@ -800,16 +808,35 @@ PATHWAYS.push({
     'Pass both quizzes',
     'Lead a workshop and have your work signed off',
   ],
-  courses: MENTAL_HEALTH_COURSES,
-  // Only what is still to come. Both of the first two titles were listed here while also
-  // shipping as written courses, so the pathway advertised outstanding work that was
-  // already done and a member reading the list could not tell what was missing.
+  courses: [CMHW_FACILITATOR],
   plannedCourses: [
     'Unstoppable Community Learning (participant facing)',
   ],
   version: '2.0 migration',
   effectiveDate: 'Migrated from the Volunteer Portal training system',
   nextReview: 'Asset inventory pending confirmation of the required follow-up sequence',
+});
+
+PATHWAYS.push({
+  family: 'Mental Health + Community Education',
+  id: 'unstoppable-ce',
+  title: 'Unstoppable Continuing Education',
+  level: 'Advanced',
+  status: 'in-development',
+  purpose:
+    'Earn one continuing education hour. For nurses, therapists, counsellors and psychologists with a current licence.',
+  format: 'One live online session you book, then a short evaluation.',
+  credentialTitle: 'Unstoppable Continuing Education, 1.0 Hour',
+  credentialType: 'Course Completion',
+  gates: [
+    'Join the whole session',
+    'Fill in the evaluation afterwards',
+  ],
+  courses: [UNSTOPPABLE_CE],
+  plannedCourses: [],
+  version: '2.0 migration',
+  effectiveDate: 'Migrated from the Volunteer Portal training system',
+  nextReview: 'With the LACDMH approval renewal',
 });
 
 export const LEARNING_MODEL = ['Discover', 'Learn', 'Practice', 'Serve', 'Demonstrate', 'Advance'];

@@ -239,7 +239,7 @@ export const COURSE_7_V2: Course = {
   delivery: 'self-paced',
   title: 'Professional Communication, Networking + Mentorship',
   promise:
-    'Introduce yourself professionally and request an informational conversation that someone will actually say yes to.',
+    'Introduce yourself well, and ask for a conversation in a way that gets a yes.',
   about: [
     'Professional relationships expand access to information, feedback, opportunity and belonging. Networking is not collecting contacts; it is building respectful relationships over time.',
     'Mentorship works best when expectations, goals and boundaries are clear, and when a learner has several sources of support rather than one.',
@@ -252,7 +252,7 @@ export const COURSE_7_V2: Course = {
   ],
   minutes: 46,
   prerequisites: 'None.',
-  whoFor: 'Learners preparing to contact professionals, request informational interviews, or work with a mentor.',
+  whoFor: 'Anyone about to reach out to someone in the field, or work with a mentor.',
   lessons: [
     {
       id: 'hce7-l1',
