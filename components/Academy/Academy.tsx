@@ -1200,7 +1200,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     const buildLabel = !hasContent ? 'Coming soon' : null;
     // Registration needs something to read, not merely a course object.
     const hasCourses = hasContent;
-    const { gates, eligible } = evaluateGates(p, state);
+    const { gates, eligible } = evaluateGates(p, state, adminOpen);
     const issued = state.credentials[p.id];
     const pre = state.preTest[p.id];
     const { pre: preScore, post: postScore, gain } = knowledgeGain(p.id, state);

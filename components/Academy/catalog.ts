@@ -797,7 +797,7 @@ PATHWAYS.push({
   id: 'unstoppable-facilitator',
   title: 'Unstoppable Facilitator Training',
   level: 'Leadership',
-  status: 'in-development',
+  status: 'published',
   purpose:
     'Learn to lead Unstoppable workshops where you live. No licence needed.',
   format: 'Videos and reading you do on your own time, then a workshop you help lead.',
@@ -809,9 +809,11 @@ PATHWAYS.push({
     'Lead a workshop and have your work signed off',
   ],
   courses: [CMHW_FACILITATOR],
-  plannedCourses: [
-    'Unstoppable Community Learning (participant facing)',
-  ],
+  // Participant-facing community learning is a third audience again, not a step on the
+  // way to facilitating. Listing it here gated the facilitator credential on a course
+  // its holders never take, so a finished facilitator could not be credentialled until
+  // an unrelated course shipped. It belongs in its own pathway when it is written.
+  plannedCourses: [],
   version: '2.0 migration',
   effectiveDate: 'Migrated from the Volunteer Portal training system',
   nextReview: 'Asset inventory pending confirmation of the required follow-up sequence',
@@ -822,7 +824,7 @@ PATHWAYS.push({
   id: 'unstoppable-ce',
   title: 'Unstoppable Continuing Education',
   level: 'Advanced',
-  status: 'in-development',
+  status: 'published',
   purpose:
     'Earn one continuing education hour. For nurses, therapists, counsellors and psychologists with a current licence.',
   format: 'One live online session you book, then a short evaluation.',
@@ -879,5 +881,15 @@ export const pathwayBlockCount = (p: Pathway) =>
     0
   );
 
-/** Is there anything here a learner could actually read? */
-export const pathwayHasContent = (p: Pathway) => pathwayBlockCount(p) > 0;
+/**
+ * Is there anything here a learner could actually do?
+ *
+ * Counting written blocks alone said no for a scheduled live course, because its
+ * substance is the session rather than text on a page. The approved continuing
+ * education course has no lessons by design and was therefore treated as an empty
+ * pathway that no admin could open. A course counts if it has something to read, or
+ * if it is a live session with requirements attached.
+ */
+export const pathwayHasContent = (p: Pathway) =>
+  pathwayBlockCount(p) > 0 ||
+  p.courses.some((c) => c.delivery === 'live' && (c.requirements?.length ?? 0) > 0);

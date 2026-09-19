@@ -249,7 +249,20 @@ export interface GateStatus {
  * Evaluates the pathway's published gates. Returns one row per gate so the
  * learner can see exactly what remains, and `eligible` only when all pass.
  */
-export function evaluateGates(p: Pathway, s: LearnerState): {
+export function evaluateGates(
+  p: Pathway,
+  s: LearnerState,
+  /**
+   * Whether an admin has opened this pathway.
+   *
+   * The pathway listing already treats an admin opening a pathway as outranking the
+   * catalogue flag. The credential did not, so a pathway could be open for people to
+   * enrol in and finish while the credential stayed locked on a flag only a deploy
+   * could change. Someone could complete every course and still be told the pathway
+   * was not open. Both now read the same signal.
+   */
+  adminOpen = false
+): {
   gates: GateStatus[];
   eligible: boolean;
 } {
@@ -268,7 +281,7 @@ export function evaluateGates(p: Pathway, s: LearnerState): {
   // how much of the published content a learner has finished. Stated as its own
   // gate so the learner sees why rather than finding a dead button.
   const gates: GateStatus[] = [];
-  if (p.status !== 'published') {
+  if (p.status !== 'published' && !adminOpen) {
     gates.push({
       label: 'We are still adding courses here',
       met: false,
