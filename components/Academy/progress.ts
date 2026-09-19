@@ -270,11 +270,11 @@ export function evaluateGates(p: Pathway, s: LearnerState): {
   const gates: GateStatus[] = [];
   if (p.status !== 'published') {
     gates.push({
-      label: 'This pathway is open',
+      label: 'We are still adding courses here',
       met: false,
       // plannedCourses holds the courses NOT yet released, so the total is both lists.
       // It read "2 of 1 courses released" on a pathway with two released and one planned.
-      detail: `${p.courses.length} of ${p.courses.length + (p.plannedCourses?.length ?? 0)} courses are ready`,
+      detail: `${p.courses.length} of ${p.courses.length + (p.plannedCourses?.length ?? 0)} are ready. This one is on us, not you.`,
     });
   }
   gates.push(

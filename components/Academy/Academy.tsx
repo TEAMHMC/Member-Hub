@@ -1412,7 +1412,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     <span className="text-sm text-zinc-700 leading-snug">
                       {g.label}
                       <span className="block text-[11px] text-zinc-400 mt-0.5">
-                        {g.met ? 'Met' : 'Not yet met'}{g.detail ? ` · ${g.detail}` : ''}
+                        {g.met ? 'Done' : 'Not yet'}{g.detail ? ` · ${g.detail}` : ''}
                       </span>
                     </span>
                   </li>
