@@ -31,7 +31,7 @@ const PROFESSIONAL_ORIENTATION: Course = {
   delivery: 'self-paced',
   title: 'Professional Orientation + Expectations',
   promise:
-    'Arrive in week one knowing what is expected of you, what you are owed, and what to do when the work does not appear.',
+    'Start week one knowing what is expected of you, what you should get, and what to do if no work shows up.',
   about: [
     'The most common way an internship disappoints is not conflict. It is a learner who waited to be given work, and a supervisor who assumed a self-starter, and eight weeks passing before either says so.',
     'This course is about the first two weeks, because that is where a placement is decided. It covers what to establish before you start, how to be useful before anybody trusts you with anything, and the specific move to make in week three if there is still nothing to do.',
@@ -45,7 +45,7 @@ const PROFESSIONAL_ORIENTATION: Course = {
   minutes: 27,
   prerequisites: 'None. Complete this before your placement begins rather than during it.',
   whoFor:
-    'Interns, fellows, student placements, and anyone about to spend a term inside an organisation they do not know yet.',
+    'Interns, fellows, and anyone about to spend a term at a place they do not know yet.',
   lessons: [
     {
       id: 'if-1-l1',
@@ -220,7 +220,7 @@ const PROJECT_PLANNING: Course = {
   delivery: 'self-paced',
   title: 'Project Planning + Milestones',
   promise:
-    'Turn a vague assignment into a plan with dates, and notice you are behind while there is still time to act.',
+    'Turn a vague task into a plan with dates, and spot that you are behind while there is still time to fix it.',
   about: [
     'A placement project usually arrives as a sentence. "Have a look at our volunteer retention." What happens next decides whether there is anything to show at the end.',
     'This course is about converting that sentence into something with a shape: a question you are answering, the smallest useful version of it, milestones that are evidence rather than effort, and a weekly check that surfaces slippage early.',
@@ -233,7 +233,7 @@ const PROJECT_PLANNING: Course = {
   ],
   minutes: 24,
   prerequisites: 'None. Course 1 first is recommended.',
-  whoFor: 'Interns and fellows holding a project, and anyone who has been handed an assignment as a sentence.',
+  whoFor: 'Interns and fellows running a project, and anyone handed a task in one vague sentence.',
   lessons: [
     {
       id: 'if-2-l1',
@@ -411,7 +411,7 @@ const ETHICS_AND_CONFIDENTIALITY: Course = {
   delivery: 'self-paced',
   title: 'Ethics, Confidentiality + Organizational Responsibility',
   promise:
-    'Know what you may look at, what you may repeat, and what to do the moment you realise you have seen something you should not have.',
+    'Know what you can look at, what you can repeat, and what to do the moment you see something you should not have.',
   about: [
     'A placement gives a learner access before it gives them training. That is the ordinary condition of an internship and it is why this course exists early in the pathway rather than late.',
     'It is written around three rules that hold in a health organisation, a school, a council office or a law firm: access is not permission, the default is that you do not repeat it, and a mistake reported immediately is a small problem.',
@@ -424,9 +424,9 @@ const ETHICS_AND_CONFIDENTIALITY: Course = {
   ],
   minutes: 26,
   prerequisites:
-    'None. Any placement involving health records, minors or sensitive systems carries additional HMC requirements assigned by role, and those are separate from this course.',
+    'None. Placements with health records, young people, or sensitive systems have extra HMC requirements. Those come with your role, not this course.',
   whoFor:
-    'Every intern and fellow, before their first day in a system that holds information about real people.',
+    'Every intern and fellow, before day one in a system that holds real people\'s information.',
   lessons: [
     {
       id: 'if-3-l1',
@@ -598,7 +598,7 @@ const PORTFOLIO_AND_IMPACT: Course = {
   delivery: 'self-paced',
   title: 'Portfolio + Impact Documentation',
   promise:
-    'Leave with evidence of what you did that somebody who was not there can evaluate.',
+    'Leave with proof of your work that someone who was not there can judge.',
   about: [
     'The pathway requires an approved portfolio artifact, and most learners assemble it in the final week from memory. What they produce is a description of activity, because the evidence that would have supported a claim was not kept.',
     'This course is about collecting as you go and writing claims that survive a stranger reading them.',

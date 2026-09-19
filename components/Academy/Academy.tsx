@@ -247,9 +247,11 @@ const CourseCard: React.FC<{
       <div className="flex flex-wrap items-center gap-2">
         {delivery && DELIVERY_BADGE[delivery] && <Badge>{DELIVERY_BADGE[delivery]}</Badge>}
         {ce && <Badge tone="solid">CE approved</Badge>}
-        {/* A price where there is one, and Free where there genuinely is not. Every card
-            said Free, including on the one course that costs money. */}
-        <Badge>{priceUsd ? `$${priceUsd}` : 'Free'}</Badge>
+        {/* A price where there is one, and no charge where there genuinely is none.
+            Both this badge and the Cost row on the course page read the same `price`
+            field, so a course shows one answer or the other and never both. Setting or
+            removing `price` in the catalogue is what turns pricing on and off. */}
+        <Badge>{priceUsd ? `$${priceUsd}` : 'No charge'}</Badge>
       </div>
 
       <div className="mt-2">
@@ -1198,7 +1200,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     const buildLabel = !hasContent ? 'Coming soon' : null;
     // Registration needs something to read, not merely a course object.
     const hasCourses = hasContent;
-    const { gates, eligible } = evaluateGates(p, state);
+    const { gates, eligible } = evaluateGates(p, state, adminOpen);
     const issued = state.credentials[p.id];
     const pre = state.preTest[p.id];
     const { pre: preScore, post: postScore, gain } = knowledgeGain(p.id, state);
@@ -1247,7 +1249,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               }))}
             />
             <p className="text-[12px] text-zinc-400 ml-1">
-              You can start any step at any time, and come back to it whenever you want.
+              Start any step whenever you want. You can always come back.
             </p>
           </section>
         )}
@@ -1305,7 +1307,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               </ol>
             )}
             <p className="text-sm text-zinc-500">
-              {p.courses.length > 0 ? 'More courses are added to this pathway over time.' : 'Courses are coming soon.'}
+              {p.courses.length > 0 ? 'We add more courses over time.' : 'Courses are coming soon.'}
             </p>
           </div>
         )}
@@ -1410,7 +1412,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     <span className="text-sm text-zinc-700 leading-snug">
                       {g.label}
                       <span className="block text-[11px] text-zinc-400 mt-0.5">
-                        {g.met ? 'Met' : 'Not yet met'}{g.detail ? ` · ${g.detail}` : ''}
+                        {g.met ? 'Done' : 'Not yet'}{g.detail ? ` · ${g.detail}` : ''}
                       </span>
                     </span>
                   </li>
@@ -1545,7 +1547,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                 ['Modules', `${c.lessons.length}`],
                 ['Knowledge checks', `${c.checks.length}`],
                 ['Applied activity', c.activity ? 'Yes, with a saved artifact' : 'None'],
-                ['Cost', 'Free'],
+                ['Cost', c.price?.amountUsd ? `$${c.price.amountUsd}` : 'No charge'],
               ].map(([k, v]) => (
                 <div key={k} className="flex items-baseline justify-between gap-4 border-b border-zinc-50 pb-2.5 last:border-0 last:pb-0">
                   <dt className="text-[12px] text-zinc-500">{k}</dt>

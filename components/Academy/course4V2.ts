@@ -260,7 +260,7 @@ export const COURSE_4_V2: Course = {
   minutes: 52,
   prerequisites: 'Courses 1 through 3.',
   whoFor:
-    'Learners planning to volunteer, shadow, intern or do research, and anyone who has logged hours without knowing how to describe them.',
+    'Anyone about to volunteer, shadow, or intern. Also anyone with hours behind them who cannot explain what they did.',
   lessons: [
     {
       id: 'hce4-l1',

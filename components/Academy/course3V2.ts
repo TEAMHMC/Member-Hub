@@ -290,7 +290,7 @@ export const COURSE_3_V2: Course = {
   delivery: 'self-paced',
   title: 'Education, Training, Licensure + Credentials',
   promise:
-    'Tell the difference between a degree, a certificate, a certification, a license, and accreditation, and verify the real requirements for a career you care about.',
+    'Learn the difference between a degree, a certificate, and a license. Then check what your career really asks for.',
   about: [
     'Health careers vary widely in what they require. Some are entered with a short-term certificate; others require associate, bachelor\'s, graduate, professional or doctoral education. Many add supervised hours, national examinations, state licensure, continuing education, or recurring certification.',
     'This course gives you the vocabulary to tell those apart and a verification chain you can run on any career, so your plan rests on what the deciding authorities actually say rather than on what a program brochure implies.',
@@ -303,7 +303,7 @@ export const COURSE_3_V2: Course = {
   ],
   minutes: 58,
   prerequisites: 'Courses 1 and 2.',
-  whoFor: 'Learners with two to four target careers who need to know what it actually takes to enter them.',
+  whoFor: 'People with a few careers in mind who need to know what it takes to get in.',
   freshness:
     'Licensure and certification requirements change. Verify against the licensing board and certifying body directly, and record the date you checked.',
   lessons: [

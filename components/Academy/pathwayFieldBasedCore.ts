@@ -36,7 +36,7 @@ const COMMUNITY_HEALTH_EQUITY: Course = {
   delivery: 'self-paced',
   title: 'Community Health + Health Equity',
   promise:
-    'Say what community health work is, what equity means in a decision you actually make, and where your own role stops.',
+    'Say what community health work is, what fairness looks like in a real choice, and where your own role ends.',
   about: [
     'Community health is a job with a method, not a disposition. This course is about the method: meeting people where they are, working through trust rather than authority, and treating access as the thing being fixed.',
     'Equity is the part most often reduced to a value statement. Here it is treated as something that shows up in ordinary operational choices, because that is the only place it ever shows up.',
@@ -50,7 +50,7 @@ const COMMUNITY_HEALTH_EQUITY: Course = {
   minutes: 25,
   prerequisites: 'None. This is the entry point to the pathway.',
   whoFor:
-    'Community health workers, promotoras, outreach volunteers, navigators, and anyone who will represent HMC in front of the public.',
+    'Community health workers, promotoras, volunteers, navigators, and anyone who speaks for HMC in public.',
   lessons: [
     {
       id: 'fbch-2-l1',
@@ -219,7 +219,7 @@ const SOCIAL_DETERMINANTS: Course = {
   delivery: 'self-paced',
   title: 'Social Determinants of Health',
   promise:
-    'Recognise the conditions producing what you see at a table, and act on the one that is actually in the way.',
+    'See what is really behind the problem in front of you, and deal with the part that is actually blocking the person.',
   about: [
     'Most of what determines somebody\'s health happens outside a clinic. This is not a slogan; it is the reason a community health role exists at all, and it is directly useful at a table.',
     'The practical value is diagnostic. Somebody who has missed three appointments has a reason, and the reason is usually a condition rather than a choice. Finding it is most of the work.',
@@ -232,7 +232,7 @@ const SOCIAL_DETERMINANTS: Course = {
   ],
   minutes: 22,
   prerequisites: 'None. Course 2 first is recommended.',
-  whoFor: 'Outreach volunteers, navigators, promotoras, and anybody who will be told why somebody has not been seen.',
+  whoFor: 'Outreach volunteers, navigators, promotoras, and anyone who will hear why a person has not been seen.',
   lessons: [
     {
       id: 'fbch-3-l1',
@@ -401,7 +401,7 @@ const BOUNDARIES_ETHICS_PRIVACY: Course = {
   delivery: 'self-paced',
   title: 'Professional Boundaries + Ethics + Privacy',
   promise:
-    'Hold a boundary in the moment it is tested, and know what you may write down, repeat, or photograph.',
+    'Hold a line when it gets tested, and know what you can write down, repeat, or photograph.',
   about: [
     'Field work puts a volunteer in somebody\'s life at a difficult moment, with no desk between them. The boundaries that are obvious in a clinic have to be held deliberately at a table, on a pavement, in a car park.',
     'Every scenario in this course is one that happens, and every one is a volunteer trying to help. That is what makes them worth rehearsing before they arrive.',
@@ -414,7 +414,7 @@ const BOUNDARIES_ETHICS_PRIVACY: Course = {
   ],
   minutes: 25,
   prerequisites: 'None. Complete before your first field shift, not after it.',
-  whoFor: 'Every volunteer working in the field, at a table, or on a street medicine shift.',
+  whoFor: 'Every volunteer in the field, at a table, or on a street medicine shift.',
   lessons: [
     {
       id: 'fbch-4-l1',
@@ -585,7 +585,7 @@ const FIELD_SAFETY: Course = {
   delivery: 'self-paced',
   title: 'Field Safety + Infection Prevention',
   promise:
-    'Work a field shift without becoming a casualty, and know the four things you must never handle.',
+    'Work a shift safely, and know the four things you must never touch.',
   about: [
     'This is the operational half of field safety: your own protection, the barriers between you and infection, the hazards a street or a car park actually contains, and heat.',
     'It teaches nothing clinical. It will not tell you how sick somebody is, what a symptom means, or what to do for a wound. Those are a clinician\'s decisions and this course is explicit about handing them over, because the most common way a volunteer causes harm in the field is by helping past their scope.',
@@ -598,7 +598,7 @@ const FIELD_SAFETY: Course = {
   ],
   minutes: 24,
   prerequisites:
-    'None for the knowledge. Field work additionally requires an approved HMC role, a supervisor, and any role-specific requirements HMC assigns.',
+    'None to learn it. Field work also needs an HMC role, a supervisor, and whatever else your role calls for.',
   whoFor: 'Volunteers on outreach, pop-up, health fair and street medicine support shifts.',
   freshness:
     'Infection prevention practice follows current CDC and Los Angeles County Department of Public Health guidance, which changes. HMC shift protocol is what you follow on the day, and it is the version to check before a shift rather than this course.',

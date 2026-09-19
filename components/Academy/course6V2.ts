@@ -259,7 +259,7 @@ export const COURSE_6_V2: Course = {
   readingLevel: 'adult',
   delivery: 'self-paced',
   title: 'Paying for the Path: Financial Aid + Cost Planning',
-  promise: 'Estimate the real cost of a program and compare offers on net cost rather than headline tuition.',
+  promise: 'Work out what a program really costs, and compare offers on the true price instead of the sticker price.',
   about: [
     'An education decision should account for the full cost of attendance, the financing available to you, the income you give up, and your actual circumstances.',
     'Federal Student Aid is the controlling source for federal aid terminology and process. Amounts, deadlines and program rules change, so this course teaches you where to check rather than printing figures that would go stale.',
@@ -271,8 +271,8 @@ export const COURSE_6_V2: Course = {
     'Build a basic education-cost comparison.',
   ],
   minutes: 46,
-  prerequisites: 'None, though Course 3 makes the education requirements clearer first.',
-  whoFor: 'Anyone weighing the cost of a program, including learners who assume a path is out of reach financially.',
+  prerequisites: 'None. Course 3 first makes this one easier.',
+  whoFor: 'Anyone weighing what a program costs, including people who assume they cannot afford it.',
   freshness:
     'Aid amounts, interest rates, deadlines and eligibility rules change, often annually. Verify at StudentAid.gov and with the school\'s financial aid office at the time you apply.',
   lessons: [

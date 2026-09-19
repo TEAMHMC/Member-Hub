@@ -245,7 +245,7 @@ export const COURSE_1_V2: Course = {
   delivery: 'self-paced',
   title: 'The Health Professions Ecosystem',
   promise:
-    'Map the health-professions ecosystem, and learn to verify career information against authorities rather than hearsay.',
+    'See the whole range of health careers, and learn how to check what is true instead of taking someone\'s word for it.',
   about: [
     'Health care is much larger than the handful of professions most people see on television, in a clinic, or during a hospital visit.',
     'This course helps you map the health-professions ecosystem, understand why health outcomes depend on teams, distinguish direct-care roles from population, research, technology, and operational careers, and learn how to verify career information using authoritative sources rather than social media or hearsay.',
@@ -261,7 +261,7 @@ export const COURSE_1_V2: Course = {
   minutes: 70,
   prerequisites: 'None. This is the entry point to the pathway.',
   whoFor:
-    'Anyone exploring health careers, including learners with no prior exposure to the field.',
+    'Anyone looking at health careers, including people brand new to the field.',
   lessons: [
     {
       id: 'hce-1-l0',
