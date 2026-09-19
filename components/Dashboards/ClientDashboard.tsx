@@ -480,12 +480,12 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         <div className="flex flex-wrap gap-4 pt-6 justify-center">
              {guest ? (
                <>
-                 <ButtonPrimary onClick={() => setActiveTab('resources')}>Get support</ButtonPrimary>
+                 <ButtonPrimary className="hmc-btn-arrow" onClick={() => setActiveTab('resources')}>Get support</ButtonPrimary>
                  <ButtonSecondary onClick={() => setActiveTab('academy')}>Browse courses</ButtonSecondary>
                </>
              ) : (
                <>
-                 <ButtonPrimary onClick={gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })}>Build my Playbook</ButtonPrimary>
+                 <ButtonPrimary className="hmc-btn-arrow" onClick={gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })}>Build my Playbook</ButtonPrimary>
                  <ButtonSecondary onClick={() => setActiveTab('events')}>Explore Events</ButtonSecondary>
                </>
              )}
