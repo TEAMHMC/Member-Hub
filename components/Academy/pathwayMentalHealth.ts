@@ -72,16 +72,22 @@ export const UNSTOPPABLE_CE: Course = {
       'This approval covers the scheduled session format. Attendance is recorded per session, and the certificate is issued against that session date.',
   },
   /**
-   * PAYPAL_CEU_URL below is the one thing here that is not yet real. The rest of this
-   * course, including the approval, the hours and the certificate the portal already
-   * generates against it, is. Point it at the HMC PayPal button for the CE seat and the
-   * whole flow works; until then the Hub shows the price and says how to pay.
+   * Pricing is off.
+   *
+   * `price` is optional, and its presence is the switch: set it and the course card
+   * badge, the Cost row and the registration pay button all appear together; leave it
+   * off and none of them do. Nothing else needs changing to turn a course paid or unpaid.
+   *
+   * It is off here because PAYPAL_CEU_URL was never pointed at a real HMC PayPal button,
+   * so the Hub was advertising $16 next to a checkout that could not take the money. To
+   * turn it back on, make that URL real first, then restore the block below:
+   *
+   *   price: {
+   *     amountUsd: 16,
+   *     payUrl: PAYPAL_CEU_URL,
+   *     note: 'Covers your seat and your CE certificate.',
+   *   },
    */
-  price: {
-    amountUsd: 16,
-    payUrl: PAYPAL_CEU_URL,
-    note: 'Covers your seat and your CE certificate. Every other HMC course is free.',
-  },
   /**
    * Fifty minutes for one credit hour.
    *
