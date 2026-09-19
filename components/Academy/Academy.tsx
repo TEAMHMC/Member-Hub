@@ -1249,7 +1249,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               }))}
             />
             <p className="text-[12px] text-zinc-400 ml-1">
-              You can start any step at any time, and come back to it whenever you want.
+              Start any step whenever you want. You can always come back.
             </p>
           </section>
         )}
@@ -1307,7 +1307,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               </ol>
             )}
             <p className="text-sm text-zinc-500">
-              {p.courses.length > 0 ? 'More courses are added to this pathway over time.' : 'Courses are coming soon.'}
+              {p.courses.length > 0 ? 'We add more courses over time.' : 'Courses are coming soon.'}
             </p>
           </div>
         )}

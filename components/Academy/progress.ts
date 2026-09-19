@@ -270,21 +270,21 @@ export function evaluateGates(p: Pathway, s: LearnerState): {
   const gates: GateStatus[] = [];
   if (p.status !== 'published') {
     gates.push({
-      label: 'Pathway published and open for credentialing',
+      label: 'This pathway is open',
       met: false,
       // plannedCourses holds the courses NOT yet released, so the total is both lists.
       // It read "2 of 1 courses released" on a pathway with two released and one planned.
-      detail: `${p.courses.length} of ${p.courses.length + (p.plannedCourses?.length ?? 0)} courses released so far`,
+      detail: `${p.courses.length} of ${p.courses.length + (p.plannedCourses?.length ?? 0)} courses are ready`,
     });
   }
   gates.push(
     {
-      label: `Complete all ${p.courses.length} courses and their required activities`,
+      label: `Finish all ${p.courses.length} courses and their activities`,
       met: coursesDone,
       detail: `${p.courses.filter((c) => isCourseComplete(p, c.id, s)).length} of ${p.courses.length} complete`,
     },
     {
-      label: `Score ${PASS_THRESHOLD}% or higher on the pathway post-test`,
+      label: `Pass the final quiz with ${PASS_THRESHOLD}% or more`,
       met: postMet,
       detail: post === null ? 'Not yet attempted' : `Best score ${post}%`,
     }
@@ -292,9 +292,9 @@ export function evaluateGates(p: Pathway, s: LearnerState): {
 
   if (artifactCourses.length) {
     gates.push({
-      label: 'Complete the carried-forward work from each course',
+      label: 'Finish the practice work from each course',
       met: artifactsDone === artifactCourses.length,
-      detail: `${artifactsDone} of ${artifactCourses.length} pieces complete`,
+      detail: `${artifactsDone} of ${artifactCourses.length} done`,
     });
   }
 

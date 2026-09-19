@@ -791,14 +791,14 @@ PATHWAYS.push({
   level: 'Leadership',
   status: 'in-development',
   purpose:
-    'HMC\'s existing mental health education, migrated into the Academy so members and volunteers take one canonical training rather than separate copies. Continuing education for licensed professionals, and facilitator preparation for people who will deliver Unstoppable programming.',
-  format: 'Scheduled sessions for continuing education, blended video and written curriculum for facilitator training',
-  credentialTitle: 'HMC Unstoppable Facilitator — Completion',
+    'Learn to lead Unstoppable workshops in your community. Have a license? You can earn CE hours here too.',
+  format: 'Live online sessions, plus videos and reading you do on your own time.',
+  credentialTitle: 'HMC Unstoppable Facilitator',
   credentialType: 'Course Completion',
   gates: [
-    'Both community mental health worker training parts complete',
-    'Both assessments passed',
-    'Facilitator readiness sequence recorded and approved by program leadership',
+    'Finish both parts of the training',
+    'Pass both quizzes',
+    'Lead a workshop and have your work signed off',
   ],
   courses: MENTAL_HEALTH_COURSES,
   // Only what is still to come. Both of the first two titles were listed here while also
