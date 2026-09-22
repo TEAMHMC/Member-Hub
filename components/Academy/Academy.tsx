@@ -11,7 +11,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as route from '../../services/route';
-import { Award, Check, CheckCircle2, ChevronRight, FileText, GraduationCap, ListChecks, Lock, PenLine, Play, ShieldCheck, TrendingUp, X } from 'lucide-react';
+import { Award, Check, CheckCircle2, ChevronRight, FileText, GraduationCap, ListChecks, Lock, PenLine, Play, Search, ShieldCheck, TrendingUp, X } from 'lucide-react';
 import {
   PATHWAYS,
   PASS_THRESHOLD,
@@ -796,6 +796,16 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
    * finished is a harder thing to do by accident.
    */
   const [attestName, setAttestName] = useState('');
+
+  /**
+   * What the member typed to find something to learn.
+   *
+   * The Academy had no search of its own. The only search box on the screen is the Hub's,
+   * which reads "Search food, housing, mental health, and more" and queries the resource
+   * directory, so somebody looking for a course on the Academy page was typing into a
+   * field that searches something else entirely.
+   */
+  const [catalogQuery, setCatalogQuery] = useState('');
   const signAttestation = (courseId: string) => {
     const name = attestName.trim();
     if (!name) return;
@@ -811,18 +821,43 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
   const renderCatalog = () => {
     const enrolledPaths = state.enrolled.map(pathwayById).filter(Boolean) as Pathway[];
+
+    /**
+     * Somebody who is already learning, rather than deciding whether to.
+     *
+     * The page opened on a full-height statement of what the Academy is, which is the
+     * right thing to say to a first visit and the wrong thing to say to somebody coming
+     * back to lesson four. It pushed their own work below the fold every time. The
+     * statement stays, because a catalogue still has to explain itself, but it steps
+     * back to a heading once there is something of theirs to put first.
+     */
+    const returning = enrolledPaths.length > 0;
+
+    /** Matched on the pathway and on the titles of the courses inside it. */
+    const q = catalogQuery.trim().toLowerCase();
+    const matches = (p: Pathway) =>
+      !q
+      || p.title.toLowerCase().includes(q)
+      || (p.purpose || '').toLowerCase().includes(q)
+      || (p.level || '').toLowerCase().includes(q)
+      || p.courses.some((c) => c.title.toLowerCase().includes(q));
+
+    const shown = PATHWAYS.filter((p) => vis(p.id).state !== 'hidden').filter(matches);
+
     return (
       <div className="max-w-6xl mx-auto py-8 space-y-14 animate-in fade-in duration-500">
         <div className="text-center space-y-4">
           <div className="pill pill-blue mx-auto">HMC Health + Education Pathways Academy</div>
-          <h1 className="text-5xl font-semibold tracking-tight text-zinc-900">
+          <h1 className={`${returning ? 'text-3xl' : 'text-5xl'} font-semibold tracking-tight text-zinc-900`}>
             From exploration to applied experience.
           </h1>
-          <p className="text-zinc-500 max-w-2xl mx-auto leading-relaxed text-lg">
-            Structured learning pathways for youth, students, aspiring health professionals,
-            community-health learners, interns, fellows, and emerging leaders. Self-paced,
-            text-first, and free.
-          </p>
+          {!returning && (
+            <p className="text-zinc-600 max-w-2xl mx-auto leading-relaxed text-lg">
+              Structured learning pathways for youth, students, aspiring health professionals,
+              community-health learners, interns, fellows, and emerging leaders. Self-paced,
+              text-first, and free.
+            </p>
+          )}
           <div className="flex flex-wrap justify-center gap-3 pt-1">
             <Btn onClick={() => setView({ name: 'credentials' })}>Browse credentials</Btn>
             <Btn variant="secondary" onClick={() => setView({ name: 'transcript' })}>My transcript</Btn>
@@ -830,16 +865,18 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           {/* The arc of the Academy, set as a line of text rather than six pills.
               A pill on a white ground with a border is a button, so readers tried to press
               these and nothing happened. This says the same thing and asks for nothing. */}
-          <p className="pt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-400">
-            {LEARNING_MODEL.join('  \u00b7  ')}
-          </p>
+          {!returning && (
+            <p className="pt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-600">
+              {LEARNING_MODEL.join('  \u00b7  ')}
+            </p>
+          )}
         </div>
 
         {enrolledPaths.length > 0 && (
           <section className="space-y-5">
             <div className="flex items-center justify-between gap-4">
               <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Your learning</h2>
-              <button onClick={() => setView({ name: 'transcript' })} className="text-xs font-bold uppercase tracking-widest text-[#233DFF] hover:underline">
+              <button onClick={() => setView({ name: 'transcript' })} className="shrink-0 px-3 py-2 -mr-3 rounded-full text-xs font-bold uppercase tracking-widest text-[#233DFF] hover:underline">
                 View transcript
               </button>
             </div>
@@ -866,15 +903,45 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
         )}
 
         <section className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Pathways</h2>
-            <p className="text-sm text-zinc-500 mt-1">
-              Each pathway leads to a defined HMC completion record. Shared foundations carry across
-              pathways, so learning is never repeated without reason.
-            </p>
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+            <div className="min-w-0">
+              <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Pathways</h2>
+              <p className="text-sm text-zinc-600 mt-1 max-w-2xl">
+                Each pathway leads to a defined HMC completion record. Shared foundations carry across
+                pathways, so learning is never repeated without reason.
+              </p>
+            </div>
+
+            {/* The Academy's own search. The Hub's search bar sits above this page and
+                queries the resource directory, so until now the only search box visible
+                to somebody looking for a course searched food and housing instead. */}
+            <div className="relative lg:w-80 shrink-0">
+              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
+              <input
+                type="search"
+                value={catalogQuery}
+                onChange={(e) => setCatalogQuery(e.target.value)}
+                placeholder="Search courses and pathways"
+                aria-label="Search courses and pathways"
+                className="w-full rounded-full border border-[#0f0f0f]/20 bg-white/70 py-3 pl-11 pr-4 text-sm text-zinc-900 placeholder:text-zinc-500 focus:outline-none focus:ring-4 focus:ring-[#233DFF]/20 focus:border-[#233DFF]/40"
+              />
+            </div>
           </div>
+
+          {/* Said in words, because a grid that quietly got shorter is not an answer. */}
+          {q && (
+            <p className="text-sm text-zinc-600" role="status">
+              {shown.length === 0
+                ? `Nothing matches "${catalogQuery.trim()}".`
+                : `${shown.length} ${shown.length === 1 ? 'pathway' : 'pathways'} match "${catalogQuery.trim()}".`}
+              {' '}
+              <button onClick={() => setCatalogQuery('')} className="font-semibold text-[#233DFF] hover:underline">
+                Show everything
+              </button>
+            </p>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {PATHWAYS.filter((p) => vis(p.id).state !== 'hidden').map((p) => {
+            {shown.map((p) => {
               const v = vis(p.id);
               const pct = pathwayPercent(p, state);
               const lessons = pathwayLessonIds(p).length;
@@ -923,9 +990,12 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     ) : undefined
                   }
                   secondary={
+                    /* py-2 is not spacing. Without it this control is 18px high, under the
+                       24px floor WCAG 2.2 AA sets for a target, and it is the one control
+                       on the card a reader uses to look before committing. */
                     <button
                       onClick={() => setView({ name: 'pathway', pathwayId: p.id })}
-                      className="w-full text-center text-[12px] font-bold uppercase tracking-widest text-zinc-600 hover:text-zinc-900"
+                      className="w-full text-center py-2 rounded-full text-[12px] font-bold uppercase tracking-widest text-zinc-600 hover:text-zinc-900 hover:bg-white/50 transition-colors"
                     >
                       {v.state === 'past' ? 'What was covered' : 'See lessons'}
                     </button>
@@ -957,7 +1027,9 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             href="https://www.healthmatters.clinic/privacy#academy"
             target="_blank"
             rel="noreferrer"
-            className="font-semibold text-[#233DFF] hover:underline"
+            /* inline-block with padding, so this clears the 24px target floor. As a bare
+               inline link it was 15px high. */
+            className="inline-block py-1.5 font-semibold text-[#233DFF] hover:underline"
           >
             How your learning record is handled
           </a>

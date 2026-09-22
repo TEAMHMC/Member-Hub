@@ -38,6 +38,8 @@ jobs:
       # it, so it runs after the build rather than with the other gates.
       - run: npx playwright install --with-deps chromium
       - run: npm run test:render:routing
+      - run: npm run test:render:guest
+      - run: npm run test:render:catalog
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
