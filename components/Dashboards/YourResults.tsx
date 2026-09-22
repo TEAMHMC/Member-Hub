@@ -137,7 +137,7 @@ const YourResults: React.FC<{ onBrowseEvents?: () => void }> = ({ onBrowseEvents
     } catch (e) {
       const c = e instanceof ApiError ? e.code : null;
       setNotice(
-        c === 'code_not_recognised' ? 'That code was not recognised. Check it and try again.'
+        c === 'code_not_recognised' ? 'That code was not recognized. Check it and try again.'
         : c === 'code_expired' ? 'That code has expired. Ask the team for a new one.'
         : c === 'too_many_attempts' ? 'Too many attempts on this code. Ask the team for a new one.'
         : c === 'already_claimed' ? 'That record is already linked to another account. Contact us and we will sort it out.'

@@ -52,9 +52,9 @@ export const UNSTOPPABLE_CE: Course = {
     'Identify culturally affirming approaches appropriate to your own practice context.',
   ],
   minutes: 60,
-  prerequisites: 'A current licence from one of the boards we list. We need your licence number for the certificate.',
+  prerequisites: 'A current license from one of the boards we list. We need your license number for the certificate.',
   whoFor:
-    'Licensed staff earning CE hours: LCSW, LMFT, LPCC, LEP, nurses, CCAPP counsellors, and psychologists.',
+    'Licensed staff earning CE hours: LCSW, LMFT, LPCC, LEP, nurses, CCAPP counselors, and psychologists.',
   ce: {
     agency: 'Los Angeles County Department of Mental Health, Quality Outcomes and Training Division',
     hours: '1.0',

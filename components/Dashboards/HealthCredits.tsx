@@ -71,7 +71,7 @@ const HealthCredits: React.FC = () => {
         <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Your account</p>
         <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 mt-1">Health Credits</h1>
         <p className="text-sm text-zinc-500 mt-2 leading-relaxed">
-          Credits recognise the time you put into your own health and into your community.
+          Credits recognize the time you put into your own health and into your community.
           They are awarded by HMC staff and they never expire.
         </p>
       </div>

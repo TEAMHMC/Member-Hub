@@ -39,7 +39,7 @@ const TEAM_ROLES_AND_SCOPE: Course = {
   promise:
     'Know who does what on a care team, what each role is allowed to do, and where your part ends.',
   about: [
-    'A learner walking into a clinical setting sees a room of people whose roles are not obvious and whose authority is not interchangeable. Getting that wrong is how an observer ends up doing something nobody authorised.',
+    'A learner walking into a clinical setting sees a room of people whose roles are not obvious and whose authority is not interchangeable. Getting that wrong is how an observer ends up doing something nobody authorized.',
     'This course covers the roles, the difference between licensure and certification, and the scope question that a learner has to be able to answer about themselves.',
   ],
   objectives: [
@@ -60,13 +60,13 @@ const TEAM_ROLES_AND_SCOPE: Course = {
       minutes: 4,
       blocks: [
         { kind: 'prose', text: [
-          'Roles in a community clinical setting are less tidy than an organisational chart suggests. What matters to a learner is not the hierarchy but who is responsible for what, because that decides who you ask.',
+          'Roles in a community clinical setting are less tidy than an organizational chart suggests. What matters to a learner is not the hierarchy but who is responsible for what, because that decides who you ask.',
         ] },
         { kind: 'steps', title: 'Commonly present', items: [
           { label: 'Physician, nurse practitioner, physician assistant', text: 'Diagnose, treat, prescribe within their own authority. A nurse practitioner and a physician assistant are independent roles with their own scope, not assistants to a physician.' },
           { label: 'Registered nurse, licensed vocational nurse', text: 'Assessment, care delivery, medication administration and patient teaching, at different levels of authority. The RN is frequently the person who actually knows what is happening with everybody in the room.' },
-          { label: 'Medical assistant, community health worker, promotora', text: 'Support, navigation, outreach, and the tasks their training and the setting authorise. A CHW role is defined by the programme and the payer rather than by a state licence.' },
-          { label: 'Pharmacist, behavioural health clinician, social worker, care coordinator', text: 'Each holds a distinct scope and each is the correct destination for a specific kind of question. Sending a housing question to a pharmacist wastes everybody\'s time.' },
+          { label: 'Medical assistant, community health worker, promotora', text: 'Support, navigation, outreach, and the tasks their training and the setting authorize. A CHW role is defined by the program and the payer rather than by a state license.' },
+          { label: 'Pharmacist, behavioral health clinician, social worker, care coordinator', text: 'Each holds a distinct scope and each is the correct destination for a specific kind of question. Sending a housing question to a pharmacist wastes everybody\'s time.' },
           { label: 'Front desk, scheduler, interpreter, records staff', text: 'Non-clinical and central. An interpreter in particular is a professional role and not a bilingual bystander, and a learner should never substitute for one.' },
         ] },
         { kind: 'check', check: {
@@ -90,17 +90,17 @@ const TEAM_ROLES_AND_SCOPE: Course = {
       minutes: 4,
       blocks: [
         { kind: 'vocab', items: [
-          { term: 'Licensure', plain: 'Legal permission from a government body to practise a profession in a place. Without it the activity is unlawful, not merely unendorsed.' },
+          { term: 'Licensure', plain: 'Legal permission from a government body to practice a profession in a place. Without it the activity is unlawful, not merely unendorsed.' },
           { term: 'Certification', plain: 'A body attests that you met its standard. It may be required by an employer or a payer, and it is not a government grant of authority.' },
           { term: 'Registration', plain: 'Being on an official list, sometimes with a competency requirement and sometimes without.' },
           { term: 'Educational completion', plain: 'A record that you completed a course of study. What HMC issues. It is evidence of learning and it grants no authority.' },
         ] },
         { kind: 'concept', title: 'Why the distinction has teeth', text: [
-          'Describing an educational completion as a certification, or a certification as a licence, is not a matter of emphasis. It is a claim about legal authority, and a learner who makes it in front of a patient has told that patient something false about who is helping them.',
-          'The community health worker role is the case where this comes up most in California, because there is no state CHW certification to hold. What exists is training, programme requirements and payer requirements, which are real and are a different thing.',
+          'Describing an educational completion as a certification, or a certification as a license, is not a matter of emphasis. It is a claim about legal authority, and a learner who makes it in front of a patient has told that patient something false about who is helping them.',
+          'The community health worker role is the case where this comes up most in California, because there is no state CHW certification to hold. What exists is training, program requirements and payer requirements, which are real and are a different thing.',
         ] },
         { kind: 'myths', items: [
-          { myth: 'Certified and licensed mean roughly the same thing in practice.', reality: 'A licence is legal authority granted by a government body. A certification is an attestation by an organisation. Only one of them makes an act lawful.' },
+          { myth: 'Certified and licensed mean roughly the same thing in practice.', reality: 'A license is legal authority granted by a government body. A certification is an attestation by an organization. Only one of them makes an act lawful.' },
           { myth: 'A completion is not worth mentioning if it is not a certification.', reality: 'It is worth mentioning accurately. Hours, coursework and a supervisor sign-off are real evidence, and precision is what keeps them credible when somebody checks.' },
         ] },
         { kind: 'check', check: {
@@ -108,7 +108,7 @@ const TEAM_ROLES_AND_SCOPE: Course = {
           q: 'What is the practical difference between licensure and certification?',
           options: [
             'Licensure is harder to obtain',
-            'Licensure is legal permission from a government body, without which the activity is unlawful; certification is an organisation attesting you met its standard',
+            'Licensure is legal permission from a government body, without which the activity is unlawful; certification is an organization attesting you met its standard',
             'Certification lasts longer',
             'Licensure applies nationally and certification applies by state',
           ],
@@ -125,11 +125,11 @@ const TEAM_ROLES_AND_SCOPE: Course = {
       blocks: [
         { kind: 'prose', text: [
           'Scope of practice is the set of activities a role is legally permitted to perform. It is set by state law and by the relevant board, not by an employer, a supervisor, or how capable somebody actually is.',
-          'That last part is the one learners find counterintuitive. A skilled person acting outside their scope is still acting outside it, and the fact that they did it well is not a defence.',
+          'That last part is the one learners find counterintuitive. A skilled person acting outside their scope is still acting outside it, and the fact that they did it well is not a defense.',
         ] },
         { kind: 'steps', title: 'Three things scope is not', items: [
           { label: 'Not the same as ability', text: 'You may be entirely capable of taking a blood pressure. Whether you may do so in a given setting is a separate question with a different answer.' },
-          { label: 'Not set by whoever is supervising', text: 'A supervisor cannot delegate an act outside the scope of the person receiving it. If a busy clinician asks you to do something you are not authorised to do, the answer is still no.' },
+          { label: 'Not set by whoever is supervising', text: 'A supervisor cannot delegate an act outside the scope of the person receiving it. If a busy clinician asks you to do something you are not authorized to do, the answer is still no.' },
           { label: 'Not the same everywhere', text: 'Scope is a state-level question, and a role that includes an act in one state may exclude it in another. This is a reason to ask rather than to generalise from what you have read.' },
         ] },
         { kind: 'case', title: 'The busy afternoon', scenario: true, text: [
@@ -139,11 +139,11 @@ const TEAM_ROLES_AND_SCOPE: Course = {
         ] },
         { kind: 'check', check: {
           id: 'ces-1-c3',
-          q: 'A supervising clinician asks a learner to perform a task the learner is capable of but not authorised to do. What is the correct response?',
+          q: 'A supervising clinician asks a learner to perform a task the learner is capable of but not authorized to do. What is the correct response?',
           options: [
-            'Perform it, since the supervisor has authorised it',
+            'Perform it, since the supervisor has authorized it',
             'Perform it if confident, and mention it afterwards',
-            'Decline, offer to find somebody who is authorised, and tell your placement supervisor',
+            'Decline, offer to find somebody who is authorized, and tell your placement supervisor',
             'Ask another learner to do it instead',
           ],
           answer: 2,
@@ -159,7 +159,7 @@ const TEAM_ROLES_AND_SCOPE: Course = {
       blocks: [
         { kind: 'steps', title: 'Ordinarily yours', items: [
           { label: 'Observing', text: 'With the patient\'s knowledge and agreement, obtained by somebody with the standing to ask.' },
-          { label: 'Non-clinical support', text: 'Directions, forms, waiting-room questions, fetching a person or an item, and anything the placement has explicitly authorised.' },
+          { label: 'Non-clinical support', text: 'Directions, forms, waiting-room questions, fetching a person or an item, and anything the placement has explicitly authorized.' },
           { label: 'Asking questions afterwards', text: 'Not during, unless invited. The debrief is where a learner gets most of the value of an observation.' },
         ] },
         { kind: 'steps', title: 'Never yours as a learner', items: [
@@ -203,7 +203,7 @@ const TEAM_ROLES_AND_SCOPE: Course = {
       'A learner who has written their own scope down declines correctly under pressure. One who has not will improvise, and the improvisation happens on a busy afternoon.',
     fields: [
       { id: 'setting', label: 'Your placement and supervisor', help: 'Where you will be, and the named person who signs off what you may do.', multiline: true },
-      { id: 'authorised', label: 'What you are explicitly authorised to do', help: 'Ask, and write the answer. Not what you assume from what you have read.', multiline: true },
+      { id: 'authorised', label: 'What you are explicitly authorized to do', help: 'Ask, and write the answer. Not what you assume from what you have read.', multiline: true },
       { id: 'decline', label: 'Your declining sentence', help: 'The words you will use, written as you will say them.', multiline: false },
       { id: 'patient', label: 'Your introduction to a patient', help: 'How you will describe yourself, in one sentence, without overstating what you are.', multiline: false },
     ],
@@ -228,12 +228,12 @@ const MEDICAL_TERMINOLOGY: Course = {
     'Follow a medical conversation without getting it wrong, and know which words you must never guess at.',
   about: [
     'Terminology is built from parts, which means a learner can decode most of what they hear without memorising lists. This course teaches the parts and the decoding habit.',
-    'It also teaches the opposite skill, which matters more: recognising the terms where a near-miss changes the meaning entirely, and where guessing is worse than admitting you did not catch it.',
+    'It also teaches the opposite skill, which matters more: recognizing the terms where a near-miss changes the meaning entirely, and where guessing is worse than admitting you did not catch it.',
   ],
   objectives: [
     'Decode unfamiliar terms from root, prefix and suffix.',
     'Use the common directional and positional terms correctly.',
-    'Recognise abbreviations that are ambiguous or dangerous to assume.',
+    'Recognize abbreviations that are ambiguous or dangerous to assume.',
     'Say that you did not understand a term, in a way that costs nothing.',
   ],
   minutes: 20,
@@ -264,7 +264,7 @@ const MEDICAL_TERMINOLOGY: Course = {
         { kind: 'steps', title: 'A second layer worth having', items: [
           { label: 'More roots', text: 'nephr, kidney. ren, kidney, from Latin rather than Greek, which is why two words for one organ exist. arthr, joint. my or myo, muscle. cyt, cell. path, disease. rhin, nose. ot, ear. ophthalm, eye.' },
           { label: 'More suffixes', text: 'osis, an abnormal condition. iasis, a condition, often a presence of something. plasty, surgical repair. scopy, looking inside with an instrument. gram, a record or image. graphy, the process of recording. penia, a deficiency.' },
-          { label: 'Two roots for one thing', text: 'Greek and Latin both contributed, so nephrology and renal both concern the kidney, and cardiac and coronary both concern the heart in different senses. This is a reason to learn both rather than to assume a word you do not recognise is new.' },
+          { label: 'Two roots for one thing', text: 'Greek and Latin both contributed, so nephrology and renal both concern the kidney, and cardiac and coronary both concern the heart in different senses. This is a reason to learn both rather than to assume a word you do not recognize is new.' },
         ] },
         { kind: 'concept', title: 'The habit, stated as a habit', text: [
           'When an unfamiliar word arrives, split it before you decide you do not know it. Find the suffix first, because it tells you what kind of word it is: a condition, a procedure, a measurement, or a study. Then the root, which tells you where. Then the prefix, which usually only modifies.',
@@ -397,14 +397,14 @@ const PATIENT_COMMUNICATION: Course = {
   promise:
     'Talk with a patient in a way that is useful and stays inside a learner\'s scope, including when they tell you something you cannot hold.',
   about: [
-    'Communication is the part of clinical work a learner can genuinely practise, because listening well is inside anybody\'s scope. What is outside it is anything that sounds like an assessment or an answer.',
+    'Communication is the part of clinical work a learner can genuinely practice, because listening well is inside anybody\'s scope. What is outside it is anything that sounds like an assessment or an answer.',
     'This course teaches the openings that produce useful information, the habits that make a patient feel like a person, and the two situations where a learner has to stop and hand over.',
   ],
   objectives: [
     'Open a conversation in a way that produces information rather than a yes or a no.',
     'Use teach-back and plain language without condescending.',
     'Work with a professional interpreter correctly.',
-    'Recognise the two moments where a learner must stop and hand over.',
+    'Recognize the two moments where a learner must stop and hand over.',
   ],
   minutes: 20,
   prerequisites: 'Healthcare Team Roles + Scope, because this course depends on knowing where your scope ends.',
@@ -423,7 +423,7 @@ const PATIENT_COMMUNICATION: Course = {
           { label: 'Open, then narrow', text: '"What brings you in today?" before anything specific. The first forty seconds of an unprompted answer contains most of what matters, and it is usually interrupted.' },
           { label: 'Do not interrupt the first answer', text: 'The instinct to clarify at the ten second mark is what produces an incomplete story. Let it finish. It rarely takes as long as it feels.' },
           { label: 'Ask what they are worried about', text: 'Not the same as what is wrong. Frequently the more useful question, and one almost nobody has asked them.' },
-          { label: 'Summarise back before moving on', text: '"So it started about two weeks ago, it is worse in the mornings, and what worries you is whether it is the same thing your father had." Getting it wrong is fine; the correction is the point.' },
+          { label: 'Summarize back before moving on', text: '"So it started about two weeks ago, it is worse in the mornings, and what worries you is whether it is the same thing your father had." Getting it wrong is fine; the correction is the point.' },
         ] },
         { kind: 'check', check: {
           id: 'ces-3-c1',
@@ -530,7 +530,7 @@ const PATIENT_COMMUNICATION: Course = {
           rationale: 'A learner notices and hands over. Investigating shapes an account somebody trained will need intact, and leaving it to the patient to raise means it may reach nobody.',
         } },
         { kind: 'takeaways', items: [
-          'Open, do not interrupt, ask what worries them, summarise back.',
+          'Open, do not interrupt, ask what worries them, summarize back.',
           'Teach-back puts the gap on the explainer. Ask what they will tell somebody.',
           'Speak to the patient, short segments, never a child, never step in for speed.',
           'A clinical question and a safety disclosure both stop with a handover, and you can stay.',
@@ -578,7 +578,7 @@ export const CES_PRE: Check[] = [
     options: [
       'Licensure is harder to obtain',
       'Certification lasts longer',
-      'Licensure is legal permission from a government body without which the act is unlawful; certification is an organisation attesting you met its standard',
+      'Licensure is legal permission from a government body without which the act is unlawful; certification is an organization attesting you met its standard',
       'Licensure is national and certification is by state',
     ],
     answer: 2,
@@ -586,12 +586,12 @@ export const CES_PRE: Check[] = [
   },
   {
     id: 'ces-t3',
-    q: 'A supervising clinician asks a learner to do something the learner is capable of but not authorised to do. What is correct?',
+    q: 'A supervising clinician asks a learner to do something the learner is capable of but not authorized to do. What is correct?',
     options: [
-      'Do it, since the supervisor authorised it',
+      'Do it, since the supervisor authorized it',
       'Do it if confident and mention it afterwards',
       'Ask another learner',
-      'Decline, offer to find somebody authorised, and tell the placement supervisor',
+      'Decline, offer to find somebody authorized, and tell the placement supervisor',
     ],
     answer: 3,
     why: 'A supervisor cannot delegate an act outside the scope of the person receiving it, so their asking does not change the answer.',
@@ -685,7 +685,7 @@ export const CES_POST: Check[] = [
     q: 'A learner completes HMC coursework and a supervisor sign-off. What may they accurately claim?',
     options: [
       'That they are certified in community health',
-      'That they are licensed to practise in a support role',
+      'That they are licensed to practice in a support role',
       'That they completed HMC coursework and a supervised sign-off, which is an educational record and grants no authority',
       'That they are registered with the state',
     ],
@@ -697,7 +697,7 @@ export const CES_POST: Check[] = [
     q: 'Why is scope of practice narrower than competence?',
     options: [
       'Because employers are cautious',
-      'Because it is set by law and by the relevant board, so doing something well is not a defence for doing it without authority',
+      'Because it is set by law and by the relevant board, so doing something well is not a defense for doing it without authority',
       'Because learners are inexperienced',
       'Because insurers require it',
     ],

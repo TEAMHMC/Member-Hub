@@ -123,7 +123,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
    *
    * Deliberately not one of the scored questions above. Those run 0 to 3 by severity, and
    * having been incarcerated is not a severity, it is a fact that changes which
-   * organisations can actually help. The directory already tags Justice-involved
+   * organizations can actually help. The directory already tags Justice-involved
    * providers, so an answer here is immediately useful rather than filed away.
    *
    * Kept in this browser and turned into a resource search, never written to the client
@@ -409,7 +409,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   /**
    * The site's buttons, not this file's own.
    *
-   * These two were hand-rolled Tailwind: uppercase, bold, extra-small, a coloured
+   * These two were hand-rolled Tailwind: uppercase, bold, extra-small, a colored
    * shadow and a grey hairline, none of which is the HMC button. The shared system at
    * hmc-buttons-1.0.5.css is already loaded by index.html and already used by Sign In,
    * which is why Sign In was the only button on the page that looked right and every
@@ -584,7 +584,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         <SurfaceCard
           badges={<CardBadge>Find</CardBadge>}
           title="Resources &amp; Support"
-          body="Search verified LA County organisations by what you need, where you are and who they serve, then reach them directly."
+          body="Search verified LA County organizations by what you need, where you are and who they serve, then reach them directly."
           onClick={() => setActiveTab('resources')}
           action={
             <ButtonPrimary onClick={(e: any) => { e.stopPropagation(); setActiveTab('resources'); }} className="w-full">
@@ -793,7 +793,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         
           <p className="text-sm text-zinc-500 leading-relaxed max-w-2xl">
         
-            Some organisations work specifically with people who have been incarcerated, on housing,
+            Some organizations work specifically with people who have been incarcerated, on housing,
         
             work and legal help. If that is you, we can show you those first. You do not have to
         

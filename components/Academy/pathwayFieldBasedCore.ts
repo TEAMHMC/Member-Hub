@@ -72,10 +72,10 @@ const COMMUNITY_HEALTH_EQUITY: Course = {
           id: 'fbch-2-c1',
           q: 'What distinguishes community health work from clinical care?',
           options: [
-            'Community health work is less specialised',
+            'Community health work is less specialized',
             'Clinical care treats the person present; community health work is concerned with everybody who did not arrive and why',
             'Community health work happens outdoors',
-            'Clinical care requires a licence and community health work does not',
+            'Clinical care requires a license and community health work does not',
           ],
           answer: 1,
           rationale: 'The distinction is what each is for, not where it happens or what it requires. It also decides what counts as a productive day, which is why a volunteer who measures themselves in people treated will conclude they achieved nothing.',
@@ -99,7 +99,7 @@ const COMMUNITY_HEALTH_EQUITY: Course = {
           'The equity version asks who is missing and changes the terms. Saturday morning rather than Tuesday, at the church hall two blocks from the bus interchange, with a bilingual volunteer at the table, and flyers handed out at the laundromat rather than posted online. Same event, same cost, different people in the room.',
         ] },
         { kind: 'why', text: [
-          'Equity is not a statement of values in a grant application. It is a set of ordinary operational choices about time, place, language and route, and every one of them is made by somebody who may not realise they are making it.',
+          'Equity is not a statement of values in a grant application. It is a set of ordinary operational choices about time, place, language and route, and every one of them is made by somebody who may not realize they are making it.',
         ] },
         { kind: 'check', check: {
           id: 'fbch-2-c2',
@@ -107,7 +107,7 @@ const COMMUNITY_HEALTH_EQUITY: Course = {
           options: [
             'Because equal treatment is never appropriate in health care',
             'Because identical terms produce different access, so the people who cannot use weekday daytime slots are effectively excluded',
-            'Because appointments should be prioritised by need',
+            'Because appointments should be prioritized by need',
             'Because the clinic has not published its equity statement',
           ],
           answer: 1,
@@ -125,10 +125,10 @@ const COMMUNITY_HEALTH_EQUITY: Course = {
           'A volunteer at a table has no power to require anything of anybody. Everything that happens there happens because a person chose to stop, chose to answer honestly, and chose to act afterwards. Trust is what makes those three choices likely, and it belongs to HMC collectively rather than to you personally.',
         ] },
         { kind: 'list', title: 'What spends it', items: [
-          'Promising an outcome you do not control. "You will qualify" is the most expensive sentence available to a volunteer, and it costs the whole organisation, not the person who said it.',
+          'Promising an outcome you do not control. "You will qualify" is the most expensive sentence available to a volunteer, and it costs the whole organization, not the person who said it.',
           'Guessing rather than referring. A confident wrong answer from somebody in an HMC shirt is worse than no answer, because it will be acted on.',
           'Asking for information you do not need. Every unnecessary question, and especially anything touching immigration status, tells a person this is a place that collects rather than a place that helps.',
-          'Not coming back. A pop-up that appears once and never again teaches a neighbourhood that outside help is temporary, and the next organisation pays for it.',
+          'Not coming back. A pop-up that appears once and never again teaches a neighbourhood that outside help is temporary, and the next organization pays for it.',
         ] },
         { kind: 'fieldnote', title: 'The sentence that keeps it', text: [
           '"I do not want to guess on something this important, so let me get you to somebody who does this every day."',
@@ -139,7 +139,7 @@ const COMMUNITY_HEALTH_EQUITY: Course = {
           q: 'Why is telling somebody they will qualify for a benefit the most costly thing a volunteer can say?',
           options: [
             'Because it is against HMC policy',
-            'Because eligibility decisions are not the volunteer\'s to make, and the person acts on it, so the cost falls on them and on the organisation\'s standing rather than on the volunteer',
+            'Because eligibility decisions are not the volunteer\'s to make, and the person acts on it, so the cost falls on them and on the organization\'s standing rather than on the volunteer',
             'Because it takes too long to explain',
             'Because volunteers should avoid discussing benefits',
           ],
@@ -155,16 +155,16 @@ const COMMUNITY_HEALTH_EQUITY: Course = {
       minutes: 5,
       blocks: [
         { kind: 'prose', text: [
-          'Completing this pathway produces an HMC educational record. It is worth having and it is not a licence, and both halves of that sentence matter.',
+          'Completing this pathway produces an HMC educational record. It is worth having and it is not a license, and both halves of that sentence matter.',
         ] },
         { kind: 'steps', title: 'Plainly', items: [
           { label: 'It is', text: 'Evidence that you completed HMC coursework, passed the assessments, and were signed off on the required practicals by a named supervisor. It is a real record with real hours behind it.' },
           { label: 'It is not a state certification', text: 'California has no state community health worker certification, and the Department of Health Care Services does not approve certificates. Anybody telling you otherwise is selling something.' },
-          { label: 'It is not clinical scope', text: 'It does not authorise you to assess, diagnose, treat, determine eligibility, or enrol anybody in anything.' },
+          { label: 'It is not clinical scope', text: 'It does not authorize you to assess, diagnose, treat, determine eligibility, or enroll anybody in anything.' },
           { label: 'It is not employment', text: 'It is a qualification for HMC roles and a piece of evidence elsewhere. It is not a job and it is not a guarantee of one.' },
         ] },
         { kind: 'myths', items: [
-          { myth: 'Understating it makes the training look weak.', reality: 'Precision is what makes it credible. A partner, a funder or a county programme checks these claims, and one overstatement discredits the whole record.' },
+          { myth: 'Understating it makes the training look weak.', reality: 'Precision is what makes it credible. A partner, a funder or a county program checks these claims, and one overstatement discredits the whole record.' },
           { myth: 'Describing myself as certified is close enough.', reality: 'It is a specific claim about legal standing that is not true, and the person who repeats it to a member is the one who causes the harm.' },
         ] },
         { kind: 'check', check: {
@@ -260,7 +260,7 @@ const SOCIAL_DETERMINANTS: Course = {
             'Social and community context',
           ],
           answer: 2,
-          rationale: 'Coverage is present, so the coverage domain is not where the obstacle sits. Naming the operative domain matters because it decides what would actually help: a transport benefit or a closer provider, not enrolment assistance.',
+          rationale: 'Coverage is present, so the coverage domain is not where the obstacle sits. Naming the operative domain matters because it decides what would actually help: a transport benefit or a closer provider, not enrollment assistance.',
         } },
       ],
     },
@@ -326,10 +326,10 @@ const SOCIAL_DETERMINANTS: Course = {
             'Whether the person seems comfortable answering it',
             'Whether you could justify needing the answer if asked afterwards',
             'Whether it appears on a standard screening form',
-            'Whether the answer would be useful to the organisation',
+            'Whether the answer would be useful to the organization',
           ],
           answer: 1,
-          rationale: 'Need is the standard, not comfort or availability on a form. Useful to the organisation is the wrong test entirely, because it justifies collecting anything, and a table that collects rather than helps loses the trust the work depends on.',
+          rationale: 'Need is the standard, not comfort or availability on a form. Useful to the organization is the wrong test entirely, because it justifies collecting anything, and a table that collects rather than helps loses the trust the work depends on.',
         } },
       ],
     },
@@ -341,11 +341,11 @@ const SOCIAL_DETERMINANTS: Course = {
       blocks: [
         { kind: 'steps', title: 'Yours to do', items: [
           { label: 'Remove the specific obstacle if it is small', text: 'A bus token, a phone number saved in their phone, a form filled in the right language, an appointment moved to a time that works.' },
-          { label: 'Refer, with a name and a number', text: 'Not a category. Not "there are food banks". A specific organisation, a phone number, and if possible a person, entered in their phone before they leave.' },
+          { label: 'Refer, with a name and a number', text: 'Not a category. Not "there are food banks". A specific organization, a phone number, and if possible a person, entered in their phone before they leave.' },
           { label: 'Log it so it exists', text: 'A referral nobody recorded is a conversation. Logging is what allows somebody to follow up, and follow up is the difference between a referral and an intention.' },
         ] },
         { kind: 'steps', title: 'Not yours', items: [
-          { label: 'Deciding eligibility', text: 'For anything. Only the county, the plan or the programme decides.' },
+          { label: 'Deciding eligibility', text: 'For anything. Only the county, the plan or the program decides.' },
           { label: 'Clinical judgement', text: 'How serious a symptom is, whether somebody needs to be seen today, what a result means. Refer.' },
           { label: 'Holding a safety concern', text: 'Anything indicating harm to a child, an older adult, a dependent adult, or immediate danger to anybody goes to your coordinator the same day, and to 988 or 911 where there is immediate danger. You notice and hand over.' },
         ] },
@@ -359,7 +359,7 @@ const SOCIAL_DETERMINANTS: Course = {
             'A referral names a category of service',
           ],
           answer: 0,
-          rationale: 'An unlogged referral cannot be followed up by anybody, so it depends entirely on the member acting alone with what they remember. Consent matters and is a separate requirement; naming a category rather than an organisation is the weaker version of the same failure.',
+          rationale: 'An unlogged referral cannot be followed up by anybody, so it depends entirely on the member acting alone with what they remember. Consent matters and is a separate requirement; naming a category rather than an organization is the weaker version of the same failure.',
         } },
         { kind: 'takeaways', items: [
           'Five domains: economic, education, health care access, neighbourhood, social context.',
@@ -410,7 +410,7 @@ const BOUNDARIES_ETHICS_PRIVACY: Course = {
     'Hold the four boundaries that are tested most often in field work.',
     'Decide what to do when a member offers money, a gift, a lift, or a friendship.',
     'Apply HMC\'s privacy rules to a photograph, a story and a form.',
-    'Recognise a dual relationship and say what to do about it.',
+    'Recognize a dual relationship and say what to do about it.',
   ],
   minutes: 25,
   prerequisites: 'None. Complete before your first field shift, not after it.',
@@ -427,7 +427,7 @@ const BOUNDARIES_ETHICS_PRIVACY: Course = {
         ] },
         { kind: 'steps', title: 'Four, with the words', items: [
           { label: 'Money', text: 'You do not give money and you do not take it. Not a loan, not bus fare from your own pocket, not a gift afterwards. "I am not able to do that one, and it is not about you. What I can do is get you to somebody who has actual funds for this."' },
-          { label: 'Transport', text: 'You do not drive a member anywhere in your own vehicle unless HMC has authorised it for that shift. This protects you at least as much as them. "I cannot give you a ride, but let me sort out how you get there."' },
+          { label: 'Transport', text: 'You do not drive a member anywhere in your own vehicle unless HMC has authorized it for that shift. This protects you at least as much as them. "I cannot give you a ride, but let me sort out how you get there."' },
           { label: 'Personal contact', text: 'Your own phone number, your address, your social media. Contact runs through HMC channels. "Everything goes through the office number so that whoever is on shift can help you, not only me."' },
           { label: 'Time outside the role', text: 'Helping on your own time, visiting, running an errand. It feels generous and it makes you the service. "I am only able to do this through HMC, because that way it does not stop when I am not here."' },
         ] },
@@ -439,7 +439,7 @@ const BOUNDARIES_ETHICS_PRIVACY: Course = {
           q: 'A member needs to get to an appointment and a volunteer could easily drive them. Why should they not?',
           options: [
             'Because it would take too long',
-            'Because it is outside what HMC has authorised for that shift, and unauthorised transport carries liability for both of them while making the help dependent on one person',
+            'Because it is outside what HMC has authorized for that shift, and unauthorised transport carries liability for both of them while making the help dependent on one person',
             'Because the member might not be grateful',
             'Because volunteers should not interact with members outside events',
           ],
@@ -474,7 +474,7 @@ const BOUNDARIES_ETHICS_PRIVACY: Course = {
             'Accept it to avoid causing offence',
             'Refuse firmly and explain that accepting gifts is unprofessional',
             'Decline in terms of the rules rather than of them, thank them for the gesture, and offer a real way to give back',
-            'Accept it and pass it to the organisation',
+            'Accept it and pass it to the organization',
           ],
           answer: 2,
           rationale: 'Money is never acceptable, and how it is declined decides whether the relationship survives. Framing it as a rule about the volunteer rather than a judgement about the giver, then naming a real way to give back, keeps both the boundary and the dignity.',
@@ -494,13 +494,13 @@ const BOUNDARIES_ETHICS_PRIVACY: Course = {
         ] },
         { kind: 'steps', title: 'Writing and repeating', items: [
           { label: 'Log through HMC, not on your phone', text: 'Notes about a member belong in the system, not in your own notes app, not in a text to another volunteer.' },
-          { label: 'Apply the identifiability test before telling any story', text: 'Would somebody who knows them recognise them from what you are about to say? A neighbourhood, an age, a job and a situation together identify a person as surely as a name.' },
-          { label: 'Never in a group chat', text: 'Volunteer group chats are the most common leak in every organisation of this kind. Anything about an individual goes through the log.' },
+          { label: 'Apply the identifiability test before telling any story', text: 'Would somebody who knows them recognize them from what you are about to say? A neighbourhood, an age, a job and a situation together identify a person as surely as a name.' },
+          { label: 'Never in a group chat', text: 'Volunteer group chats are the most common leak in every organization of this kind. Anything about an individual goes through the log.' },
         ] },
         { kind: 'case', title: 'The post that meant well', scenario: true, text: [
           'A volunteer posts about a moving afternoon at a street medicine shift. No name. She mentions the block, that he is a veteran in his sixties, that he has been sleeping there about two years, and what he said about his daughter.',
           'Everybody on that block knows exactly who it is. So does his daughter, who did not know where he was.',
-          'Nothing was disclosed in the sense the volunteer would have recognised. The post was warm and it was about the organisation doing good. It also told a neighbourhood, and one family, something that was his to tell.',
+          'Nothing was disclosed in the sense the volunteer would have recognized. The post was warm and it was about the organization doing good. It also told a neighbourhood, and one family, something that was his to tell.',
         ] },
         { kind: 'check', check: {
           id: 'fbch-4-c3',
@@ -534,7 +534,7 @@ const BOUNDARIES_ETHICS_PRIVACY: Course = {
         ] },
         { kind: 'check', check: {
           id: 'fbch-4-c4',
-          q: 'A volunteer recognises the next person at the intake table as a neighbour. What should they do?',
+          q: 'A volunteer recognizes the next person at the intake table as a neighbour. What should they do?',
           options: [
             'Continue, since knowing them will help build trust',
             'Quietly hand the person to a colleague without explanation',
@@ -594,7 +594,7 @@ const FIELD_SAFETY: Course = {
     'Perform hand hygiene and use barrier protection correctly on a field shift.',
     'Name the four things a volunteer must never handle and what to do instead.',
     'Assess your own safety before entering or staying in a location.',
-    'Recognise heat illness risk in yourself and others, and act by escalating.',
+    'Recognize heat illness risk in yourself and others, and act by escalating.',
   ],
   minutes: 24,
   prerequisites:
@@ -646,7 +646,7 @@ const FIELD_SAFETY: Course = {
           { label: 'Sharps', text: 'Needles, syringes, lancets, broken glass, anything that could puncture. You do not pick it up, move it, sweep it, or put it in a bag. You mark the spot, keep people away from it, and tell the clinical lead or the shift lead, who has a container and the training to use it.' },
           { label: 'Blood and body fluids', text: 'Not with gloves, not with a paper towel. Keep people back and get the person on the shift whose role covers it. If you are exposed, wash the area immediately with soap and water and report it the same hour, not at the end of the shift.' },
           { label: 'Medication', text: 'You do not hand somebody a pill, hold their medication, or advise on it. Including something as ordinary as a painkiller from your own bag. It is somebody else\'s clinical decision every time.' },
-          { label: 'Somebody else\'s belongings', text: 'Especially on a street medicine shift. Do not move, tidy, or discard anything. Those belongings may be everything a person owns, and moving them can end their trust in the whole organisation.' },
+          { label: 'Somebody else\'s belongings', text: 'Especially on a street medicine shift. Do not move, tidy, or discard anything. Those belongings may be everything a person owns, and moving them can end their trust in the whole organization.' },
         ] },
         { kind: 'why', text: [
           'Every one of these has an ordinary version where handling it seems obviously helpful. That is why the rule is absolute rather than a judgement: the moment it becomes a judgement, it becomes a judgement made in a hurry by somebody who is trying to help.',
@@ -783,7 +783,7 @@ export const FBCH_PRE: Check[] = [
     id: 'fbch-t1',
     q: 'What distinguishes community health work from clinical care?',
     options: [
-      'It is less specialised',
+      'It is less specialized',
       'Clinical care treats the person present; community health work is concerned with everybody who did not arrive and why',
       'It happens outside a building',
       'It does not require training',
@@ -797,7 +797,7 @@ export const FBCH_PRE: Check[] = [
     options: [
       'Because equal treatment is never appropriate',
       'Because identical terms produce different access, so shift workers, non-English readers and people without cars are effectively excluded',
-      'Because screenings should be prioritised by need',
+      'Because screenings should be prioritized by need',
       'Because the event was not advertised widely enough',
     ],
     answer: 1,
@@ -813,14 +813,14 @@ export const FBCH_PRE: Check[] = [
       '"I am not able to do that one."',
     ],
     answer: 1,
-    why: 'Eligibility is not the volunteer\'s to determine and the person acts on it. The cost falls on them and on the organisation\'s standing, not on the volunteer who said it.',
+    why: 'Eligibility is not the volunteer\'s to determine and the person acts on it. The cost falls on them and on the organization\'s standing, not on the volunteer who said it.',
   },
   {
     id: 'fbch-t4',
     q: 'A member has coverage but has not been seen in three years because the nearest clinic accepting patients is two bus transfers away. Which determinant domain is operative?',
     options: ['Economic stability', 'Health care access and quality', 'Neighbourhood and built environment', 'Social and community context'],
     answer: 2,
-    why: 'Coverage is present, so the barrier is transport. Naming the right domain decides what would help: a transport benefit or a closer provider, not enrolment assistance.',
+    why: 'Coverage is present, so the barrier is transport. Naming the right domain decides what would help: a transport benefit or a closer provider, not enrollment assistance.',
   },
   {
     id: 'fbch-t5',
@@ -841,10 +841,10 @@ export const FBCH_PRE: Check[] = [
       'Whether the person seems comfortable answering',
       'Whether you could justify needing the answer if asked afterwards',
       'Whether it is on a standard screening form',
-      'Whether the answer is useful to the organisation',
+      'Whether the answer is useful to the organization',
     ],
     answer: 1,
-    why: 'Need is the standard. Useful to the organisation is the wrong test entirely, because it justifies collecting anything, and a table that collects rather than helps loses the trust the work depends on.',
+    why: 'Need is the standard. Useful to the organization is the wrong test entirely, because it justifies collecting anything, and a table that collects rather than helps loses the trust the work depends on.',
   },
   {
     id: 'fbch-t7',
@@ -852,7 +852,7 @@ export const FBCH_PRE: Check[] = [
     options: [
       'Accept it to avoid offence',
       'Refuse firmly and explain that gifts are unprofessional',
-      'Accept it and pass it to the organisation',
+      'Accept it and pass it to the organization',
       'Decline in terms of the rules rather than of them, thank them, and offer a real way to give back',
     ],
     answer: 3,
@@ -860,7 +860,7 @@ export const FBCH_PRE: Check[] = [
   },
   {
     id: 'fbch-t8',
-    q: 'A volunteer recognises the next person at the table as a neighbour. What should they do?',
+    q: 'A volunteer recognizes the next person at the table as a neighbour. What should they do?',
     options: [
       'Continue, since knowing them builds trust',
       'Quietly pass them to a colleague',
@@ -976,7 +976,7 @@ export const FBCH_POST: Check[] = [
       'The member may be ungrateful',
       'Volunteers should not interact with members between events',
       'It would take too long',
-      'It is outside what HMC authorised, and it makes the help depend on one person who will eventually be unavailable',
+      'It is outside what HMC authorized, and it makes the help depend on one person who will eventually be unavailable',
     ],
     answer: 3,
     why: 'Liability and durability. Help resting on one volunteer\'s car ends the week that volunteer is unavailable, which is the member\'s loss.',
@@ -987,7 +987,7 @@ export const FBCH_POST: Check[] = [
     options: [
       'Nothing, since no name was given',
       'The combination identifies the person to everybody who knows them, including family who may not have known where he was',
-      'The organisation had not approved the post',
+      'The organization had not approved the post',
       'Street medicine shifts should never be mentioned publicly',
     ],
     answer: 1,

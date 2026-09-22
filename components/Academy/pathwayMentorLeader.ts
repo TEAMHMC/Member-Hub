@@ -40,7 +40,7 @@ const ROLE_OF_A_MENTOR: Course = {
   objectives: [
     'State in one sentence what your mentoring relationship is for.',
     'Distinguish the three things a mentor does from the four things a mentor is not there to do.',
-    'Recognise the three failure patterns before they establish themselves.',
+    'Recognize the three failure patterns before they establish themselves.',
     'Run a first conversation that sets expectations instead of setting a tone.',
   ],
   minutes: 34,
@@ -140,15 +140,15 @@ const ROLE_OF_A_MENTOR: Course = {
           'Every one of these boundaries gets crossed by mentors acting entirely in good faith. Each has a sentence that holds it, which is worth having ready before you need it.',
         ] },
         { kind: 'steps', title: 'Not these four', items: [
-          { label: 'Not the decision maker', text: 'You do not choose their programme, their job, or their next move. You make the trade-offs visible and they choose. The sentence: "I can tell you what I would weigh. I am not going to tell you what to do, because you are the one who lives with it."' },
+          { label: 'Not the decision maker', text: 'You do not choose their program, their job, or their next move. You make the trade-offs visible and they choose. The sentence: "I can tell you what I would weigh. I am not going to tell you what to do, because you are the one who lives with it."' },
           { label: 'Not their therapist', text: 'You can listen to something hard without becoming the person treating it. The sentence: "I am glad you told me. This is bigger than what I can help with, and I want you talking to somebody who does this properly. Can I help you find them?"' },
           { label: 'Not their supervisor', text: 'If you also hold authority over their work, say so and name which hat you are wearing in a given conversation. A mentor who is quietly also assessing them is a mentor they cannot be honest with.' },
           { label: 'Not their only support', text: 'A learner whose entire professional network is one person is fragile. Part of the job is building a bench you are not on.' },
         ] },
         { kind: 'case', title: 'The overlap that goes wrong most often', scenario: true, text: [
-          'A programme coordinator mentors a volunteer she also schedules and evaluates. In month two the volunteer is struggling and does not say so, because the person who would hear it is the person who decides whether she gets the shift she wants.',
+          'A program coordinator mentors a volunteer she also schedules and evaluates. In month two the volunteer is struggling and does not say so, because the person who would hear it is the person who decides whether she gets the shift she wants.',
           'Nothing improper happened. The coordinator is kind and the volunteer is capable. The structure did the damage on its own.',
-          'The fix is not to refuse the overlap, which is unavoidable in a small organisation. It is to name it out loud in the first conversation, and to say which conversations are mentoring and which are supervision. A learner who knows which hat you are wearing can choose what to say. A learner who does not know assumes the worst one.',
+          'The fix is not to refuse the overlap, which is unavoidable in a small organization. It is to name it out loud in the first conversation, and to say which conversations are mentoring and which are supervision. A learner who knows which hat you are wearing can choose what to say. A learner who does not know assumes the worst one.',
         ] },
         { kind: 'check', check: {
           id: 'ml-1-c3',
@@ -160,7 +160,7 @@ const ROLE_OF_A_MENTOR: Course = {
             'Asking them not to raise work problems with you',
           ],
           answer: 1,
-          rationale: 'In a small organisation the overlap is usually unavoidable, so the harm comes from it being unspoken. A learner who knows which role you are in can decide what to say; one who does not will assume the assessing role and withhold.',
+          rationale: 'In a small organization the overlap is usually unavoidable, so the harm comes from it being unspoken. A learner who knows which role you are in can decide what to say; one who does not will assume the assessing role and withhold.',
           distractors: 'Keeping it separate in your own head protects you, not them. They cannot see inside your head, so they manage the risk by telling you less.',
         } },
         { kind: 'takeaways', items: [
@@ -250,7 +250,7 @@ const TRUST_AND_SAFETY: Course = {
   ],
   objectives: [
     'Explain why accuracy of information is the practical case for psychological safety.',
-    'Name the specific behaviours that build trust in the first month.',
+    'Name the specific behaviors that build trust in the first month.',
     'Identify the four common ways a mentor breaks trust without noticing.',
     'Distinguish psychological safety from comfort and act on the difference.',
   ],
@@ -274,7 +274,7 @@ const TRUST_AND_SAFETY: Course = {
         ] },
         { kind: 'case', title: 'The problem behind the problem', scenario: true, text: [
           'A volunteer tells her mentor she wants help with time management, because her shifts keep slipping. The mentor is good at time management and provides a system.',
-          'Four weeks later nothing has changed. The actual situation is that she is the only driver for a parent with dialysis three mornings a week, and she has not said so because it sounds like an excuse and she is afraid of being moved off the programme.',
+          'Four weeks later nothing has changed. The actual situation is that she is the only driver for a parent with dialysis three mornings a week, and she has not said so because it sounds like an excuse and she is afraid of being moved off the program.',
           'The mentor did competent work on a false premise. The system was fine. The premise was face saving, and the reason for the face saving was that nothing in the first month had told her it was safe to say the real thing.',
         ] },
         { kind: 'check', check: {
@@ -283,7 +283,7 @@ const TRUST_AND_SAFETY: Course = {
           options: [
             'It makes the relationship more pleasant for both people',
             'Without it you receive an edited version of the situation and give confident advice about the wrong problem',
-            'It is required by most mentoring programmes',
+            'It is required by most mentoring programs',
             'It reduces the mentor\'s workload',
           ],
           answer: 1,
@@ -294,7 +294,7 @@ const TRUST_AND_SAFETY: Course = {
     {
       id: 'ml-2-l2',
       title: 'What builds trust in the first month',
-      summary: 'Five behaviours, none of which are about being nice.',
+      summary: 'Five behaviors, none of which are about being nice.',
       minutes: 6,
       blocks: [
         { kind: 'list', title: 'What actually does it', items: [
@@ -305,7 +305,7 @@ const TRUST_AND_SAFETY: Course = {
           'Keeping what they told you where they put it. One story repeated to a third person ends the relationship even if nothing bad follows.',
         ] },
         { kind: 'why', text: [
-          'None of these are about warmth. A warm mentor who forgets what they promised is less trusted than a blunt one who never does. Learners are reading for evidence, and evidence is behavioural.',
+          'None of these are about warmth. A warm mentor who forgets what they promised is less trusted than a blunt one who never does. Learners are reading for evidence, and evidence is behavioral.',
         ] },
         { kind: 'steps', title: 'What the first month is actually testing', items: [
           { label: 'Does this person remember', text: 'A learner watches whether you recall what they told you last time without being reminded. Notes between meetings are not administrative, they are the mechanism by which somebody feels held in mind.' },
@@ -321,7 +321,7 @@ const TRUST_AND_SAFETY: Course = {
           q: 'A mentor is consistently warm and encouraging, but twice has forgotten a small thing they promised. What is the likely effect on trust?',
           options: [
             'Neutral, because the warmth compensates',
-            'Trust falls, because early trust is built on behavioural evidence and reliability at small scale is the main evidence available',
+            'Trust falls, because early trust is built on behavioral evidence and reliability at small scale is the main evidence available',
             'Trust rises, because the learner sees the mentor is busy and important',
             'No effect until a large promise is broken',
           ],
@@ -394,7 +394,7 @@ const TRUST_AND_SAFETY: Course = {
         } },
         { kind: 'takeaways', items: [
           'Safety is an information condition first: without it you advise on an edited premise.',
-          'Early trust is behavioural. Small kept promises outweigh warmth.',
+          'Early trust is behavioral. Small kept promises outweigh warmth.',
           'The four good faith failures are solving, comparing, reassuring too fast, and leaking.',
           'Safety exists so that hard conversations are possible, not so they can be avoided.',
         ] },
@@ -407,7 +407,7 @@ const TRUST_AND_SAFETY: Course = {
     title: 'Trust practices you will actually do',
     minutes: 6,
     purpose:
-      'Trust is behavioural, so this asks for behaviours with dates on them rather than intentions, and names the failure you are prone to before you commit to anything.',
+      'Trust is behavioral, so this asks for behaviors with dates on them rather than intentions, and names the failure you are prone to before you commit to anything.',
     fields: [
       { id: 'promise', label: 'The small promise', help: 'One thing you will complete within twenty four hours of your next meeting, and how you will confirm it is done.', multiline: true },
       { id: 'failure', label: 'Your failure pattern', help: 'Solving, comparing, reassuring too fast, or leaking. Pick the one that is yours and say how you will notice it happening.', multiline: true },
@@ -439,7 +439,7 @@ const COACHING_ADVISING_SUPERVISING: Course = {
     'Define coaching, advising and supervising by the authority each one carries.',
     'Choose the mode a situation calls for using time, stakes and competence.',
     'Name the mode out loud so the learner is not guessing.',
-    'Recognise when advising is the wrong tool and when it is negligent not to use it.',
+    'Recognize when advising is the wrong tool and when it is negligent not to use it.',
   ],
   minutes: 27,
   prerequisites: 'None.',
@@ -554,7 +554,7 @@ const COACHING_ADVISING_SUPERVISING: Course = {
       minutes: 5,
       blocks: [
         { kind: 'prose', text: [
-          'In a small organisation one person routinely holds two of the three roles, and sometimes all of them. HMC coordinators mentor volunteers they also schedule, assess, and approve hours for. Refusing the overlap is not available; the choice is between an overlap that is named and one that is not.',
+          'In a small organization one person routinely holds two of the three roles, and sometimes all of them. HMC coordinators mentor volunteers they also schedule, assess, and approve hours for. Refusing the overlap is not available; the choice is between an overlap that is named and one that is not.',
         ] },
         { kind: 'steps', title: 'Two habits', items: [
           { label: 'Announce the switch', text: 'When a conversation moves from mentoring into supervision, say so as it happens. "I am going to put the coordinator hat on for two minutes, because this part is not optional." Then say when you have taken it off. It sounds stilted the first time and stops sounding stilted immediately.' },
@@ -613,7 +613,7 @@ const COACHING_ADVISING_SUPERVISING: Course = {
   },
   furtherLearning: [
     { name: 'International Coaching Federation, core competencies', use: 'What coaching is as a defined practice, and the boundary it draws against advising.' },
-    { name: 'MENTOR National Mentoring Partnership, Elements of Effective Practice for Mentoring', use: 'Role clarity and supervision expectations in a mentoring programme.' },
+    { name: 'MENTOR National Mentoring Partnership, Elements of Effective Practice for Mentoring', use: 'Role clarity and supervision expectations in a mentoring program.' },
   ],
 };
 
@@ -636,7 +636,7 @@ const EFFECTIVE_FEEDBACK: Course = {
     'Frame feedback as information about a gap rather than a judgement of a person.',
     'Use a four part structure that survives being nervous.',
     'Receive feedback without defending, and model that for a learner.',
-    'Recognise when what you are about to give is not feedback but an escalation.',
+    'Recognize when what you are about to give is not feedback but an escalation.',
   ],
   minutes: 27,
   prerequisites: 'None. Courses 2 and 3 first are recommended.',
@@ -650,7 +650,7 @@ const EFFECTIVE_FEEDBACK: Course = {
       blocks: [
         { kind: 'prose', text: [
           'Feedback is information about the distance between what happened and what was needed. Stated that way it is usable. Stated as a characteristic of the person it is a verdict, and verdicts get argued with rather than acted on.',
-          '"You are disorganised" cannot be acted on. It is a claim about who somebody is, it invites a defence, and even if accepted it does not indicate what to do differently on Thursday.',
+          '"You are disorganised" cannot be acted on. It is a claim about who somebody is, it invites a defense, and even if accepted it does not indicate what to do differently on Thursday.',
           '"The last two shifts started fifteen minutes late and the intake table was not set up when the first person arrived" can be acted on. It is checkable, it is about a specific gap, and the next action is obvious to both of you.',
         ] },
         { kind: 'concept', title: 'The test', text: [
@@ -672,7 +672,7 @@ const EFFECTIVE_FEEDBACK: Course = {
           options: [
             'You need to be more professional',
             'You have an attitude problem with the coordinators',
-            'In the last two team emails the reply went to the whole group including the partner organisation, and one of them named a member',
+            'In the last two team emails the reply went to the whole group including the partner organization, and one of them named a member',
             'You are not really a team player',
           ],
           answer: 2,
@@ -726,7 +726,7 @@ const EFFECTIVE_FEEDBACK: Course = {
         { kind: 'steps', title: 'What to do instead', items: [
           { label: 'Take the information first', text: '"Let me make sure I have it. You are saying the last two check-ins felt rushed and you did not get to the thing you came with." Repeat it back before responding to it.' },
           { label: 'Thank them for the specific thing', text: 'Not for the courage it took. For the content. "That is useful and I had not noticed it."' },
-          { label: 'Say what you will do, once', text: 'One change, not a defence and not a plan of five items.' },
+          { label: 'Say what you will do, once', text: 'One change, not a defense and not a plan of five items.' },
           { label: 'Leave the explanation out unless asked', text: 'If context genuinely matters, offer it later and separately, so it cannot function as a rebuttal in the moment.' },
         ] },
         { kind: 'tryit', title: 'Ask for one', text: [
@@ -738,7 +738,7 @@ const EFFECTIVE_FEEDBACK: Course = {
           q: 'A learner tells a mentor that recent meetings felt rushed. The mentor immediately explains the scheduling pressure that caused it. What is the likely effect?',
           options: [
             'The learner appreciates the transparency and feels closer',
-            'The explanation is indistinguishable from a defence from the outside, so the learner learns that feedback to this mentor comes back with a rebuttal',
+            'The explanation is indistinguishable from a defense from the outside, so the learner learns that feedback to this mentor comes back with a rebuttal',
             'No effect, since the explanation is true',
             'The learner will raise it again more forcefully',
           ],
@@ -798,7 +798,7 @@ const EFFECTIVE_FEEDBACK: Course = {
   },
   furtherLearning: [
     { name: 'National Association of Colleges and Employers, Career Readiness Competencies', use: 'Professionalism and communication as defined competencies, for framing feedback against a standard rather than a preference.' },
-    { name: 'MENTOR National Mentoring Partnership, Elements of Effective Practice for Mentoring', use: 'Monitoring and support expectations, including when a mentoring concern belongs with programme staff.' },
+    { name: 'MENTOR National Mentoring Partnership, Elements of Effective Practice for Mentoring', use: 'Monitoring and support expectations, including when a mentoring concern belongs with program staff.' },
   ],
 };
 
@@ -823,7 +823,7 @@ const RISK_AND_ESCALATION: Course = {
     'One rule runs through all of it: a mentor notices and hands over. You do not assess how serious it is, you do not investigate, and you do not hold it alone until you are sure. Each of those is a judgement that belongs to somebody trained and accountable for making it.',
   ],
   objectives: [
-    'Recognise the categories of disclosure that must leave the mentoring relationship.',
+    'Recognize the categories of disclosure that must leave the mentoring relationship.',
     'Act on the difference between immediate danger and same day escalation.',
     'State the limits of confidentiality before a disclosure rather than after.',
     'Avoid the four responses that make a disclosure harder to act on.',
@@ -849,7 +849,7 @@ const RISK_AND_ESCALATION: Course = {
           { label: 'Immediate danger to life', text: 'Someone is in danger right now, from themselves or another person. This does not wait for a coordinator, an email or a meeting. In the United States, 988 is the Suicide and Crisis Lifeline, reachable by call or text, and 911 is for immediate emergency response.' },
           { label: 'Harm or suspected harm to a child, an older adult, or a dependent adult', text: 'You do not decide whether it happened, whether it is serious enough, or whether there is another explanation. You report it through the route HMC has given you, the same day. The threshold for reporting is suspicion, not certainty, and the assessment is somebody else\'s job.' },
           { label: 'Risk to the person\'s wellbeing that is beyond mentoring', text: 'Untreated mental health difficulty, substance use, housing loss, an unsafe home. These are referrals, not mentoring topics, and HMC has routes for all of them.' },
-          { label: 'Conduct or safeguarding concerns', text: 'Something a volunteer, a member of staff or a partner did. This goes to your coordinator, and if the concern involves your coordinator it goes above them. Every organisation needs that second route to exist and this one does.' },
+          { label: 'Conduct or safeguarding concerns', text: 'Something a volunteer, a member of staff or a partner did. This goes to your coordinator, and if the concern involves your coordinator it goes above them. Every organization needs that second route to exist and this one does.' },
         ] },
         { kind: 'concept', title: 'Suspicion, not certainty', text: [
           'The single most common reason a serious concern goes unreported by a well meaning person is that they wanted to be sure first. Waiting for certainty is how a concern sits with one person for three weeks.',
@@ -903,7 +903,7 @@ const RISK_AND_ESCALATION: Course = {
             'Refer them to a service and end the conversation',
           ],
           answer: 1,
-          rationale: 'Immediate danger is the one category that does not route through the organisation first. A coordinator cannot act faster than a crisis line, and the notification to HMC follows rather than precedes the response.',
+          rationale: 'Immediate danger is the one category that does not route through the organization first. A coordinator cannot act faster than a crisis line, and the notification to HMC follows rather than precedes the response.',
         } },
       ],
     },
@@ -932,7 +932,7 @@ const RISK_AND_ESCALATION: Course = {
             'When a disclosure makes it relevant',
             'In the first meeting, before there is anything to disclose',
             'Only if the learner asks',
-            'In writing at the end of the programme',
+            'In writing at the end of the program',
           ],
           answer: 1,
           rationale: 'Stated first it reads as competence and costs nothing. Stated after a disclosure it lands as a betrayal at the moment the person is most exposed, and it teaches them that telling somebody was a mistake.',
@@ -1044,7 +1044,7 @@ export const MENTOR_PRE: Check[] = [
       'Asking the learner not to discuss work',
     ],
     answer: 2,
-    why: 'The overlap is usually unavoidable in a small organisation. The harm comes from it being unspoken, because the learner then assumes the assessing role and withholds.',
+    why: 'The overlap is usually unavoidable in a small organization. The harm comes from it being unspoken, because the learner then assumes the assessing role and withholds.',
   },
   {
     id: 'ml-t4',
@@ -1052,7 +1052,7 @@ export const MENTOR_PRE: Check[] = [
     options: [
       'It makes the relationship more pleasant',
       'Without it you receive an edited account and advise confidently on the wrong problem',
-      'It is expected by most programmes',
+      'It is expected by most programs',
       'It reduces the number of meetings needed',
     ],
     answer: 1,
@@ -1083,7 +1083,7 @@ export const MENTOR_PRE: Check[] = [
     options: [
       'You need to be more professional',
       'You have an attitude problem',
-      'The last two team emails went to the whole group including the partner organisation, and one named a member',
+      'The last two team emails went to the whole group including the partner organization, and one named a member',
       'You are not a team player',
     ],
     answer: 2,
@@ -1115,7 +1115,7 @@ export const MENTOR_PRE: Check[] = [
       'When a disclosure makes it relevant',
       'Only if asked',
       'In the first meeting, before there is anything to disclose',
-      'At the end of the programme',
+      'At the end of the program',
     ],
     answer: 2,
     why: 'Stated first it reads as competence. Stated after a disclosure it lands as a betrayal at the moment the person is most exposed.',
@@ -1176,7 +1176,7 @@ export const MENTOR_POST: Check[] = [
     q: 'A mentor is consistently warm but has twice forgotten a small commitment. What happens to trust?',
     options: [
       'It holds, because warmth compensates',
-      'It falls, because early trust rests on behavioural evidence and small reliability is most of the evidence available',
+      'It falls, because early trust rests on behavioral evidence and small reliability is most of the evidence available',
       'It rises, since the learner sees a busy professional',
       'Nothing until a significant promise is broken',
     ],
@@ -1212,7 +1212,7 @@ export const MENTOR_POST: Check[] = [
       'That they should raise it more firmly',
     ],
     answer: 1,
-    why: 'An explanation and a defence are indistinguishable from the outside. The cost is to whether they offer feedback again.',
+    why: 'An explanation and a defense are indistinguishable from the outside. The cost is to whether they offer feedback again.',
   },
   {
     id: 'ml-p9',
@@ -1236,7 +1236,7 @@ export const MENTOR_POST: Check[] = [
       'Give them a referral and end the conversation',
     ],
     answer: 2,
-    why: 'Immediate danger is the one category that does not route through the organisation first. A coordinator cannot act faster than a crisis line.',
+    why: 'Immediate danger is the one category that does not route through the organization first. A coordinator cannot act faster than a crisis line.',
   },
 ];
 

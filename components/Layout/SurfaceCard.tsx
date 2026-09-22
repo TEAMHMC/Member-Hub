@@ -11,7 +11,7 @@ import React from 'react';
  * The gradient is the card itself and not a cover slab above it, which is what made an
  * earlier version of this cost a 16:9 band per card and push the action below the fold on
  * a phone. Here it is only the surface the content sits on, so it costs no height at all,
- * and the colours are HMC's own blue, pink and orange.
+ * and the colors are HMC's own blue, pink and orange.
  *
  * The hairline is the same #0f0f0f the site buttons carry, so a card and a button read as
  * one system rather than two.
