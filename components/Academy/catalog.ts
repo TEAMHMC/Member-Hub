@@ -784,10 +784,10 @@ export const PATHWAYS: Pathway[] = [
   },
 ];
 
-// These are two different programmes for two different people, and they were one
+// These are two different programs for two different people, and they were one
 // pathway. The continuing education course is for licensed professionals and needs a
-// licence number; the facilitator training is for community health workers, students
-// and volunteers and needs no licence at all. Bundled together, the facilitator
+// license number; the facilitator training is for community health workers, students
+// and volunteers and needs no license at all. Bundled together, the facilitator
 // credential required finishing a course its own audience is not eligible to take, and
 // a clinician wanting one CE hour was put on a facilitator track they never asked for.
 // Only the workshop carries the LACDMH approval. The facilitator training never has.
@@ -799,7 +799,7 @@ PATHWAYS.push({
   level: 'Leadership',
   status: 'published',
   purpose:
-    'Learn to lead Unstoppable workshops where you live. No licence needed.',
+    'Learn to lead Unstoppable workshops where you live. No license needed.',
   format: 'Videos and reading you do on your own time, then a workshop you help lead.',
   credentialTitle: 'HMC Unstoppable Facilitator',
   credentialType: 'Course Completion',
@@ -826,7 +826,7 @@ PATHWAYS.push({
   level: 'Advanced',
   status: 'published',
   purpose:
-    'Earn one continuing education hour. For nurses, therapists, counsellors and psychologists with a current licence.',
+    'Earn one continuing education hour. For nurses, therapists, counselors and psychologists with a current license.',
   format: 'One live online session you book, then a short evaluation.',
   credentialTitle: 'Unstoppable Continuing Education, 1.0 Hour',
   credentialType: 'Course Completion',

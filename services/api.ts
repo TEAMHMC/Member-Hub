@@ -134,7 +134,7 @@ export interface ClientMe {
     contacted?: boolean;
     /** Open, and nobody has been in touch. The state where a member should be told how to chase it. */
     awaitingResponse?: boolean;
-    /** Public directory contact for the organisation, or null when the directory holds none. */
+    /** Public directory contact for the organization, or null when the directory holds none. */
     resource?: {
       phone: string | null;
       website: string | null;

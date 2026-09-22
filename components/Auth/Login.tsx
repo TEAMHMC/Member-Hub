@@ -72,7 +72,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
    * Asked once, in their words rather than in ours. The Hub has always had two audiences
    * and no way for anybody to indicate which they were, so a person who came to take a
    * training was given a screening surface, a health playbook and results they will never
-   * have. Nothing derived from behaviour is as good as the person saying it.
+   * have. Nothing derived from behavior is as good as the person saying it.
    */
   const [audience, setAudience] = useState<'care' | 'learner' | 'both' | null>(null);
   const [invite, setInvite] = useState('');
@@ -297,7 +297,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     } catch {
       // Not fatal to the sign-in. They are already authenticated, and blocking entry on a
       // profile write would lock somebody out of the Hub over a saved name. They will be
-      // asked once more next time, which is the old behaviour rather than a new failure.
+      // asked once more next time, which is the old behavior rather than a new failure.
       setErr('We signed you in, but could not save your details just then. We may ask again next time.');
     } finally {
       setBusy(false);
@@ -325,7 +325,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   const inputStyle = "w-full h-[52px] px-5 rounded-2xl border border-zinc-200 bg-white text-base font-medium focus:ring-4 focus:ring-[#233DFF]/10 focus:border-[#233DFF]/30 outline-none transition-all placeholder:text-zinc-300";
   const labelStyle = "block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-3 ml-1";
-  // Shape, colour, dot and roll-up hover come from the shared HMC button system
+  // Shape, color, dot and roll-up hover come from the shared HMC button system
   // (loaded in index.html) so the Hub matches healthmatters.clinic. Only the
   // full-width sizing and disabled handling are specific to this form.
   const buttonStyle = "hmc-btn hmc-btn-primary w-full h-[52px] justify-center disabled:opacity-50 disabled:cursor-not-allowed";

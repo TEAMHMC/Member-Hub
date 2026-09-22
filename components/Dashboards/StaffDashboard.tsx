@@ -62,7 +62,7 @@ const primary = 'px-5 py-3 rounded-full bg-[#233DFF] text-white text-[11px] font
 interface Props {
   staff: StaffStanding;
   /** The address this session signed in with. StaffStanding carries a name and a role but
-      not an address, and self-removal has to be recognisable before the button is drawn. */
+      not an address, and self-removal has to be recognizable before the button is drawn. */
   selfEmail: string;
   onExit: () => void;
 }

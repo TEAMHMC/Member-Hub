@@ -61,14 +61,14 @@ const KIND_LABEL: Record<NotificationKind, string> = {
 };
 
 /**
- * What kind of thing an event is, taken from the programme it belongs to.
+ * What kind of thing an event is, taken from the program it belongs to.
  *
  * The events endpoint carries a `program` field, which is how HMC already classifies its
  * own calendar: Community Fair, Community Wellness, Unstoppable Wellness Meetup. The bell
  * ignored it and stamped every row "Workshop", so the December toy distribution announced
  * itself as a workshop and so did a resource fair and an interfaith meeting.
  *
- * Matched loosely on purpose. Programme names are typed by hand in the Event Finder admin
+ * Matched loosely on purpose. Program names are typed by hand in the Event Finder admin
  * and a new one should read as a plain event rather than as the wrong specific thing.
  */
 export const eventKind = (program?: string, title?: string): NotificationKind => {

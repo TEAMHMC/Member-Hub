@@ -257,7 +257,7 @@ export function evaluateGates(
    *
    * The pathway listing already treats an admin opening a pathway as outranking the
    * catalogue flag. The credential did not, so a pathway could be open for people to
-   * enrol in and finish while the credential stayed locked on a flag only a deploy
+   * enroll in and finish while the credential stayed locked on a flag only a deploy
    * could change. Someone could complete every course and still be told the pathway
    * was not open. Both now read the same signal.
    */
