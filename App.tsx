@@ -48,15 +48,36 @@ const adoptLocalProgress = (stableId: string) => {
     for (const prefix of PREFIXES) {
       const target = `${prefix}${stableId}`;
       if (localStorage.getItem(target)) continue;
-      // The most recently written entry under an old random id, if there is one.
-      const orphan = Object.keys(localStorage)
-        .filter((k) => k.startsWith(prefix) && k !== target && k.startsWith(`${prefix}usr_`))
-        .pop();
+
+      /**
+       * What a visitor did before they had an account.
+       *
+       * Everything a visitor completes is filed under the literal id 'guest', because
+       * that is what the guest user object carries. This only ever looked for keys
+       * shaped `usr_`, so it never saw that one, and somebody who worked through three
+       * lessons and then signed up had every one of them discarded at exactly the
+       * moment they committed to HMC. It is taken first, because it is the work that
+       * prompted the sign-up rather than a residue from an older session.
+       */
+      const guestKey = `${prefix}guest`;
+      const orphan = (localStorage.getItem(guestKey) && guestKey !== target)
+        ? guestKey
+        : Object.keys(localStorage)
+            .filter((k) => k.startsWith(prefix) && k !== target && k.startsWith(`${prefix}usr_`))
+            .pop();
+
       if (orphan) {
         const value = localStorage.getItem(orphan);
         if (value) localStorage.setItem(target, value);
       }
     }
+    /**
+     * Then let go of the visitor's copy.
+     *
+     * It has been carried onto the account, and the next person to open this browser
+     * without signing in would otherwise be handed the last visitor's transcript.
+     */
+    for (const prefix of PREFIXES) localStorage.removeItem(`${prefix}guest`);
     localStorage.setItem(`hmc_migrated_${stableId}`, '1');
   } catch {
     /* private mode, or a full quota. Progress still syncs from the server. */

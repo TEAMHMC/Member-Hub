@@ -22,7 +22,8 @@
     "test:event-time": "tsx tests/event-time.test.ts",
     "test:render:console": "node tests/browser/staff-console.cjs",
     "test:course-editor": "tsx tests/course-editor.test.ts",
-    "test:render:routing": "node tests/browser/routing.cjs"
+    "test:render:routing": "node tests/browser/routing.cjs",
+    "test:render:guest": "node tests/browser/guest-progress.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.562.0",
