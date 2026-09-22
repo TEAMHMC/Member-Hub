@@ -10,6 +10,7 @@
 // instruction that relies on color alone (state is always also stated in text).
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import * as route from '../../services/route';
 import { Award, Check, CheckCircle2, ChevronRight, FileText, GraduationCap, ListChecks, Lock, PenLine, Play, ShieldCheck, TrendingUp, X } from 'lucide-react';
 import {
   PATHWAYS,
@@ -516,7 +517,31 @@ const BlockView: React.FC<{
 
 const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal, initialView = 'catalog', member = null, guest = false, onRequireSignIn, curriculumStaff = false }) => {
   const [state, setState] = useState<LearnerState>(() => loadState(userId));
-  const [view, setView] = useState<View>({ name: initialView } as View);
+  /**
+   * Where in the Academy the member is, and the address that says so.
+   *
+   * The Academy is eight levels deep and every one of them used to be this one piece of
+   * state at `hub.healthmatters.clinic/`. Nothing about that was visible in the address
+   * bar, so the browser Back button had no step inside the Academy to go back to and
+   * left the Hub instead. That is what made a native surface feel like somewhere else.
+   *
+   * The initial value comes from the URL, so a link to a lesson opens that lesson.
+   * `setView` is the same call it always was at all forty call sites below; it now also
+   * files the move in history.
+   */
+  const [view, setViewState] = useState<View>(() => {
+    const r = route.current();
+    return (r.tab === 'academy' && r.academy ? r.academy : { name: initialView }) as View;
+  });
+  const setView = React.useCallback((v: View) => {
+    setViewState(v);
+    route.push({ tab: 'academy', academy: v as route.AcademyRoute });
+  }, []);
+
+  // Back and Forward within the Academy. Anything outside it is the Hub's to handle.
+  useEffect(() => route.onPop((r) => {
+    if (r.tab === 'academy') setViewState((r.academy || { name: 'catalog' }) as View);
+  }), []);
 
   /**
    * What the public should see per pathway, set by an admin in the portal.
@@ -709,9 +734,15 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [view]);
   // Follow a deep link from the Hub (Home cards link straight to credentials).
+  //
+  // Skipped on the first pass. `initialView` defaults to 'catalog', so without this
+  // guard opening the Academy at a course address would immediately be overwritten
+  // with the catalogue and the link the member followed would not work.
+  const initialViewSettled = useRef(false);
   useEffect(() => {
+    if (!initialViewSettled.current) { initialViewSettled.current = true; return; }
     setView({ name: initialView } as View);
-  }, [initialView]);
+  }, [initialView, setView]);
 
   const set = (fn: (s: LearnerState) => LearnerState) => setState((s) => fn(s));
 

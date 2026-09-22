@@ -12,6 +12,7 @@ import { context as ctxApi, client as clientApi, resultsAccess } from './service
 import SunnyNavigator from './components/Navigator/SunnyNavigator';
 import TrainingRegistration from './components/Academy/TrainingRegistration';
 import { PATHWAYS } from './components/Academy/catalog';
+import * as route from './services/route';
 
 /**
  * One member, one id, on every device they sign in from.
@@ -90,7 +91,46 @@ const App: React.FC = () => {
   useEffect(() => {
     ctxApi.hello().then((r) => setVisitorId(r.visitorId)).catch(() => {});
   }, []);
-  const [activeTab, setActiveTab] = useState<string>('dash');
+  /**
+   * The open section, and the address that names it.
+   *
+   * Reading the first value from the URL is what makes a link to the Hub land where it
+   * points. Before this every address rendered Home, so a course link somebody was sent
+   * opened the front page and the member had to find their way back to what they had
+   * been sent. Every later change is mirrored into history by the wrapper below, so Back
+   * steps through the Hub instead of out of it.
+   */
+  const [activeTab, setActiveTabState] = useState<string>(() => route.current().tab);
+
+  /**
+   * The tab the address currently names.
+   *
+   * ClientDashboard holds the open tab as well and reports it upward, including once on
+   * mount, so this is told "academy" while the member is already inside a course. Filing
+   * that as a move would rewrite `/academy/course/<pathway>/<course>` back to `/academy`
+   * and throw away the depth the Academy had just read out of the URL, which is exactly
+   * what a reload and a pasted course link each looked like. A tab that has not changed
+   * is not a move.
+   */
+  const addressedTab = React.useRef<string>(route.current().tab);
+  const setActiveTab = React.useCallback((tab: string) => {
+    setActiveTabState(tab);
+    if (addressedTab.current === tab) return;
+    addressedTab.current = tab;
+    route.push({ tab });
+  }, []);
+
+  // Name the first screen, and tidy an address the Hub does not recognise, without
+  // filing a history entry for a step the member never took.
+  //
+  // The whole route is replaced, not just its tab. Replacing the tab alone rewrote
+  // `/academy/course/<pathway>/<course>` to `/academy` on the first paint, before the
+  // Academy had mounted and read its own depth, so every course address anybody pasted
+  // or reloaded quietly opened the catalogue instead.
+  useEffect(() => { route.replace(route.current()); }, []);
+
+  // Back and Forward. The Academy subscribes separately for its own depth.
+  useEffect(() => route.onPop((r) => { addressedTab.current = r.tab; setActiveTabState(r.tab); }), []);
 
   // Staff see the member experience by default and switch to the console
   // deliberately. Somebody maintaining the Hub needs to look at what a member

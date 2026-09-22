@@ -21,7 +21,8 @@
     "test:engagement": "tsx tests/engagement.test.ts",
     "test:event-time": "tsx tests/event-time.test.ts",
     "test:render:console": "node tests/browser/staff-console.cjs",
-    "test:course-editor": "tsx tests/course-editor.test.ts"
+    "test:course-editor": "tsx tests/course-editor.test.ts",
+    "test:render:routing": "node tests/browser/routing.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.562.0",
