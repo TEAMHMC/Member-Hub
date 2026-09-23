@@ -248,11 +248,11 @@ const CourseCard: React.FC<{
       <div className="flex flex-wrap items-center gap-2">
         {delivery && DELIVERY_BADGE[delivery] && <Badge>{DELIVERY_BADGE[delivery]}</Badge>}
         {ce && <Badge tone="solid">CE approved</Badge>}
-        {/* A price where there is one, and no charge where there genuinely is none.
-            Both this badge and the Cost row on the course page read the same `price`
-            field, so a course shows one answer or the other and never both. Setting or
-            removing `price` in the catalogue is what turns pricing on and off. */}
-        <Badge>{priceUsd ? `$${priceUsd}` : 'No charge'}</Badge>
+        {/* A price where there is one, and nothing where there is none: HMC does
+            not describe its courses by cost. Both this badge and the Cost row on the
+            course page read the same `price` field. Setting or removing `price` in the
+            catalogue is what turns pricing on and off. */}
+        {priceUsd ? <Badge>{`$${priceUsd}`}</Badge> : null}
       </div>
 
       <div className="mt-2">
@@ -1693,7 +1693,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                 ['Modules', `${c.lessons.length}`],
                 ['Knowledge checks', `${c.checks.length}`],
                 ['Applied activity', c.activity ? 'Yes, with a saved artifact' : 'None'],
-                ['Cost', c.price?.amountUsd ? `$${c.price.amountUsd}` : 'No charge'],
+                ...(c.price?.amountUsd ? [['Cost', `$${c.price.amountUsd}`]] : []),
               ].map(([k, v]) => (
                 <div key={k} className="flex items-baseline justify-between gap-4 border-b border-zinc-50 pb-2.5 last:border-0 last:pb-0">
                   <dt className="text-[12px] text-zinc-500">{k}</dt>
