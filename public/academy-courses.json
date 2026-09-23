@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-19T16:46:32.539Z",
+  "generatedAt": "2026-09-22T23:58:00.639Z",
   "courses": [
     {
       "id": "hce-1",
@@ -184,11 +184,18 @@
       "delivery": "self-paced"
     },
     {
+      "id": "unstoppable-experience",
+      "title": "The Unstoppable Experience",
+      "pathwayId": "unstoppable-community",
+      "pathwayTitle": "The Unstoppable Experience",
+      "delivery": "live"
+    },
+    {
       "id": "cmhw-facilitator",
       "title": "Community Mental Health Worker and Facilitator Training",
       "pathwayId": "unstoppable-facilitator",
       "pathwayTitle": "Unstoppable Facilitator Training",
-      "delivery": "blended"
+      "delivery": "self-paced"
     },
     {
       "id": "unstoppable-ce",

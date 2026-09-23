@@ -156,6 +156,16 @@ export interface Course {
   /** Who this is written for. Drives reading level, not just tone. */
   readingLevel?: ReadingLevel;
   delivery?: Delivery;
+  /**
+   * How a live course is delivered, when every session of it is delivered the same way.
+   *
+   * Sessions each carry their own modality, which is right for a course that sometimes runs
+   * in a room and sometimes on a call. It is not enough on its own: a course with no
+   * session scheduled yet still has to be able to tell somebody how it is run, and the
+   * Unstoppable material referenced a partner venue HMC no longer uses long after it had
+   * moved to virtual delivery.
+   */
+  modality?: Modality;
   /** Populated for live and blended courses. */
   sessions?: Session[];
   ce?: CeApproval;
@@ -391,7 +401,7 @@ import { CES_FOUNDATION_COURSES, CES_PRE, CES_POST } from './pathwayClinicalFoun
 import { MENTOR_LEADER_COURSES, MENTOR_PRE, MENTOR_POST } from './pathwayMentorLeader';
 import { INTERNSHIP_COURSES } from './pathwayInternships';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
-import { CMHW_FACILITATOR, UNSTOPPABLE_CE } from './pathwayMentalHealth';
+import { CMHW_FACILITATOR, UNSTOPPABLE_CE, UNSTOPPABLE_EXPERIENCE } from './pathwayMentalHealth';
 import { STEM_CAMP } from './programStemCollab';
 import { COURSE_1_V2 } from './course1V2';
 import { COURSE_2_V2 } from './course2V2';
@@ -784,6 +794,33 @@ export const PATHWAYS: Pathway[] = [
   },
 ];
 
+// The third Unstoppable audience, and the one the other two exist for: the community
+// participant. It was listed as planned work on the facilitator pathway, which gated the
+// facilitator credential on a course its holders never take. It has its own pathway
+// because it has its own person. No license, no referral, nothing to finish first.
+// Listed first of the three because it is how almost everybody arrives.
+
+PATHWAYS.push({
+  family: 'Mental Health + Community Education',
+  id: 'unstoppable-community',
+  title: 'The Unstoppable Experience',
+  level: 'Discover',
+  status: 'published',
+  purpose:
+    'A live monthly hour to pause and talk about mental health with people who get it. Open to everyone.',
+  format: 'One live online session a month. Read what happens before you join.',
+  credentialTitle: 'Unstoppable Experience Participant',
+  credentialType: 'Course Completion',
+  gates: [
+    'Join a session',
+  ],
+  courses: [UNSTOPPABLE_EXPERIENCE],
+  plannedCourses: [],
+  version: '1.0',
+  effectiveDate: 'Migrated from the Unstoppable Experience Queue Cards, September 22, 2026',
+  nextReview: 'After the first three monthly sessions run from the Hub',
+});
+
 // These are two different programs for two different people, and they were one
 // pathway. The continuing education course is for licensed professionals and needs a
 // license number; the facilitator training is for community health workers, students
@@ -811,8 +848,7 @@ PATHWAYS.push({
   courses: [CMHW_FACILITATOR],
   // Participant-facing community learning is a third audience again, not a step on the
   // way to facilitating. Listing it here gated the facilitator credential on a course
-  // its holders never take, so a finished facilitator could not be credentialled until
-  // an unrelated course shipped. It belongs in its own pathway when it is written.
+  // its holders never take. It now has its own pathway, unstoppable-community, above.
   plannedCourses: [],
   version: '2.0 migration',
   effectiveDate: 'Migrated from the Volunteer Portal training system',
