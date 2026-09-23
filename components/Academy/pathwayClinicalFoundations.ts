@@ -11,7 +11,7 @@
 //   Simulation Case 1, 2 and 3
 //   Practical / Simulation Competency Review
 //
-// Those teach or rehearse clinical judgement, and the pathway's own record says it is
+// Those teach or rehearse clinical judgment, and the pathway's own record says it is
 // pending clinical governance review. HMC has a PMHNP; that is who reviews them. A previous
 // agent introduced a scoring error into a validated instrument in this codebase, which is
 // the concrete reason the line is drawn here rather than at whatever felt defensible.
@@ -327,7 +327,7 @@ const MEDICAL_TERMINOLOGY: Course = {
         ] },
         { kind: 'list', title: 'Do not assume', items: [
           'Abbreviations that mean different things in different settings. A three-letter abbreviation can have several expansions, and which one is meant depends on the specialty and the sentence, not on the letters.',
-          'Anything where a similar word means something quite different. Terminology contains many near neighbours, and a near miss is not a partial answer, it is a different word.',
+          'Anything where a similar word means something quite different. Terminology contains many near neighbors, and a near miss is not a partial answer, it is a different word.',
           'Drug names. Many look and sound alike, the consequences of confusing them are serious, and this is never a learner\'s guess to make.',
           'Numbers, doses and units. Repeat them back exactly or write nothing.',
           'Anything you are recording rather than merely hearing. A note carries your uncertainty forward invisibly to everybody who reads it afterwards.',
@@ -702,7 +702,7 @@ export const CES_POST: Check[] = [
       'Because insurers require it',
     ],
     answer: 1,
-    why: 'Scope is a legal boundary, not a judgement about ability, and a supervisor cannot move it by asking.',
+    why: 'Scope is a legal boundary, not a judgment about ability, and a supervisor cannot move it by asking.',
   },
   {
     id: 'ces-p4',
@@ -740,7 +740,7 @@ export const CES_POST: Check[] = [
     q: 'Why does a learner never guess at a drug name?',
     options: [
       'Because the spelling is difficult',
-      'Because many look and sound alike, the consequences of confusing them are serious, and it is not a learner\'s judgement to make',
+      'Because many look and sound alike, the consequences of confusing them are serious, and it is not a learner\'s judgment to make',
       'Because drug names change frequently',
       'Because only a pharmacist may say them',
     ],

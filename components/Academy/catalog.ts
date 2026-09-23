@@ -694,7 +694,7 @@ export const PATHWAYS: Pathway[] = [
       'Reflection and debrief',
     ],
     // Three written, and the three that teach nothing clinical. Everything left below either
-    // teaches or rehearses a clinical judgement, and this pathway's record has said it is
+    // teaches or rehearses a clinical judgment, and this pathway's record has said it is
     // pending clinical governance review since it was created. HMC has a PMHNP; that is who
     // reviews them. Writing them without that review is how a curriculum acquires an error
     // nobody catches, which has already happened once in this codebase.

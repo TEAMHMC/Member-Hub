@@ -13,7 +13,7 @@
 //
 // Two deliberate limits, both about scope rather than length.
 //
-// Nothing here teaches a clinical judgement. Field safety covers hand hygiene, barrier
+// Nothing here teaches a clinical judgment. Field safety covers hand hygiene, barrier
 // precautions, sharps that a volunteer must not touch, and heat, because those are
 // operational. It does not teach assessment, triage, wound care, or anything that would
 // have a volunteer deciding how sick somebody is. Those belong to a licensed clinician and
@@ -128,7 +128,7 @@ const COMMUNITY_HEALTH_EQUITY: Course = {
           'Promising an outcome you do not control. "You will qualify" is the most expensive sentence available to a volunteer, and it costs the whole organization, not the person who said it.',
           'Guessing rather than referring. A confident wrong answer from somebody in an HMC shirt is worse than no answer, because it will be acted on.',
           'Asking for information you do not need. Every unnecessary question, and especially anything touching immigration status, tells a person this is a place that collects rather than a place that helps.',
-          'Not coming back. A pop-up that appears once and never again teaches a neighbourhood that outside help is temporary, and the next organization pays for it.',
+          'Not coming back. A pop-up that appears once and never again teaches a neighborhood that outside help is temporary, and the next organization pays for it.',
         ] },
         { kind: 'fieldnote', title: 'The sentence that keeps it', text: [
           '"I do not want to guess on something this important, so let me get you to somebody who does this every day."',
@@ -247,7 +247,7 @@ const SOCIAL_DETERMINANTS: Course = {
           { label: 'Economic stability', text: 'Income, employment, food security, housing stability. In practice: a shift worker who loses pay for every appointment attended, so appointments lose.' },
           { label: 'Education access and quality', text: 'Literacy, language, early childhood education, higher education. In practice: a renewal packet written at a reading level its recipient cannot use, in a language they do not read.' },
           { label: 'Health care access and quality', text: 'Coverage, a usual source of care, provider availability, health literacy. In practice: coverage that exists on paper with no provider within an hour who is taking new patients.' },
-          { label: 'Neighbourhood and built environment', text: 'Housing quality, transport, air, water, safety. In practice: a clinic two bus transfers away, which is ninety minutes each way with a child.' },
+          { label: 'Neighborhood and built environment', text: 'Housing quality, transport, air, water, safety. In practice: a clinic two bus transfers away, which is ninety minutes each way with a child.' },
           { label: 'Social and community context', text: 'Support networks, discrimination, incarceration, civic participation. In practice: somebody who will not give an address because of who they think will receive it.' },
         ] },
         { kind: 'check', check: {
@@ -256,7 +256,7 @@ const SOCIAL_DETERMINANTS: Course = {
           options: [
             'Economic stability',
             'Health care access and quality only',
-            'Neighbourhood and built environment, since transport is the barrier and coverage is not the problem',
+            'Neighborhood and built environment, since transport is the barrier and coverage is not the problem',
             'Social and community context',
           ],
           answer: 2,
@@ -311,7 +311,7 @@ const SOCIAL_DETERMINANTS: Course = {
           { label: 'Ask about the day, not the category', text: '"What would getting to an appointment look like for you?" rather than "do you have transport problems?" People answer the concrete version.' },
           { label: 'Offer rather than ask', text: '"Some people find the bus fare is the thing that makes this hard. Is that you?" Naming it first makes it ordinary rather than a confession.' },
           { label: 'Ask one thing, then stop', text: 'One question, then leave a silence. The instinct is to fill it with a second question, which turns a conversation into a form.' },
-          { label: 'Accept the answer you get', text: 'If they do not want to say, that is the end of it. A person deciding not to tell you something has made a reasonable judgement about a stranger.' },
+          { label: 'Accept the answer you get', text: 'If they do not want to say, that is the end of it. A person deciding not to tell you something has made a reasonable judgment about a stranger.' },
         ] },
         { kind: 'list', title: 'Never yours to ask', items: [
           'Immigration status. Do not ask, do not record, do not speculate, and do not let a form you are helping with go anywhere near it.',
@@ -346,7 +346,7 @@ const SOCIAL_DETERMINANTS: Course = {
         ] },
         { kind: 'steps', title: 'Not yours', items: [
           { label: 'Deciding eligibility', text: 'For anything. Only the county, the plan or the program decides.' },
-          { label: 'Clinical judgement', text: 'How serious a symptom is, whether somebody needs to be seen today, what a result means. Refer.' },
+          { label: 'Clinical judgment', text: 'How serious a symptom is, whether somebody needs to be seen today, what a result means. Refer.' },
           { label: 'Holding a safety concern', text: 'Anything indicating harm to a child, an older adult, a dependent adult, or immediate danger to anybody goes to your coordinator the same day, and to 988 or 911 where there is immediate danger. You notice and hand over.' },
         ] },
         { kind: 'check', check: {
@@ -362,7 +362,7 @@ const SOCIAL_DETERMINANTS: Course = {
           rationale: 'An unlogged referral cannot be followed up by anybody, so it depends entirely on the member acting alone with what they remember. Consent matters and is a separate requirement; naming a category rather than an organization is the weaker version of the same failure.',
         } },
         { kind: 'takeaways', items: [
-          'Five domains: economic, education, health care access, neighbourhood, social context.',
+          'Five domains: economic, education, health care access, neighborhood, social context.',
           'What somebody presents with is rarely the barrier. Ask what the day costs them.',
           'Ask what you could justify needing. Never immigration status.',
           'A referral is logged, named and numbered. Otherwise it is an intention.',
@@ -458,26 +458,26 @@ const BOUNDARIES_ETHICS_PRIVACY: Course = {
           'The difficult version is not a request. It is a gift, offered by somebody with very little, as a matter of dignity. Refusing flatly can be a genuine insult and can undo the relationship you have built.',
         ] },
         { kind: 'steps', title: 'How to hold it without wounding', items: [
-          { label: 'Food and drink at the moment', text: 'Accepting a cup of coffee or a plate at a community event is usually right, and refusing it can be the ruder act. Use judgement about what it costs them and never let it become expected.' },
+          { label: 'Food and drink at the moment', text: 'Accepting a cup of coffee or a plate at a community event is usually right, and refusing it can be the ruder act. Use judgment about what it costs them and never let it become expected.' },
           { label: 'Money or valuables', text: 'Never, and say why in terms of yourself rather than of them. "They do not let us take anything, and I would be in trouble. It means a lot that you offered."' },
-          { label: 'Redirect the impulse', text: 'People want to give something back. Give them a real route: volunteering, telling a neighbour about the event, filling in the feedback card. That accepts the gesture and keeps the boundary.' },
+          { label: 'Redirect the impulse', text: 'People want to give something back. Give them a real route: volunteering, telling a neighbor about the event, filling in the feedback card. That accepts the gesture and keeps the boundary.' },
           { label: 'Tell your coordinator', text: 'Not to report anybody. So that a pattern is visible, and so that you are not the only person who knows.' },
         ] },
         { kind: 'myths', items: [
-          { myth: 'Refusing a gift is always the professional choice.', reality: 'A flat refusal can be a real insult and can cost the relationship. The judgement is about value and expectation, and the way you refuse matters as much as whether you do.' },
+          { myth: 'Refusing a gift is always the professional choice.', reality: 'A flat refusal can be a real insult and can cost the relationship. The judgment is about value and expectation, and the way you refuse matters as much as whether you do.' },
           { myth: 'Accepting something small commits me to nothing.', reality: 'It commits you to nothing and it can create an expectation on their side, which is why the redirect matters. Naming a way to give back settles it.' },
         ] },
         { kind: 'check', check: {
           id: 'fbch-4-c2',
           q: 'A member with very little insists on giving a volunteer twenty dollars after a successful referral. What is the best response?',
           options: [
-            'Accept it to avoid causing offence',
+            'Accept it to avoid causing offense',
             'Refuse firmly and explain that accepting gifts is unprofessional',
             'Decline in terms of the rules rather than of them, thank them for the gesture, and offer a real way to give back',
             'Accept it and pass it to the organization',
           ],
           answer: 2,
-          rationale: 'Money is never acceptable, and how it is declined decides whether the relationship survives. Framing it as a rule about the volunteer rather than a judgement about the giver, then naming a real way to give back, keeps both the boundary and the dignity.',
+          rationale: 'Money is never acceptable, and how it is declined decides whether the relationship survives. Framing it as a rule about the volunteer rather than a judgment about the giver, then naming a real way to give back, keeps both the boundary and the dignity.',
         } },
       ],
     },
@@ -494,13 +494,13 @@ const BOUNDARIES_ETHICS_PRIVACY: Course = {
         ] },
         { kind: 'steps', title: 'Writing and repeating', items: [
           { label: 'Log through HMC, not on your phone', text: 'Notes about a member belong in the system, not in your own notes app, not in a text to another volunteer.' },
-          { label: 'Apply the identifiability test before telling any story', text: 'Would somebody who knows them recognize them from what you are about to say? A neighbourhood, an age, a job and a situation together identify a person as surely as a name.' },
+          { label: 'Apply the identifiability test before telling any story', text: 'Would somebody who knows them recognize them from what you are about to say? A neighborhood, an age, a job and a situation together identify a person as surely as a name.' },
           { label: 'Never in a group chat', text: 'Volunteer group chats are the most common leak in every organization of this kind. Anything about an individual goes through the log.' },
         ] },
         { kind: 'case', title: 'The post that meant well', scenario: true, text: [
           'A volunteer posts about a moving afternoon at a street medicine shift. No name. She mentions the block, that he is a veteran in his sixties, that he has been sleeping there about two years, and what he said about his daughter.',
           'Everybody on that block knows exactly who it is. So does his daughter, who did not know where he was.',
-          'Nothing was disclosed in the sense the volunteer would have recognized. The post was warm and it was about the organization doing good. It also told a neighbourhood, and one family, something that was his to tell.',
+          'Nothing was disclosed in the sense the volunteer would have recognized. The post was warm and it was about the organization doing good. It also told a neighborhood, and one family, something that was his to tell.',
         ] },
         { kind: 'check', check: {
           id: 'fbch-4-c3',
@@ -519,11 +519,11 @@ const BOUNDARIES_ETHICS_PRIVACY: Course = {
     {
       id: 'fbch-4-l4',
       title: 'Dual relationships',
-      summary: 'When the person at your table is your neighbour, your cousin, or somebody you know.',
+      summary: 'When the person at your table is your neighbor, your cousin, or somebody you know.',
       minutes: 4,
       blocks: [
         { kind: 'prose', text: [
-          'HMC volunteers work in their own neighbourhoods, which is a large part of why the work succeeds and guarantees that sooner or later the person in front of you is somebody you know.',
+          'HMC volunteers work in their own neighborhoods, which is a large part of why the work succeeds and guarantees that sooner or later the person in front of you is somebody you know.',
           'This is not misconduct and it does not have to be avoided. It has to be handled, and handled the same way every time.',
         ] },
         { kind: 'steps', title: 'What to do', items: [
@@ -534,7 +534,7 @@ const BOUNDARIES_ETHICS_PRIVACY: Course = {
         ] },
         { kind: 'check', check: {
           id: 'fbch-4-c4',
-          q: 'A volunteer recognizes the next person at the intake table as a neighbour. What should they do?',
+          q: 'A volunteer recognizes the next person at the intake table as a neighbor. What should they do?',
           options: [
             'Continue, since knowing them will help build trust',
             'Quietly hand the person to a colleague without explanation',
@@ -563,7 +563,7 @@ const BOUNDARIES_ETHICS_PRIVACY: Course = {
     fields: [
       { id: 'money', label: 'Money', help: 'What you will say when money is offered, and when it is asked for.', multiline: true },
       { id: 'transport', label: 'Transport and personal contact', help: 'Your words for a lift, and for somebody asking for your number.', multiline: true },
-      { id: 'known', label: 'Somebody you know', help: 'The sentence you will use when the person at the table is a neighbour.', multiline: true },
+      { id: 'known', label: 'Somebody you know', help: 'The sentence you will use when the person at the table is a neighbor.', multiline: true },
       { id: 'story', label: 'The story you will not tell', help: 'Apply the identifiability test to something you have already told somebody. What would you remove?', multiline: true },
     ],
   },
@@ -649,7 +649,7 @@ const FIELD_SAFETY: Course = {
           { label: 'Somebody else\'s belongings', text: 'Especially on a street medicine shift. Do not move, tidy, or discard anything. Those belongings may be everything a person owns, and moving them can end their trust in the whole organization.' },
         ] },
         { kind: 'why', text: [
-          'Every one of these has an ordinary version where handling it seems obviously helpful. That is why the rule is absolute rather than a judgement: the moment it becomes a judgement, it becomes a judgement made in a hurry by somebody who is trying to help.',
+          'Every one of these has an ordinary version where handling it seems obviously helpful. That is why the rule is absolute rather than a judgment: the moment it becomes a judgment, it becomes a judgment made in a hurry by somebody who is trying to help.',
         ] },
         { kind: 'check', check: {
           id: 'fbch-5-c2',
@@ -680,7 +680,7 @@ const FIELD_SAFETY: Course = {
         { kind: 'steps', title: 'While you are there', items: [
           { label: 'Keep an exit behind you', text: 'Do not let yourself be positioned with people between you and the way out. This costs nothing and is the single most useful habit in this lesson.' },
           { label: 'Watch the environment as well as the person', text: 'Dogs, traffic, other people arriving, changes in tone nearby. Most field incidents come from the surroundings rather than the person you are talking to.' },
-          { label: 'Do not enter a dwelling or a tent', text: 'Talk at the entrance. This is HMC protocol and it is not a judgement about anybody.' },
+          { label: 'Do not enter a dwelling or a tent', text: 'Talk at the entrance. This is HMC protocol and it is not a judgment about anybody.' },
         ] },
         { kind: 'concept', title: 'You are allowed to leave', text: [
           'If a situation feels unsafe, you disengage and leave. You do not need to be able to justify it, you do not need your partner to agree, and you are never required to explain to the person why you are going.',
@@ -696,7 +696,7 @@ const FIELD_SAFETY: Course = {
             'Finish the current conversation and then withdraw',
           ],
           answer: 2,
-          rationale: 'Requiring a volunteer to articulate a threat before withdrawing means they will stay through the period where withdrawing was still easy. The judgement is theirs alone and it is not reviewed afterwards.',
+          rationale: 'Requiring a volunteer to articulate a threat before withdrawing means they will stay through the period where withdrawing was still easy. The judgment is theirs alone and it is not reviewed afterwards.',
         } },
       ],
     },
@@ -711,7 +711,7 @@ const FIELD_SAFETY: Course = {
         ] },
         { kind: 'steps', title: 'For yourself and your team', items: [
           { label: 'Water before thirst, shade on a schedule', text: 'Thirst arrives after the deficit. Drink on a timer and take shade breaks as a rota rather than when somebody feels bad, because the person who most needs one is the least likely to ask.' },
-          { label: 'Watch your partner, not yourself', text: 'Early heat illness impairs the judgement you would use to notice it. Pairs work because each person is watching the other.' },
+          { label: 'Watch your partner, not yourself', text: 'Early heat illness impairs the judgment you would use to notice it. Pairs work because each person is watching the other.' },
           { label: 'Escalate, do not assess', text: 'If somebody is unwell in the heat, get them out of it, get them water if they are fully alert and able to drink, and get the clinical lead or emergency services. Do not attempt to judge how serious it is. Confusion, a lack of sweating in the heat, or somebody who cannot stay alert is an emergency call, not a shade break.' },
         ] },
         { kind: 'concept', title: 'Members are at higher risk than you', text: [
@@ -818,7 +818,7 @@ export const FBCH_PRE: Check[] = [
   {
     id: 'fbch-t4',
     q: 'A member has coverage but has not been seen in three years because the nearest clinic accepting patients is two bus transfers away. Which determinant domain is operative?',
-    options: ['Economic stability', 'Health care access and quality', 'Neighbourhood and built environment', 'Social and community context'],
+    options: ['Economic stability', 'Health care access and quality', 'Neighborhood and built environment', 'Social and community context'],
     answer: 2,
     why: 'Coverage is present, so the barrier is transport. Naming the right domain decides what would help: a transport benefit or a closer provider, not enrollment assistance.',
   },
@@ -850,7 +850,7 @@ export const FBCH_PRE: Check[] = [
     id: 'fbch-t7',
     q: 'A member offers a volunteer twenty dollars after a successful referral. What is the best response?',
     options: [
-      'Accept it to avoid offence',
+      'Accept it to avoid offense',
       'Refuse firmly and explain that gifts are unprofessional',
       'Accept it and pass it to the organization',
       'Decline in terms of the rules rather than of them, thank them, and offer a real way to give back',
@@ -860,7 +860,7 @@ export const FBCH_PRE: Check[] = [
   },
   {
     id: 'fbch-t8',
-    q: 'A volunteer recognizes the next person at the table as a neighbour. What should they do?',
+    q: 'A volunteer recognizes the next person at the table as a neighbor. What should they do?',
     options: [
       'Continue, since knowing them builds trust',
       'Quietly pass them to a colleague',
@@ -1015,7 +1015,7 @@ export const FBCH_POST: Check[] = [
       'Complete the conversation and then withdraw',
     ],
     answer: 0,
-    why: 'Requiring a volunteer to articulate a threat before withdrawing keeps them there through the period when leaving was still easy. The judgement is theirs and it is not reviewed afterwards.',
+    why: 'Requiring a volunteer to articulate a threat before withdrawing keeps them there through the period when leaving was still easy. The judgment is theirs and it is not reviewed afterwards.',
   },
 ];
 
