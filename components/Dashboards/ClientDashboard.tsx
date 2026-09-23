@@ -474,7 +474,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
             copy that was being shown to members. */}
         <p className="text-zinc-500 max-w-lg mx-auto leading-relaxed text-lg">
           {guest
-            ? 'Health screenings, community events, and help with food, housing and care. Plus training pathways into health careers, with completion records you can show an employer. Most of it costs nothing, and where something does, the price is on it before you start.'
+            ? 'Health screenings, community events, and help with food, housing and care. Plus training pathways into health careers, with completion records you can show an employer. Open to anyone who wants support or wants to learn.'
             : 'Everything you need for your health and wellbeing is here.'}
         </p>
         <div className="flex flex-wrap gap-4 pt-6 justify-center">
