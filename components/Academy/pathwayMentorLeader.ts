@@ -588,7 +588,7 @@ const COACHING_ADVISING_SUPERVISING: Course = {
     {
       id: 'ml-3-x1',
       q: 'A volunteer you supervise is skipping a required safety step. Which mode does the situation call for?',
-      options: ['Coaching, to build their own judgement', 'Advising, since they may not know why the step exists', 'Supervising, because you are accountable for the standard and it is not optional', 'Mentoring, since the relationship is developmental'],
+      options: ['Coaching, to build their own judgment', 'Advising, since they may not know why the step exists', 'Supervising, because you are accountable for the standard and it is not optional', 'Mentoring, since the relationship is developmental'],
       answer: 2,
       why: 'Accountability for the standard sits with you, so the step is a requirement rather than a suggestion. Coaching a safety question is not developmental, it is absent. Explain the reason afterwards; do not make compliance wait for the explanation.',
     },
@@ -633,7 +633,7 @@ const EFFECTIVE_FEEDBACK: Course = {
     'This course treats feedback as information about a gap between what happened and what was needed. That framing does most of the work, and the structure that follows is short enough to use under pressure.',
   ],
   objectives: [
-    'Frame feedback as information about a gap rather than a judgement of a person.',
+    'Frame feedback as information about a gap rather than a judgment of a person.',
     'Use a four part structure that survives being nervous.',
     'Receive feedback without defending, and model that for a learner.',
     'Recognize when what you are about to give is not feedback but an escalation.',
@@ -644,7 +644,7 @@ const EFFECTIVE_FEEDBACK: Course = {
   lessons: [
     {
       id: 'ml-4-l1',
-      title: 'Information, not judgement',
+      title: 'Information, not judgment',
       summary: 'Why "you are disorganised" cannot be acted on and "the last two shifts started late" can.',
       minutes: 6,
       blocks: [
@@ -759,7 +759,7 @@ const EFFECTIVE_FEEDBACK: Course = {
         { kind: 'list', title: 'Not feedback', items: [
           'Anything involving harm or risk of harm to a person, including a member, a young person, or the volunteer themselves. That is an escalation, and Course 5 is about how.',
           'A pattern you have already raised twice with no change. That is a performance or supervision matter, and continuing to feed it back privately is how it stays invisible.',
-          'Conduct that breaches a policy: privacy, safeguarding, boundaries, discrimination. Policies exist so that these do not depend on one person\'s judgement in the moment.',
+          'Conduct that breaches a policy: privacy, safeguarding, boundaries, discrimination. Policies exist so that these do not depend on one person\'s judgment in the moment.',
           'Something you were told in confidence by a third person, where you are not the right route. Handle the route first.',
         ] },
         { kind: 'check', check: {
@@ -820,7 +820,7 @@ const RISK_AND_ESCALATION: Course = {
     'Know which things you cannot keep between the two of you, and pass them on the same day without making it worse.',
   about: [
     'A mentoring relationship that is working will eventually be told something serious. The purpose of this course is that the moment finds you already decided.',
-    'One rule runs through all of it: a mentor notices and hands over. You do not assess how serious it is, you do not investigate, and you do not hold it alone until you are sure. Each of those is a judgement that belongs to somebody trained and accountable for making it.',
+    'One rule runs through all of it: a mentor notices and hands over. You do not assess how serious it is, you do not investigate, and you do not hold it alone until you are sure. Each of those is a judgment that belongs to somebody trained and accountable for making it.',
   ],
   objectives: [
     'Recognize the categories of disclosure that must leave the mentoring relationship.',

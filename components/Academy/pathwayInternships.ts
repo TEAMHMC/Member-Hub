@@ -436,7 +436,7 @@ const ETHICS_AND_CONFIDENTIALITY: Course = {
       blocks: [
         { kind: 'prose', text: [
           'A placement will usually give you more access than your work requires, because access is granted in blocks and roles are approximate. What you can open and what you are authorized to open are two different sets, and the difference is where almost every ordinary breach happens.',
-          'The rule is that you look at what you need for the task in front of you, and nothing else. Not the neighbour who came to a clinic. Not the person you recognize on a list. Not yourself, in a records system, out of curiosity.',
+          'The rule is that you look at what you need for the task in front of you, and nothing else. Not the neighbor who came to a clinic. Not the person you recognize on a list. Not yourself, in a records system, out of curiosity.',
         ] },
         { kind: 'vocab', items: [
           { term: 'Minimum necessary', plain: 'Looking at only the information you need for the specific task, even when your access would let you see much more.' },
@@ -467,19 +467,19 @@ const ETHICS_AND_CONFIDENTIALITY: Course = {
       minutes: 5,
       blocks: [
         { kind: 'list', title: 'The ordinary routes', items: [
-          'The anecdote with the details left in. A story told to a friend, with the age, the neighbourhood and the condition, about somebody who can be identified by any of the three together.',
+          'The anecdote with the details left in. A story told to a friend, with the age, the neighborhood and the condition, about somebody who can be identified by any of the three together.',
           'The screenshot. Sent to ask a colleague a question, with a name still in the corner, into a channel that is not the one you thought.',
           'The document taken home. Saved to a personal drive to work on at the weekend, and still there two years later.',
           'The reply to all. A thread that acquired an external recipient four messages ago.',
           'The public post about the placement. Written with warmth about a moving day at work, describing one person closely enough that their own family would know them.',
         ] },
         { kind: 'concept', title: 'The identifiability test', text: [
-          'Before you repeat anything about a person, ask whether somebody who knows them would recognize them from what you are about to say. Not whether you named them. A neighbourhood, an age, a job and a condition together identify a person as surely as a name does.',
+          'Before you repeat anything about a person, ask whether somebody who knows them would recognize them from what you are about to say. Not whether you named them. A neighborhood, an age, a job and a condition together identify a person as surely as a name does.',
           'If the answer is yes, or you are unsure, remove details until the answer is clearly no, or do not tell it.',
         ] },
         { kind: 'check', check: {
           id: 'if-3-c2',
-          q: 'An intern describes a case publicly without naming anybody, but includes the neighbourhood, the person\'s approximate age, their occupation and their condition. Why is this still a problem?',
+          q: 'An intern describes a case publicly without naming anybody, but includes the neighborhood, the person\'s approximate age, their occupation and their condition. Why is this still a problem?',
           options: [
             'Because internal information should never be discussed publicly in any form',
             'Because a combination of details identifies a person as effectively as a name to anybody who knows them',
@@ -694,14 +694,14 @@ const PORTFOLIO_AND_IMPACT: Course = {
           { label: 'The situation', text: 'What was true before, with the number or the state, and where you got it.' },
           { label: 'What you did', text: 'Your own action, in the first person, distinguishing what you did from what the team did.' },
           { label: 'What changed', text: 'The state now, and how you know.' },
-          { label: 'What you would do differently', text: 'One sentence. A reviewer reads this as judgement rather than as weakness, and its absence reads as somebody who has not thought about it.' },
+          { label: 'What you would do differently', text: 'One sentence. A reviewer reads this as judgment rather than as weakness, and its absence reads as somebody who has not thought about it.' },
         ] },
         { kind: 'concept', title: 'Accuracy about your own part', text: [
           'Say observed when you observed, assisted when you assisted, and led when you led. This is a professional habit and the field cares about it more than almost anything else at this stage.',
           'The reason is practical rather than moral. Overstatement is discovered in the follow-up question, and the discovery costs you the credibility of everything else on the page. A modest accurate claim survives being asked about.',
         ] },
         { kind: 'myths', items: [
-          { myth: 'A portfolio should show only successes.', reality: 'A reviewer is assessing judgement. A piece of work that did not achieve what it aimed at, described accurately with what you learned, evidences more than a list of things that went well.' },
+          { myth: 'A portfolio should show only successes.', reality: 'A reviewer is assessing judgment. A piece of work that did not achieve what it aimed at, described accurately with what you learned, evidences more than a list of things that went well.' },
           { myth: 'Modest claims will be overlooked.', reality: 'Specific claims are remembered. It is the inflated ones that are forgotten, because they sound like everybody else\'s.' },
         ] },
         { kind: 'check', check: {
