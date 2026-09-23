@@ -61,4 +61,27 @@ export type Block =
   /** Words defined in plain language. Shown as a glossary strip in the lesson. */
   | { kind: 'vocab'; items: Vocab[] }
   /** A short thing to do with no special equipment. Replaces kit-dependent labs. */
-  | { kind: 'activity'; title: string; text: string[]; materials?: string };
+  | { kind: 'activity'; title: string; text: string[]; materials?: string }
+  /**
+   * A recorded session a learner watches, on demand.
+   *
+   * The Academy could describe a video and could not show one, so the courses built on
+   * HMC's recorded trainings said "this is the existing HMC training video, it runs about
+   * 23 minutes" and left the learner to find it. The recordings exist and are already
+   * embedded in the volunteer portal; a learner in the Hub was being told about a thing
+   * rather than given it.
+   *
+   * `embed` is a provider embed URL, not a watch link, because that is what goes in a
+   * frame. `watchUrl` is the ordinary link, kept so somebody whose browser or network
+   * blocks the frame still has a way to the material rather than an empty box.
+   */
+  | {
+      kind: 'video';
+      title: string;
+      embed: string;
+      watchUrl?: string;
+      minutes: number;
+      presenter?: string;
+      /** What the recording covers, for somebody deciding whether to watch now. */
+      text?: string[];
+    };

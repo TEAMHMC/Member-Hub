@@ -44,6 +44,22 @@ const countWords = (l: Lesson): number => {
   return src.join(' ').split(/\s+/).filter(Boolean).length;
 };
 
+/**
+ * Minutes a learner spends watching rather than reading.
+ *
+ * The pace rule below already exempts live and blended courses, because their time sits in
+ * a scheduled session and not in text. A recording is the same situation and the rule had
+ * no way to know it: the facilitator training is two of Dr. Bounds's recordings, 80 minutes
+ * of real learner effort carrying about sixty words of surrounding prose, which reads as a
+ * padded course to a words-per-minute check.
+ *
+ * So watch time comes out of the denominator. What the rule is actually defending is that
+ * stated duration corresponds to real effort, and it still does: these minutes are counted
+ * in the course total, they are simply not counted as reading.
+ */
+const watchMinutes = (l: Lesson): number =>
+  (l.blocks || []).reduce((n, b: any) => n + (b.kind === 'video' ? (b.minutes || 0) : 0), 0);
+
 console.log('\nCurriculum integrity\n');
 
 // ── Time honesty ─────────────────────────────────────────────────────────
@@ -63,7 +79,11 @@ for (const p of PATHWAYS) {
     const textBased = !c.delivery || c.delivery === 'self-paced';
     if (!textBased) continue;
 
-    const pace = words / Math.max(lessonMin, 1);
+    const watchMin = c.lessons.reduce((n, l) => n + watchMinutes(l), 0);
+    const readMin = lessonMin - watchMin;
+    // A course that is entirely recordings has no reading pace to judge.
+    if (readMin <= 0) continue;
+    const pace = words / Math.max(readMin, 1);
 
     // Courses not yet converted to the guided standard are known debt, tracked
     // with real numbers rather than silently excused or left to block the gate.
