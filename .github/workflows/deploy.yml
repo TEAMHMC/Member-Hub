@@ -14,8 +14,14 @@ permissions:
   pages: write
   id-token: write
 
+# Pull request checks and production deploys used to share one group with
+# cancel-in-progress, so pushing to any PR branch cancelled a deploy of main that
+# was already running. On Sep 22 that cancelled the deploys of #44 and #36 and left
+# main undeployed. Deploys of main now have their own group and are never cancelled
+# by a PR; a newer push to main still supersedes an older one. Each PR has its own
+# group, where a newer push cancelling an older check is what you want.
 concurrency:
-  group: pages
+  group: ${{ github.event_name == 'pull_request' && format('check-{0}', github.ref) || 'pages' }}
   cancel-in-progress: true
 
 jobs:
