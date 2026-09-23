@@ -199,8 +199,16 @@ export const buildFeed = (input: {
   library: LibraryRow[];
   /** The live calendar, the same one the Events tab shows. */
   events?: EventRow[];
-  /** Pathways a coordinator has opened, so an opening is news rather than a permanent card. */
-  openPathwayIds?: string[];
+  /**
+   * Cohorts a member can act on now, so an opening is news rather than something you
+   * only find by wandering into the Academy.
+   *
+   * This was declared and never read, and never passed in either, which is why the
+   * Trainings tab was empty for anybody who had not just watched a course appear. A
+   * new visitor is seeded as having seen every existing course, correctly, so without
+   * this there was nothing left for that tab to show.
+   */
+  openCohorts?: { pathwayId: string; title: string; state: 'open' | 'upcoming'; cohortLabel?: string }[];
   now?: Date;
 }): FeedItem[] => {
   const now = input.now || new Date();
@@ -218,6 +226,26 @@ export const buildFeed = (input: {
       date: null,
       action: { label: 'Open the Academy', tab: 'academy' },
       weight: 3,
+    });
+  }
+
+  for (const c of input.openCohorts || []) {
+    // An open pathway says enroll; an upcoming one says save a spot. Both are things a
+    // member can do today, which is the whole reason this belongs in the bell.
+    const open = c.state === 'open';
+    items.push({
+      id: `cohort:${c.pathwayId}`,
+      kind: 'cohort',
+      group: 'training',
+      title: open ? `Enrollment is open: ${c.title}` : `Registration is open: ${c.title}`,
+      detail: c.cohortLabel
+        ? `${c.cohortLabel}. ${open ? 'Enroll when you are ready.' : 'Saving a spot holds your place.'}`
+        : open ? 'Enroll when you are ready.' : 'Saving a spot holds your place.',
+      date: null,
+      action: { label: open ? 'Enroll' : 'Save my spot', tab: 'academy' },
+      // Above a new course, below a dated session: something you can act on outranks a
+      // catalogue addition, and a thing with a date outranks both.
+      weight: 5,
     });
   }
 
