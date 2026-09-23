@@ -855,7 +855,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             <p className="text-zinc-600 max-w-2xl mx-auto leading-relaxed text-lg">
               Structured learning pathways for youth, students, aspiring health professionals,
               community-health learners, interns, fellows, and emerging leaders. Self-paced,
-              text-first, and free.
+              text-first, and open to everyone.
             </p>
           )}
           <div className="flex flex-wrap justify-center gap-3 pt-1">
@@ -1986,7 +1986,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                         setView({ name: 'lesson', pathwayId, courseId, index: i });
                       }}
                       aria-label={locked ? `${l.title}. Available once you enroll.` : l.title}
-                      title={locked ? 'Available as soon as you enroll. Enrolling is free.' : undefined}
+                      title={locked ? 'Available as soon as you enroll. Enrolling is open to everyone.' : undefined}
                       className={`w-full text-left flex items-start gap-5 p-6 rounded-2xl border transition-all ${done ? 'bg-zinc-50/60 border-zinc-100' : locked ? 'bg-zinc-50/40 border-zinc-150 hover:border-[#233DFF]/30' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40 hover:shadow-sm'}`}
                     >
                       <span className={`w-11 h-11 rounded-2xl flex items-center justify-center border shrink-0 ${done ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : locked ? 'bg-zinc-100 text-zinc-400 border-zinc-200' : 'bg-blue-50 text-[#233DFF] border-blue-100'}`}>
