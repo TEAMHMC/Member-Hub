@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { User, Shift, Resource, ServiceEncounter, Referral, Assessment } from '../../types';
 import { buildPlanFromScores } from '../../services/plan';
 import { formatEventTime } from '../../services/eventTime';
-import { context as ctxApi, client as clientApi, referrals as referralsApi, sunny as sunnyApi, toolLink, TOOLS, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
+import { context as ctxApi, client as clientApi, referrals as referralsApi, sunny as sunnyApi, toolLink, TOOLS, programColor, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
 import HealthCredits from './HealthCredits';
 import YourProgress from './YourProgress';
 import YourResults from './YourResults';
@@ -280,7 +280,23 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
           (e) => typeof e.lat === 'number' && typeof e.lng === 'number' && e.lat !== 0 && e.lng !== 0,
         );
         geoEvents.forEach((e) => {
-          const m = L.marker([e.lat as number, e.lng as number]).addTo(mapInstance);
+          // The Event Finder's pin, so the same event looks the same on both surfaces. A
+          // default Leaflet marker carries no information beyond location; this one says
+          // which programme the event belongs to before anybody clicks it.
+          const color = programColor(e.program);
+          const icon = L.divIcon({
+            className: 'hmc-event-pin',
+            html: `
+              <div style="transform: translate(-50%, -100%); width: 32px; height: 40px;">
+                <svg viewBox="0 0 32 40" fill="${color}" stroke="black" stroke-width="1.5">
+                  <path d="M16 2C9.373 2 4 7.373 4 14c0 8 12 26 12 26s12-18 12-26c0-6.627-5.373-12-12-12z" />
+                  <circle cx="16" cy="14" r="5" fill="white" stroke="black" stroke-width="1" />
+                </svg>
+              </div>`,
+            iconSize: [32, 40],
+            iconAnchor: [16, 40],
+          });
+          const m = L.marker([e.lat as number, e.lng as number], { icon }).addTo(mapInstance);
           m.bindPopup(`<strong>${e.title}</strong><br/>${[e.dateDisplay || e.date, formatEventTime(e.time), e.location].filter(Boolean).join(' · ')}`);
         });
         if (geoEvents.length) {
@@ -892,7 +908,18 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
          </div>
       </div>
 
-      <div className="h-[580px] w-full bg-white border border-zinc-200 rounded-3xl overflow-hidden relative shadow-md">
+      {/* Tall enough to be worth looking at.
+          This was a fixed 580px box, which did two things. It left most of a desktop screen
+          empty below the panel, and it squashed the map: fitBounds has to zoom out far
+          enough to hold every pin, and in a short wide box that meant the whole of southern
+          California for events that are all in Los Angeles. A taller panel fits the same
+          pins at a useful zoom, and shows more of the list before it scrolls.
+
+          Sized against the height that is left rather than a share of the whole, so it
+          grows into a tall screen without running past the fold on a short one. The floor
+          keeps it usable on a laptop; the ceiling stops a very tall window turning the map
+          into a wall. */}
+      <div className="h-[clamp(460px,calc(100vh-28rem),900px)] w-full bg-white border border-zinc-200 rounded-3xl overflow-hidden relative shadow-md">
          <div id="event-map" className="h-full w-full"></div>
          {viewMode === 'list' && (
            <div className="absolute inset-0 bg-white/95 z-20 p-6 md:p-10 overflow-y-auto">

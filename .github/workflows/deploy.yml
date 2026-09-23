@@ -41,6 +41,7 @@ jobs:
       - run: npm run test:render:guest
       - run: npm run test:render:catalog
       - run: npm run test:render:ordinal
+      - run: npm run test:render:events
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
