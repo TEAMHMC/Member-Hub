@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Activity, Flame, Clock, Footprints, AlertTriangle } from 'lucide-react';
-import { memberActivity, type MemberProgress } from '../../services/api';
+import { memberActivity, ApiError, type MemberProgress } from '../../services/api';
 
 /**
  * What a member has actually done, in one place.
@@ -62,13 +62,19 @@ const Stat: React.FC<{ icon: React.ReactNode; value: string; label: string }> = 
 
 const YourProgress: React.FC = () => {
   const [data, setData] = useState<MemberProgress | null>(null);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<'transient' | 'server' | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     memberActivity.progress()
       .then((p) => { if (!cancelled) setData(p); })
-      .catch(() => { if (!cancelled) setFailed(true); });
+      .catch((e) => {
+        if (cancelled) return;
+        // Telling somebody to refresh is good advice for a dropped request and useless
+        // advice for a fault on our side, which will still be there on the next twenty
+        // refreshes. The server distinguishes the two, so this does too.
+        setFailed(e instanceof ApiError && e.status >= 500 ? 'server' : 'transient');
+      });
     return () => { cancelled = true; };
   }, []);
 
@@ -79,8 +85,9 @@ const YourProgress: React.FC = () => {
         <div>
           <p className="font-semibold text-zinc-900">Your progress could not be loaded</p>
           <p className="text-sm text-zinc-600 mt-1">
-            Nothing has been lost. Refresh the page, and if it keeps happening let us know at
-            contact@healthmatters.clinic.
+            {failed === 'server'
+              ? 'Nothing has been lost. This is a fault on our side and we can see it, so there is nothing you need to do. Your walks, check-ins and courses are all still recorded.'
+              : 'Nothing has been lost. Refresh the page, and if it keeps happening let us know at contact@healthmatters.clinic.'}
           </p>
         </div>
       </div>

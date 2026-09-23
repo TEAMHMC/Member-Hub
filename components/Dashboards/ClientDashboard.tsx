@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Shift, Resource, ServiceEncounter, Referral, Assessment } from '../../types';
 import { buildPlanFromScores } from '../../services/plan';
+import { formatEventTime } from '../../services/eventTime';
 import { context as ctxApi, client as clientApi, referrals as referralsApi, sunny as sunnyApi, toolLink, TOOLS, type HmcEvent, type ClientMe, type NextAction } from '../../services/api';
 import HealthCredits from './HealthCredits';
 import YourProgress from './YourProgress';
@@ -122,7 +123,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
    *
    * Deliberately not one of the scored questions above. Those run 0 to 3 by severity, and
    * having been incarcerated is not a severity, it is a fact that changes which
-   * organisations can actually help. The directory already tags Justice-involved
+   * organizations can actually help. The directory already tags Justice-involved
    * providers, so an answer here is immediately useful rather than filed away.
    *
    * Kept in this browser and turned into a resource search, never written to the client
@@ -280,7 +281,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         );
         geoEvents.forEach((e) => {
           const m = L.marker([e.lat as number, e.lng as number]).addTo(mapInstance);
-          m.bindPopup(`<strong>${e.title}</strong><br/>${[e.dateDisplay || e.date, e.time, e.location].filter(Boolean).join(' · ')}`);
+          m.bindPopup(`<strong>${e.title}</strong><br/>${[e.dateDisplay || e.date, formatEventTime(e.time), e.location].filter(Boolean).join(' · ')}`);
         });
         if (geoEvents.length) {
           const bounds = L.latLngBounds(geoEvents.map((e) => [e.lat, e.lng]));
@@ -408,7 +409,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   /**
    * The site's buttons, not this file's own.
    *
-   * These two were hand-rolled Tailwind: uppercase, bold, extra-small, a coloured
+   * These two were hand-rolled Tailwind: uppercase, bold, extra-small, a colored
    * shadow and a grey hairline, none of which is the HMC button. The shared system at
    * hmc-buttons-1.0.5.css is already loaded by index.html and already used by Sign In,
    * which is why Sign In was the only button on the page that looked right and every
@@ -479,12 +480,12 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         <div className="flex flex-wrap gap-4 pt-6 justify-center">
              {guest ? (
                <>
-                 <ButtonPrimary onClick={() => setActiveTab('resources')}>Get support</ButtonPrimary>
+                 <ButtonPrimary className="hmc-btn-arrow" onClick={() => setActiveTab('resources')}>Get support</ButtonPrimary>
                  <ButtonSecondary onClick={() => setActiveTab('academy')}>Browse courses</ButtonSecondary>
                </>
              ) : (
                <>
-                 <ButtonPrimary onClick={gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })}>Build my Playbook</ButtonPrimary>
+                 <ButtonPrimary className="hmc-btn-arrow" onClick={gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })}>Build my Playbook</ButtonPrimary>
                  <ButtonSecondary onClick={() => setActiveTab('events')}>Explore Events</ButtonSecondary>
                </>
              )}
@@ -589,7 +590,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         <SurfaceCard
           badges={<CardBadge>Find</CardBadge>}
           title="Resources &amp; Support"
-          body="Search verified LA County organisations by what you need, where you are and who they serve, then reach them directly."
+          body="Search verified LA County organizations by what you need, where you are and who they serve, then reach them directly."
           onClick={() => setActiveTab('resources')}
           action={
             <ButtonPrimary onClick={(e: any) => { e.stopPropagation(); setActiveTab('resources'); }} className="w-full">
@@ -798,7 +799,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         
           <p className="text-sm text-zinc-500 leading-relaxed max-w-2xl">
         
-            Some organisations work specifically with people who have been incarcerated, on housing,
+            Some organizations work specifically with people who have been incarcerated, on housing,
         
             work and legal help. If that is you, we can show you those first. You do not have to
         
@@ -926,7 +927,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
                         <div>
                           <p className="text-sm font-semibold text-zinc-900">{ev.title}</p>
                           <p className="text-xs text-zinc-500 mt-1">
-                            {[ev.dateDisplay || ev.date, ev.time, ev.location].filter(Boolean).join(' · ') || 'See details'}
+                            {[ev.dateDisplay || ev.date, formatEventTime(ev.time), ev.location].filter(Boolean).join(' · ') || 'See details'}
                           </p>
                         </div>
                       </div>
@@ -1025,6 +1026,10 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
       onSignal={(type, payload) => ctxApi.event(type, payload)}
       guest={guest}
       onRequireSignIn={onRequireSignIn}
+      // Whoever maintains or reviews the curriculum sees the governance line under a
+      // lesson. Nobody else does: it is written in HMC's own build language and a member
+      // was being shown the state of our internal work in place of the material.
+      curriculumStaff={Boolean(user.staff?.capabilities.includes('academy') || user.staff?.capabilities.includes('review'))}
     />
   );
 

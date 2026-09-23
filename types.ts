@@ -50,7 +50,9 @@ export interface StaffStanding {
   role: string;
   name: string;
   isAdmin: boolean;
-  capabilities: Array<'academy' | 'content' | 'support' | 'staffAdmin'>;
+  // 'review' is read-only access to the curriculum, held by a clinical reviewer or an
+  // external auditor who is not on the volunteers roster. It grants nothing else.
+  capabilities: Array<'academy' | 'content' | 'support' | 'staffAdmin' | 'review' | 'curriculum'>;
 }
 
 export interface User {

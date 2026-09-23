@@ -10,7 +10,8 @@
 // instruction that relies on color alone (state is always also stated in text).
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Award, Check, CheckCircle2, ChevronRight, FileText, GraduationCap, ListChecks, Lock, PenLine, Play, ShieldCheck, TrendingUp, X } from 'lucide-react';
+import * as route from '../../services/route';
+import { Award, Check, CheckCircle2, ChevronRight, FileText, GraduationCap, ListChecks, Lock, PenLine, Play, Search, ShieldCheck, TrendingUp, X } from 'lucide-react';
 import {
   PATHWAYS,
   PASS_THRESHOLD,
@@ -31,7 +32,7 @@ import SurfaceCard, { CardBadge } from '../Layout/SurfaceCard';
 import type { Block, KnowledgeCheck } from './blocks';
 import TrainingRegistration from './TrainingRegistration';
 import { training as trainingApi, chw as trainingApi_chw, curriculumApi, type ScheduledSession } from '../../services/api';
-import { reviewedProse, preservedBlocks, extraSections, type OverrideMap } from './overrides';
+import { reviewedProse, preservedBlocks, extraSections, mergedCourse, type OverrideMap } from './overrides';
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
@@ -53,6 +54,16 @@ interface AcademyProps {
   guest?: boolean;
   /** Opens the sign-in panel with a line saying what it is for. */
   onRequireSignIn?: (reason?: string) => void;
+  /**
+   * Whether this session maintains or reviews the curriculum.
+   *
+   * The only thing it changes is whether the governance line under a lesson is shown:
+   * version, effective date and next review. That line is a real record and a clinical
+   * reviewer needs it, but it is written in HMC's own build language ("Four of eleven
+   * courses written", "1.0 partial"), and a member reading a lesson was being shown the
+   * state of our internal work instead of the material.
+   */
+  curriculumStaff?: boolean;
 }
 
 type View =
@@ -202,7 +213,7 @@ const PathSteps: React.FC<{
  * distinction is why the previous gradient block was removed from the catalogue. It added
  * a 16:9 band of decoration to every card and pushed the title and the action below the
  * fold on a phone. Here the gradient is only the surface the content sits on, so it costs
- * no height at all, and the colours come from HMC's own blue, pink and orange.
+ * no height at all, and the colors come from HMC's own blue, pink and orange.
  *
  * Content order is fixed so that a column of these can be scanned. Badges, then course
  * number, then title, then the one-sentence promise, then progress if there is any, then
@@ -224,7 +235,7 @@ const CourseCard: React.FC<{
   onOpen: () => void;
 }> = ({ num, total, title, promise, minutes, delivery, ce, priceUsd, percent, done, locked, onOpen }) => (
   /* The outline is the same #0f0f0f hairline the site buttons carry, so a card and a
-     button read as the same system. It darkens on hover rather than changing colour. */
+     button read as the same system. It darkens on hover rather than changing color. */
   <article
     className="relative flex flex-col rounded-3xl border border-[#0f0f0f]/20 overflow-hidden transition-all hover:border-[#0f0f0f]/45 hover:-translate-y-0.5"
     style={{
@@ -237,9 +248,11 @@ const CourseCard: React.FC<{
       <div className="flex flex-wrap items-center gap-2">
         {delivery && DELIVERY_BADGE[delivery] && <Badge>{DELIVERY_BADGE[delivery]}</Badge>}
         {ce && <Badge tone="solid">CE approved</Badge>}
-        {/* A price where there is one, and Free where there genuinely is not. Every card
-            said Free, including on the one course that costs money. */}
-        <Badge>{priceUsd ? `$${priceUsd}` : 'Free'}</Badge>
+        {/* A price where there is one, and no charge where there genuinely is none.
+            Both this badge and the Cost row on the course page read the same `price`
+            field, so a course shows one answer or the other and never both. Setting or
+            removing `price` in the catalogue is what turns pricing on and off. */}
+        <Badge>{priceUsd ? `$${priceUsd}` : 'No charge'}</Badge>
       </div>
 
       <div className="mt-2">
@@ -279,8 +292,8 @@ const CourseCard: React.FC<{
 
 // ── v2 guided-block renderer ─────────────────────────────────────────────
 // One component per block kind from the Written Guided Curriculum Standard.
-// Every callout states its purpose in text as well as colour, so meaning never
-// depends on colour alone.
+// Every callout states its purpose in text as well as color, so meaning never
+// depends on color alone.
 
 const BlockCallout: React.FC<{ label: string; tone: 'blue' | 'orange' | 'zinc' | 'amber'; children: React.ReactNode }> = ({ label, tone, children }) => {
   const t = tone === 'blue' ? 'border-[#233DFF]/20 bg-blue-50/40' + '|' + 'text-[#233DFF]'
@@ -502,9 +515,33 @@ const BlockView: React.FC<{
   }
 };
 
-const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal, initialView = 'catalog', member = null, guest = false, onRequireSignIn }) => {
+const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, onSignal, initialView = 'catalog', member = null, guest = false, onRequireSignIn, curriculumStaff = false }) => {
   const [state, setState] = useState<LearnerState>(() => loadState(userId));
-  const [view, setView] = useState<View>({ name: initialView } as View);
+  /**
+   * Where in the Academy the member is, and the address that says so.
+   *
+   * The Academy is eight levels deep and every one of them used to be this one piece of
+   * state at `hub.healthmatters.clinic/`. Nothing about that was visible in the address
+   * bar, so the browser Back button had no step inside the Academy to go back to and
+   * left the Hub instead. That is what made a native surface feel like somewhere else.
+   *
+   * The initial value comes from the URL, so a link to a lesson opens that lesson.
+   * `setView` is the same call it always was at all forty call sites below; it now also
+   * files the move in history.
+   */
+  const [view, setViewState] = useState<View>(() => {
+    const r = route.current();
+    return (r.tab === 'academy' && r.academy ? r.academy : { name: initialView }) as View;
+  });
+  const setView = React.useCallback((v: View) => {
+    setViewState(v);
+    route.push({ tab: 'academy', academy: v as route.AcademyRoute });
+  }, []);
+
+  // Back and Forward within the Academy. Anything outside it is the Hub's to handle.
+  useEffect(() => route.onPop((r) => {
+    if (r.tab === 'academy') setViewState((r.academy || { name: 'catalog' }) as View);
+  }), []);
 
   /**
    * What the public should see per pathway, set by an admin in the portal.
@@ -697,9 +734,15 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [view]);
   // Follow a deep link from the Hub (Home cards link straight to credentials).
+  //
+  // Skipped on the first pass. `initialView` defaults to 'catalog', so without this
+  // guard opening the Academy at a course address would immediately be overwritten
+  // with the catalogue and the link the member followed would not work.
+  const initialViewSettled = useRef(false);
   useEffect(() => {
+    if (!initialViewSettled.current) { initialViewSettled.current = true; return; }
     setView({ name: initialView } as View);
-  }, [initialView]);
+  }, [initialView, setView]);
 
   const set = (fn: (s: LearnerState) => LearnerState) => setState((s) => fn(s));
 
@@ -753,6 +796,16 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
    * finished is a harder thing to do by accident.
    */
   const [attestName, setAttestName] = useState('');
+
+  /**
+   * What the member typed to find something to learn.
+   *
+   * The Academy had no search of its own. The only search box on the screen is the Hub's,
+   * which reads "Search food, housing, mental health, and more" and queries the resource
+   * directory, so somebody looking for a course on the Academy page was typing into a
+   * field that searches something else entirely.
+   */
+  const [catalogQuery, setCatalogQuery] = useState('');
   const signAttestation = (courseId: string) => {
     const name = attestName.trim();
     if (!name) return;
@@ -768,18 +821,43 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
   const renderCatalog = () => {
     const enrolledPaths = state.enrolled.map(pathwayById).filter(Boolean) as Pathway[];
+
+    /**
+     * Somebody who is already learning, rather than deciding whether to.
+     *
+     * The page opened on a full-height statement of what the Academy is, which is the
+     * right thing to say to a first visit and the wrong thing to say to somebody coming
+     * back to lesson four. It pushed their own work below the fold every time. The
+     * statement stays, because a catalogue still has to explain itself, but it steps
+     * back to a heading once there is something of theirs to put first.
+     */
+    const returning = enrolledPaths.length > 0;
+
+    /** Matched on the pathway and on the titles of the courses inside it. */
+    const q = catalogQuery.trim().toLowerCase();
+    const matches = (p: Pathway) =>
+      !q
+      || p.title.toLowerCase().includes(q)
+      || (p.purpose || '').toLowerCase().includes(q)
+      || (p.level || '').toLowerCase().includes(q)
+      || p.courses.some((c) => c.title.toLowerCase().includes(q));
+
+    const shown = PATHWAYS.filter((p) => vis(p.id).state !== 'hidden').filter(matches);
+
     return (
       <div className="max-w-6xl mx-auto py-8 space-y-14 animate-in fade-in duration-500">
         <div className="text-center space-y-4">
           <div className="pill pill-blue mx-auto">HMC Health + Education Pathways Academy</div>
-          <h1 className="text-5xl font-semibold tracking-tight text-zinc-900">
+          <h1 className={`${returning ? 'text-3xl' : 'text-5xl'} font-semibold tracking-tight text-zinc-900`}>
             From exploration to applied experience.
           </h1>
-          <p className="text-zinc-500 max-w-2xl mx-auto leading-relaxed text-lg">
-            Structured learning pathways for youth, students, aspiring health professionals,
-            community-health learners, interns, fellows, and emerging leaders. Self-paced,
-            text-first, and free.
-          </p>
+          {!returning && (
+            <p className="text-zinc-600 max-w-2xl mx-auto leading-relaxed text-lg">
+              Structured learning pathways for youth, students, aspiring health professionals,
+              community-health learners, interns, fellows, and emerging leaders. Self-paced,
+              text-first, and open to everyone.
+            </p>
+          )}
           <div className="flex flex-wrap justify-center gap-3 pt-1">
             <Btn onClick={() => setView({ name: 'credentials' })}>Browse credentials</Btn>
             <Btn variant="secondary" onClick={() => setView({ name: 'transcript' })}>My transcript</Btn>
@@ -787,16 +865,18 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           {/* The arc of the Academy, set as a line of text rather than six pills.
               A pill on a white ground with a border is a button, so readers tried to press
               these and nothing happened. This says the same thing and asks for nothing. */}
-          <p className="pt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-400">
-            {LEARNING_MODEL.join('  \u00b7  ')}
-          </p>
+          {!returning && (
+            <p className="pt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-600">
+              {LEARNING_MODEL.join('  \u00b7  ')}
+            </p>
+          )}
         </div>
 
         {enrolledPaths.length > 0 && (
           <section className="space-y-5">
             <div className="flex items-center justify-between gap-4">
               <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Your learning</h2>
-              <button onClick={() => setView({ name: 'transcript' })} className="text-xs font-bold uppercase tracking-widest text-[#233DFF] hover:underline">
+              <button onClick={() => setView({ name: 'transcript' })} className="shrink-0 px-3 py-2 -mr-3 rounded-full text-xs font-bold uppercase tracking-widest text-[#233DFF] hover:underline">
                 View transcript
               </button>
             </div>
@@ -823,15 +903,45 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
         )}
 
         <section className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Pathways</h2>
-            <p className="text-sm text-zinc-500 mt-1">
-              Each pathway leads to a defined HMC completion record. Shared foundations carry across
-              pathways, so learning is never repeated without reason.
-            </p>
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+            <div className="min-w-0">
+              <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Pathways</h2>
+              <p className="text-sm text-zinc-600 mt-1 max-w-2xl">
+                Each pathway leads to a defined HMC completion record. Shared foundations carry across
+                pathways, so learning is never repeated without reason.
+              </p>
+            </div>
+
+            {/* The Academy's own search. The Hub's search bar sits above this page and
+                queries the resource directory, so until now the only search box visible
+                to somebody looking for a course searched food and housing instead. */}
+            <div className="relative lg:w-80 shrink-0">
+              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
+              <input
+                type="search"
+                value={catalogQuery}
+                onChange={(e) => setCatalogQuery(e.target.value)}
+                placeholder="Search courses and pathways"
+                aria-label="Search courses and pathways"
+                className="w-full rounded-full border border-[#0f0f0f]/20 bg-white/70 py-3 pl-11 pr-4 text-sm text-zinc-900 placeholder:text-zinc-500 focus:outline-none focus:ring-4 focus:ring-[#233DFF]/20 focus:border-[#233DFF]/40"
+              />
+            </div>
           </div>
+
+          {/* Said in words, because a grid that quietly got shorter is not an answer. */}
+          {q && (
+            <p className="text-sm text-zinc-600" role="status">
+              {shown.length === 0
+                ? `Nothing matches "${catalogQuery.trim()}".`
+                : `${shown.length} ${shown.length === 1 ? 'pathway' : 'pathways'} match "${catalogQuery.trim()}".`}
+              {' '}
+              <button onClick={() => setCatalogQuery('')} className="font-semibold text-[#233DFF] hover:underline">
+                Show everything
+              </button>
+            </p>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {PATHWAYS.filter((p) => vis(p.id).state !== 'hidden').map((p) => {
+            {shown.map((p) => {
               const v = vis(p.id);
               const pct = pathwayPercent(p, state);
               const lessons = pathwayLessonIds(p).length;
@@ -842,18 +952,18 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               const ready = pathwayHasContent(p);
               const enrollable = v.state === 'open' && ready;
               // The gradient cover block that used to sit on top of each card is
-              // gone. It cycled four invented colours that are not in the HMC
+              // gone. It cycled four invented colors that are not in the HMC
               // palette, took up a 16:9 slab per card for decoration only, and
               // pushed the course title and the enroll action below the fold on a
               // phone. The badge and the title now sit in the card itself, where a
               // reader is already looking.
-              // Tone rather than a colour class, so the badge belongs to the card system
+              // Tone rather than a color class, so the badge belongs to the card system
               // instead of carrying its own palette. Warm is the one that means "act soon".
               const badge: { text: string; tone: 'outline' | 'solid' | 'warm' } =
                 v.state === 'past' ? { text: 'Past cohort', tone: 'outline' }
                 : v.state === 'upcoming' ? { text: v.cohortLabel || 'Upcoming', tone: 'warm' }
                 : ready ? { text: 'Open now', tone: 'solid' }
-                : { text: 'In curriculum review', tone: 'outline' };
+                : { text: 'Coming soon', tone: 'outline' };
 
               return (
                 <SurfaceCard
@@ -880,9 +990,12 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     ) : undefined
                   }
                   secondary={
+                    /* py-2 is not spacing. Without it this control is 18px high, under the
+                       24px floor WCAG 2.2 AA sets for a target, and it is the one control
+                       on the card a reader uses to look before committing. */
                     <button
                       onClick={() => setView({ name: 'pathway', pathwayId: p.id })}
-                      className="w-full text-center text-[12px] font-bold uppercase tracking-widest text-zinc-600 hover:text-zinc-900"
+                      className="w-full text-center py-2 rounded-full text-[12px] font-bold uppercase tracking-widest text-zinc-600 hover:text-zinc-900 hover:bg-white/50 transition-colors"
                     >
                       {v.state === 'past' ? 'What was covered' : 'See lessons'}
                     </button>
@@ -911,10 +1024,12 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           Academy records are kept separately from clinical and client records, and enrolling does not
           create a clinician-patient relationship.{' '}
           <a
-            href="https://www.healthmatters.clinic/privacy#academy"
+            href="https://www.healthmatters.clinic/privacy-policy#academy"
             target="_blank"
             rel="noreferrer"
-            className="font-semibold text-[#233DFF] hover:underline"
+            /* inline-block with padding, so this clears the 24px target floor. As a bare
+               inline link it was 15px high. */
+            className="inline-block py-1.5 font-semibold text-[#233DFF] hover:underline"
           >
             How your learning record is handled
           </a>
@@ -1011,7 +1126,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     <button onClick={() => setView({ name: 'pathway', pathwayId: c.pathwayId })} className="text-left group">
                       <span className="block text-[13.5px] font-semibold text-zinc-900 group-hover:text-[#233DFF] leading-snug">{c.title}</span>
                       <span className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mt-1.5">
-                        {c.level} · {isAvailable(c.pathwayId) ? 'Open for enrollment' : 'In development'}
+                        {c.level} · {isAvailable(c.pathwayId) ? 'Open for enrollment' : 'Coming soon'}
                       </span>
                     </button>
                   </td>
@@ -1041,7 +1156,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${LEVEL_ACCENT[c.level].bg} ${LEVEL_ACCENT[c.level].text}`}>{c.level}</span>
                     <span className="pill pill-neutral">{c.type}</span>
-                    {!isAvailable(c.pathwayId) && <span className="pill pill-neutral">In development</span>}
+                    {!isAvailable(c.pathwayId) && <span className="pill pill-neutral">Coming soon</span>}
                   </div>
                   <h3 className="text-xl font-semibold text-zinc-900 leading-snug">{c.title}</h3>
                 </div>
@@ -1180,14 +1295,15 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     const published = hasContent && (adminOpen || p.status === 'published');
     // Distinguishes "nearly finished" from "nothing here yet", which the single
     // In development label could not.
-    const buildLabel = !hasContent
-      ? 'Not yet available'
-      : !published
-        ? 'In development'
-        : null;
+    // Only the state a member can act on. A pathway with courses open is not labelled
+    // at all, because the courses below already say what is open; labelling it told a
+    // member the work was unfinished when what they needed to know was that they could
+    // start today. "In development" and "In curriculum review" are how HMC tracks its own
+    // build, and neither belongs on a page a member reads.
+    const buildLabel = !hasContent ? 'Coming soon' : null;
     // Registration needs something to read, not merely a course object.
     const hasCourses = hasContent;
-    const { gates, eligible } = evaluateGates(p, state);
+    const { gates, eligible } = evaluateGates(p, state, adminOpen);
     const issued = state.credentials[p.id];
     const pre = state.preTest[p.id];
     const { pre: preScore, post: postScore, gain } = knowledgeGain(p.id, state);
@@ -1201,7 +1317,6 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${accent.bg} ${accent.text}`}>
               {p.level}
             </span>
-            <span className="pill pill-neutral">Version {p.version}</span>
             {buildLabel && <span className="pill pill-neutral">{buildLabel}</span>}
           </div>
           <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">{p.title}</h1>
@@ -1237,7 +1352,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               }))}
             />
             <p className="text-[12px] text-zinc-400 ml-1">
-              You can start any step at any time, and come back to it whenever you want.
+              Start any step whenever you want. You can always come back.
             </p>
           </section>
         )}
@@ -1260,7 +1375,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               <p className="text-sm text-zinc-500 mt-1">
                 {published
                   ? 'Self-paced. Start any time.'
-                  : 'Start the courses that are open now. More are added as they are released, and the completion record opens when the pathway is published.'}
+                  : 'Start the courses that are open now. More are added over time, and your completion record opens once the full pathway is available.'}
               </p>
             </div>
             <Btn onClick={() => {
@@ -1281,8 +1396,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
         {!published && (
           <div className="bg-white rounded-2xl border border-dashed border-zinc-300 p-8 space-y-5">
             <p className="text-sm text-zinc-600 leading-relaxed">
-              This pathway is under curriculum review. The courses below are open now. More are
-              released as curriculum review completes them.
+              These courses are open now. You can start any of them today.
             </p>
             {p.courses.length > 0 && (
               <ol className="space-y-2">
@@ -1296,7 +1410,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               </ol>
             )}
             <p className="text-sm text-zinc-500">
-              {p.courses.length > 0 ? 'More courses available soon.' : 'Courses available soon.'}
+              {p.courses.length > 0 ? 'We add more courses over time.' : 'Courses are coming soon.'}
             </p>
           </div>
         )}
@@ -1332,7 +1446,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             <div className="space-y-4">
               <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Courses</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {p.courses.map((c) => (
+                {p.courses.map((raw) => mergedCourse(raw, overrides[raw.id])).map((c) => (
                   <CourseCard
                     key={c.id}
                     num={c.num}
@@ -1401,7 +1515,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     <span className="text-sm text-zinc-700 leading-snug">
                       {g.label}
                       <span className="block text-[11px] text-zinc-400 mt-0.5">
-                        {g.met ? 'Met' : 'Not yet met'}{g.detail ? ` · ${g.detail}` : ''}
+                        {g.met ? 'Done' : 'Not yet'}{g.detail ? ` · ${g.detail}` : ''}
                       </span>
                     </span>
                   </li>
@@ -1438,7 +1552,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           <footer className="mt-4 border-t border-zinc-200 pt-6">
             <details className="group">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[11px] font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-600">
-                <span>Sources and version</span>
+                <span>{curriculumStaff ? 'Sources and version' : 'Sources'}</span>
                 <span className="text-base leading-none transition-transform group-open:rotate-45" aria-hidden="true">+</span>
               </summary>
               <div className="pt-5 space-y-4">
@@ -1449,9 +1563,11 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     </li>
                   ))}
                 </ul>
-                <p className="text-[11px] text-zinc-400">
-                  Version {p.version} &middot; Effective {p.effectiveDate} &middot; Next review {p.nextReview}
-                </p>
+                {curriculumStaff && (
+                  <p className="text-[11px] text-zinc-400">
+                    Version {p.version} &middot; Effective {p.effectiveDate} &middot; Next review {p.nextReview}
+                  </p>
+                )}
               </div>
             </details>
           </footer>
@@ -1478,7 +1594,11 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
   const renderCourse = (pathwayId: string, courseId: string) => {
     const p = pathwayById(pathwayId);
-    const c = p?.courses.find((x) => x.id === courseId);
+    // The catalogue entry with any released page correction over it, merged once so the
+    // card, the promise, About, the objectives, the prerequisites, who it is for and what
+    // completion requires all read from the same place.
+    const raw = p?.courses.find((x) => x.id === courseId);
+    const c = raw ? mergedCourse(raw, overrides[raw.id]) : undefined;
     if (!p || !c) return renderCatalog();
     const firstUnfinished = c.lessons.findIndex((l) => !state.lessons.includes(l.id));
     const activityDone = !!(state.activities[c.id] || '').trim();
@@ -1530,7 +1650,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                 ['Modules', `${c.lessons.length}`],
                 ['Knowledge checks', `${c.checks.length}`],
                 ['Applied activity', c.activity ? 'Yes, with a saved artifact' : 'None'],
-                ['Cost', 'Free'],
+                ['Cost', c.price?.amountUsd ? `$${c.price.amountUsd}` : 'No charge'],
               ].map(([k, v]) => (
                 <div key={k} className="flex items-baseline justify-between gap-4 border-b border-zinc-50 pb-2.5 last:border-0 last:pb-0">
                   <dt className="text-[12px] text-zinc-500">{k}</dt>
@@ -1866,7 +1986,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                         setView({ name: 'lesson', pathwayId, courseId, index: i });
                       }}
                       aria-label={locked ? `${l.title}. Available once you enroll.` : l.title}
-                      title={locked ? 'Available as soon as you enroll. Enrolling is free.' : undefined}
+                      title={locked ? 'Available as soon as you enroll. Enrolling is open to everyone.' : undefined}
                       className={`w-full text-left flex items-start gap-5 p-6 rounded-2xl border transition-all ${done ? 'bg-zinc-50/60 border-zinc-100' : locked ? 'bg-zinc-50/40 border-zinc-150 hover:border-[#233DFF]/30' : 'bg-white border-zinc-200 hover:border-[#233DFF]/40 hover:shadow-sm'}`}
                     >
                       <span className={`w-11 h-11 rounded-2xl flex items-center justify-center border shrink-0 ${done ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : locked ? 'bg-zinc-100 text-zinc-400 border-zinc-200' : 'bg-blue-50 text-[#233DFF] border-blue-100'}`}>

@@ -64,7 +64,7 @@ export interface EngagementClock {
  *
  * Deliberately not a React hook. The clock has to keep running across a lesson change
  * within the same course, and a hook keyed to the lesson component would reset on every
- * navigation, which is precisely the behaviour that would let somebody click through
+ * navigation, which is precisely the behavior that would let somebody click through
  * twelve lessons in a minute and still show twelve minutes.
  */
 export function startEngagementClock(userId: string, courseId: string): EngagementClock {

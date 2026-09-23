@@ -20,7 +20,7 @@ export const CARE_NAVIGATION_COVERAGE: Course = {
   num: 1,
   title: 'Care Navigation and Coverage',
   promise:
-    'Notice who is about to lose Medi-Cal, tell them what is changing without overpromising, and hand them to someone qualified.',
+    'Spot who is about to lose Medi-Cal, explain what is changing without promising too much, and pass them to someone who can help.',
   about: [
     'Medi-Cal is changing in ways that will cause people to lose coverage if nobody tells them what is coming. Most people will find out through a letter they did not open or a deadline they did not know about.',
     'HMC volunteers are already in front of these community members at pop-ups, health fairs, and street medicine shifts. This course trains a narrow and specific skill: notice, inform, and connect. It does not authorize you to determine eligibility or to enroll anyone.',
@@ -36,9 +36,9 @@ export const CARE_NAVIGATION_COVERAGE: Course = {
   // plus 22 for the applied conversation. The previous 130 was not backed by the
   // content and is exactly the overstatement the guided standard exists to stop.
   minutes: 68,
-  prerequisites: 'None for the knowledge content. Field application requires an approved HMC role and supervision.',
+  prerequisites: 'None to learn it. To use it in the field you need an HMC role and a supervisor.',
   whoFor:
-    'Community health workers, promotoras, navigators, outreach volunteers, and anyone staffing an HMC table where a coverage conversation can happen.',
+    'Community health workers, promotoras, navigators, and anyone working an HMC table where coverage comes up.',
   lessons: [
     {
       id: "fbch-cov-l1",

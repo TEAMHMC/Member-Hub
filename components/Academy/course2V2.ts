@@ -293,8 +293,8 @@ export const COURSE_2_V2: Course = {
     'Select two to four careers for deeper research.',
   ],
   minutes: 52,
-  prerequisites: 'Course 1, The Health Professions Ecosystem.',
-  whoFor: 'Learners who can name several health careers and now need to narrow the list to a few worth researching.',
+  prerequisites: 'Course 1 first.',
+  whoFor: 'People who can name a few health careers and now need to pick which ones to look into.',
   lessons: [
     {
       id: 'hce2-l1',

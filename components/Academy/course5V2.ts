@@ -246,7 +246,7 @@ export const COURSE_5_V2: Course = {
   readingLevel: 'adult',
   delivery: 'self-paced',
   title: 'Academic Readiness + Competency Development',
-  promise: 'Build a realistic academic plan against the actual prerequisites of the programs you may apply to.',
+  promise: 'Build a school plan that matches what your programs actually ask for.',
   about: [
     'Health-professions programs evaluate academic performance, prerequisite preparation, competencies and experience differently from one another. This course builds a plan against the programs you are actually considering rather than against generic advice.',
     'It also treats academic difficulty as diagnostic information rather than as a verdict, because a bad term is where most people leave a path they could have finished.',
@@ -259,7 +259,7 @@ export const COURSE_5_V2: Course = {
   ],
   minutes: 54,
   prerequisites: 'Courses 1 through 3.',
-  whoFor: 'Learners currently in school, returning to school, or planning prerequisite coursework.',
+  whoFor: 'People in school now, going back, or planning the classes they need first.',
   freshness:
     'Program prerequisites and expiration rules change between application cycles. Verify on the program\'s own admissions page and record the date.',
   lessons: [

@@ -134,7 +134,7 @@ export interface ClientMe {
     contacted?: boolean;
     /** Open, and nobody has been in touch. The state where a member should be told how to chase it. */
     awaitingResponse?: boolean;
-    /** Public directory contact for the organisation, or null when the directory holds none. */
+    /** Public directory contact for the organization, or null when the directory holds none. */
     resource?: {
       phone: string | null;
       website: string | null;
@@ -163,7 +163,7 @@ export interface ClientMe {
 }
 
 // ── Staff (people who maintain the Hub) ──────────────────────────────────
-export type HubCapability = 'academy' | 'content' | 'support' | 'staffAdmin';
+export type HubCapability = 'academy' | 'content' | 'support' | 'staffAdmin' | 'review' | 'curriculum';
 
 export interface HubStaff {
   role: string;
@@ -228,8 +228,94 @@ export const curriculumApi = {
   },
 };
 
+/** Somebody who maintains the Hub, on the Hub's own roster rather than the volunteers one. */
+export interface HubPerson {
+  email: string;
+  name: string;
+  tier: string;
+  tierLabel: string;
+  role: string;
+  capabilities: HubCapability[];
+  active: boolean;
+  grantedAt: string | null;
+  grantedBy: string | null;
+  revokedAt: string | null;
+}
+
+export interface HubTier {
+  id: string;
+  label: string;
+  describes: string;
+}
+
+/** One Academy course, as the review list shows it. */
+export interface HubCurriculumCourse {
+  id: string;
+  title: string;
+  /** A correction has been released over the built-in text. Not the same as reviewed. */
+  corrected: boolean;
+  version: number;
+  updatedAt: string | null;
+  updatedByName: string | null;
+  note: string | null;
+}
+
+export interface CoursePageOverride {
+  promise?: string;
+  about?: string[];
+  objectives?: string[];
+  prerequisites?: string;
+  whoFor?: string;
+  requirements?: { id: string; label: string; detail?: string; kind: 'attend' | 'assignment' | 'practicum' | 'evaluation' }[];
+}
+
+export interface HubCurriculumDetail {
+  id: string;
+  title: string;
+  content: string;
+  sections: { heading: string; body: string }[];
+  /** The rest of the course page, when a correction to it has been released. */
+  page?: CoursePageOverride | null;
+  version: number;
+  hasCorrection: boolean;
+  history: Array<{ version: number; note: string | null; archivedAt: string | null; archivedBy: string | null }>;
+}
+
 export const staffApi = {
   overview: () => req<HubStaffOverview>('/api/hub/staff/overview'),
+
+  // ── Who maintains the Hub ──────────────────────────────────────────────
+  people: () => req<{ tiers: HubTier[]; people: HubPerson[] }>('/api/hub/staff/people'),
+  grantAccess: (email: string, name: string, tier: string) =>
+    req<{ success: boolean; email: string; tier: string; capabilities: HubCapability[] }>(
+      '/api/hub/staff/people',
+      { method: 'PUT', body: JSON.stringify({ email, name, tier }) },
+    ),
+  revokeAccess: (email: string) =>
+    req<{ success: boolean; email: string }>(
+      `/api/hub/staff/people/${encodeURIComponent(email)}`,
+      { method: 'DELETE' },
+    ),
+
+  // ── Curriculum review ──────────────────────────────────────────────────
+  curriculum: () => req<{ courses: HubCurriculumCourse[]; note?: string }>('/api/hub/staff/curriculum'),
+  /**
+   * Release a correction: lesson text, the rest of the course page, or both.
+   *
+   * Sending no `sections` key at all is what tells the server this is a page-only release,
+   * so the lesson text already released is kept rather than blanked.
+   */
+  releaseCourseFull: (id: string, body: Record<string, unknown>) =>
+    req<{ success: boolean; version: number; updatedAt: string }>(
+      `/api/hub/staff/curriculum/${encodeURIComponent(id)}`,
+      { method: 'PUT', body: JSON.stringify(body) },
+    ),
+  course: (id: string) => req<HubCurriculumDetail>(`/api/hub/staff/curriculum/${encodeURIComponent(id)}`),
+  releaseCourse: (id: string, content: string, sections: { heading: string; body: string }[], note: string) =>
+    req<{ success: boolean; version: number; updatedAt: string }>(
+      `/api/hub/staff/curriculum/${encodeURIComponent(id)}`,
+      { method: 'PUT', body: JSON.stringify({ content, sections, note }) },
+    ),
   setAcademyVisibility: (pathwayId: string, state: string, cohortLabel?: string) =>
     req<{ success: boolean; pathwayId: string; state: string; cohortLabel: string | null }>(
       `/api/hub/staff/academy-visibility/${encodeURIComponent(pathwayId)}`,
@@ -472,11 +558,18 @@ export const client = {
    *   issues a code to any existing member without it, and to a new address only
    *   with it, so this has to travel or a genuinely invited person is refused.
    */
-  requestLink: (email: string, invite?: string) =>
+  requestLink: (email: string, invite?: string, ref?: string) =>
     req<{ ok: boolean }>('/api/client/auth/request-link', {
       method: 'POST',
-      body: JSON.stringify(invite ? { email, invite } : { email }),
+      // A volunteer's QR code travels too: somebody a volunteer signed up at an event
+      // counts as invited if the Hub is ever switched to invite-only.
+      body: JSON.stringify({ email, ...(invite ? { invite } : {}), ...(ref ? { ref } : {}) }),
     }),
+  /** Who signed this person up, for the greeting: a volunteer first name and an event. */
+  navigatorRef: (code: string, eventId?: string) =>
+    req<{ valid: boolean; volunteerFirstName?: string | null; eventTitle?: string | null }>(
+      `/api/public/navigator-ref/${encodeURIComponent(code)}${eventId ? `?event=${encodeURIComponent(eventId)}` : ''}`,
+    ),
   verifyLink: (email: string, code: string) =>
     req<{ ok: boolean; identified: boolean; email: string }>('/api/client/auth/verify-link', {
       method: 'POST',
@@ -511,6 +604,10 @@ export const client = {
     audience?: 'care' | 'learner' | 'both';
     consentToShare?: boolean;
     consentToContact?: boolean;
+    /** Broad categories the person tapped. Stored apart from intake needs. */
+    onboardingNeeds?: string[];
+    /** The volunteer code and event from the QR they scanned. First touch only. */
+    referral?: { code: string; eventId?: string };
   }) =>
     req<{ ok: boolean; identified: boolean; audience: string | null }>('/api/client/profile', {
       method: 'POST',

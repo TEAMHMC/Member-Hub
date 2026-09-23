@@ -1,10 +1,14 @@
 
 import React from 'react';
 import { UserRole, type Audience, type StaffStanding } from '../../types';
+
+// Health Credits is not fully built, so it stays out of the navigation until it is.
+// Flip this to show it again; the screen and its route are untouched.
+const SHOW_CREDITS = false;
 import {
   Home, Calendar,
   LogOut, LogIn, Compass, ShieldCheck, Activity, Brain, GraduationCap,
-  SlidersHorizontal, Eye, Coins,
+  SlidersHorizontal, Eye, Coins, HeartHandshake, Building2, ArrowUpRight,
   User as UserIcon
 } from 'lucide-react';
 
@@ -37,6 +41,29 @@ const Sidebar: React.FC<SidebarProps> = ({
   // dashboard ever rendered. Staff browse the Hub as members and reach the
   // console through the button below, so there is one set of surfaces to keep
   // working and staff see the same thing members see.
+  /**
+   * Destinations that are not tabs in this app.
+   *
+   * Volunteering and partnering both have their own product with their own account,
+   * and the Hub had no route to either, so the two questions it is asked most often
+   * after "what can I learn" had no answer in the nav. These are rendered as links
+   * that visibly leave, rather than as tabs that look like they load in place.
+   */
+  const OUTBOUND = [
+    {
+      icon: <HeartHandshake size={18} />,
+      label: 'Volunteer',
+      id: 'volunteer',
+      href: 'https://volunteer.healthmatters.clinic',
+    },
+    {
+      icon: <Building2 size={18} />,
+      label: 'For Organizations',
+      id: 'partners',
+      href: 'https://partner.healthmatters.clinic',
+    },
+  ];
+
   const getNavItems = () => {
     // What anybody can read without an account. The Hub used to answer every route with a
     // sign-in wall, so somebody sent a link to a course or an event landed on a form and
@@ -48,6 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
         { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
         { icon: <ShieldCheck size={18} />, label: 'Resources', id: 'resources' },
+        ...OUTBOUND,
       ];
     }
     // A learner has no care relationship with HMC, so the screening,
@@ -57,7 +85,8 @@ const Sidebar: React.FC<SidebarProps> = ({
         { icon: <Home size={18} />, label: 'Home', id: 'dash' },
         { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
         { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
-        { icon: <Coins size={18} />, label: 'Credits', id: 'credits' },
+        ...(SHOW_CREDITS ? [{ icon: <Coins size={18} />, label: 'Credits', id: 'credits' }] : []),
+        ...OUTBOUND,
       ];
     }
     /**
@@ -82,7 +111,8 @@ const Sidebar: React.FC<SidebarProps> = ({
       { icon: <Compass size={18} />, label: 'Playbook', id: 'game-plan' },
       ...(hasResults ? [{ icon: <Activity size={18} />, label: 'Results', id: 'health' }] : []),
       { icon: <ShieldCheck size={18} />, label: 'Resources', id: 'resources' },
-      { icon: <Coins size={18} />, label: 'Credits', id: 'credits' },
+      ...(SHOW_CREDITS ? [{ icon: <Coins size={18} />, label: 'Credits', id: 'credits' }] : []),
+      ...OUTBOUND,
     ];
   };
 
@@ -104,7 +134,32 @@ const Sidebar: React.FC<SidebarProps> = ({
     );
   };
 
-  const navButton = (item: { icon: React.ReactNode; label: string; id: string }, horizontal = false) => (
+  const navButton = (
+    item: { icon: React.ReactNode; label: string; id: string; href?: string },
+    horizontal = false
+  ) => {
+    const shape = `flex items-center gap-3 rounded-full transition-all font-bold uppercase tracking-wider text-[11px] whitespace-nowrap ${horizontal ? 'px-4 py-2.5 shrink-0' : 'w-full px-4 py-3'}`;
+
+    // A destination in another product. Never shows as the active tab, because
+    // the Hub is still the page underneath, and carries the outward arrow so the
+    // hand-off is visible before the click rather than after it.
+    if (item.href) {
+      return (
+        <a
+          key={item.id}
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`${shape} text-zinc-500 hover:text-zinc-900 hover:bg-white/60`}
+        >
+          <span className="text-zinc-400">{item.icon}</span>
+          {item.label}
+          <ArrowUpRight size={14} className="ml-auto text-zinc-300 shrink-0" />
+        </a>
+      );
+    }
+
+    return (
     <button
       key={item.id}
       onClick={() => onTabChange(item.id)}
@@ -117,7 +172,8 @@ const Sidebar: React.FC<SidebarProps> = ({
       <span className={activeTab === item.id ? 'text-white' : 'text-zinc-400'}>{item.icon}</span>
       {item.label}
     </button>
-  );
+    );
+  };
 
   const Brand = (
     <div className="flex items-center gap-3 cursor-pointer" onClick={() => onTabChange('dash')}>

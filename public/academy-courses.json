@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-03T15:41:29.026Z",
+  "generatedAt": "2026-09-19T16:46:32.539Z",
   "courses": [
     {
       "id": "hce-1",
@@ -184,18 +184,18 @@
       "delivery": "self-paced"
     },
     {
-      "id": "unstoppable-ce",
-      "title": "Unstoppable: The Power of Healing and Growth",
-      "pathwayId": "unstoppable-mental-health",
-      "pathwayTitle": "Unstoppable Continuing Education and Facilitator Training",
-      "delivery": "live"
-    },
-    {
       "id": "cmhw-facilitator",
       "title": "Community Mental Health Worker and Facilitator Training",
-      "pathwayId": "unstoppable-mental-health",
-      "pathwayTitle": "Unstoppable Continuing Education and Facilitator Training",
+      "pathwayId": "unstoppable-facilitator",
+      "pathwayTitle": "Unstoppable Facilitator Training",
       "delivery": "blended"
+    },
+    {
+      "id": "unstoppable-ce",
+      "title": "Unstoppable: The Power of Healing and Growth",
+      "pathwayId": "unstoppable-ce",
+      "pathwayTitle": "Unstoppable Continuing Education",
+      "delivery": "live"
     }
   ]
 }

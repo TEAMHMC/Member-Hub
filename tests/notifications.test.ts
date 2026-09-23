@@ -138,7 +138,7 @@ ok(relativeTime(null) === '' && relativeTime('nonsense') === '', 'an unusable da
 
 console.log('Labels');
 for (const k of ['course', 'training', 'cohort', 'workshop', 'webinar', 'office-hours', 'recording', 'news'] as const) {
-  ok(kindLabel(k).length > 2, `${k} has a label a member would recognise`, kindLabel(k));
+  ok(kindLabel(k).length > 2, `${k} has a label a member would recognize`, kindLabel(k));
   ok(!/[—–]/.test(kindLabel(k)), `${k} label has no em dash`);
 }
 

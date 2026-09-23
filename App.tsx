@@ -12,6 +12,7 @@ import { context as ctxApi, client as clientApi, resultsAccess } from './service
 import SunnyNavigator from './components/Navigator/SunnyNavigator';
 import TrainingRegistration from './components/Academy/TrainingRegistration';
 import { PATHWAYS } from './components/Academy/catalog';
+import * as route from './services/route';
 
 /**
  * One member, one id, on every device they sign in from.
@@ -47,15 +48,36 @@ const adoptLocalProgress = (stableId: string) => {
     for (const prefix of PREFIXES) {
       const target = `${prefix}${stableId}`;
       if (localStorage.getItem(target)) continue;
-      // The most recently written entry under an old random id, if there is one.
-      const orphan = Object.keys(localStorage)
-        .filter((k) => k.startsWith(prefix) && k !== target && k.startsWith(`${prefix}usr_`))
-        .pop();
+
+      /**
+       * What a visitor did before they had an account.
+       *
+       * Everything a visitor completes is filed under the literal id 'guest', because
+       * that is what the guest user object carries. This only ever looked for keys
+       * shaped `usr_`, so it never saw that one, and somebody who worked through three
+       * lessons and then signed up had every one of them discarded at exactly the
+       * moment they committed to HMC. It is taken first, because it is the work that
+       * prompted the sign-up rather than a residue from an older session.
+       */
+      const guestKey = `${prefix}guest`;
+      const orphan = (localStorage.getItem(guestKey) && guestKey !== target)
+        ? guestKey
+        : Object.keys(localStorage)
+            .filter((k) => k.startsWith(prefix) && k !== target && k.startsWith(`${prefix}usr_`))
+            .pop();
+
       if (orphan) {
         const value = localStorage.getItem(orphan);
         if (value) localStorage.setItem(target, value);
       }
     }
+    /**
+     * Then let go of the visitor's copy.
+     *
+     * It has been carried onto the account, and the next person to open this browser
+     * without signing in would otherwise be handed the last visitor's transcript.
+     */
+    for (const prefix of PREFIXES) localStorage.removeItem(`${prefix}guest`);
     localStorage.setItem(`hmc_migrated_${stableId}`, '1');
   } catch {
     /* private mode, or a full quota. Progress still syncs from the server. */
@@ -90,7 +112,46 @@ const App: React.FC = () => {
   useEffect(() => {
     ctxApi.hello().then((r) => setVisitorId(r.visitorId)).catch(() => {});
   }, []);
-  const [activeTab, setActiveTab] = useState<string>('dash');
+  /**
+   * The open section, and the address that names it.
+   *
+   * Reading the first value from the URL is what makes a link to the Hub land where it
+   * points. Before this every address rendered Home, so a course link somebody was sent
+   * opened the front page and the member had to find their way back to what they had
+   * been sent. Every later change is mirrored into history by the wrapper below, so Back
+   * steps through the Hub instead of out of it.
+   */
+  const [activeTab, setActiveTabState] = useState<string>(() => route.current().tab);
+
+  /**
+   * The tab the address currently names.
+   *
+   * ClientDashboard holds the open tab as well and reports it upward, including once on
+   * mount, so this is told "academy" while the member is already inside a course. Filing
+   * that as a move would rewrite `/academy/course/<pathway>/<course>` back to `/academy`
+   * and throw away the depth the Academy had just read out of the URL, which is exactly
+   * what a reload and a pasted course link each looked like. A tab that has not changed
+   * is not a move.
+   */
+  const addressedTab = React.useRef<string>(route.current().tab);
+  const setActiveTab = React.useCallback((tab: string) => {
+    setActiveTabState(tab);
+    if (addressedTab.current === tab) return;
+    addressedTab.current = tab;
+    route.push({ tab });
+  }, []);
+
+  // Name the first screen, and tidy an address the Hub does not recognise, without
+  // filing a history entry for a step the member never took.
+  //
+  // The whole route is replaced, not just its tab. Replacing the tab alone rewrote
+  // `/academy/course/<pathway>/<course>` to `/academy` on the first paint, before the
+  // Academy had mounted and read its own depth, so every course address anybody pasted
+  // or reloaded quietly opened the catalogue instead.
+  useEffect(() => { route.replace(route.current()); }, []);
+
+  // Back and Forward. The Academy subscribes separately for its own depth.
+  useEffect(() => route.onPop((r) => { addressedTab.current = r.tab; setActiveTabState(r.tab); }), []);
 
   // Staff see the member experience by default and switch to the console
   // deliberately. Somebody maintaining the Hub needs to look at what a member
@@ -120,12 +181,25 @@ const App: React.FC = () => {
   const [signIn, setSignIn] = useState<{ open: boolean; reason?: string }>({ open: false });
   const requireSignIn = (reason?: string) => setSignIn({ open: true, reason });
 
-  // Restore a session by validating the httpOnly cookie with the backend
-  // (source of truth), not by trusting localStorage alone. localStorage only
-  // caches non-sensitive UI fields (name, zip, badges) for a fast first paint.
-  useEffect(() => {
+  /**
+   * Ask the server who this is, and build the session from its answer.
+   *
+   * Pulled out of the mount effect because signing in has to do exactly the same thing.
+   * It did not. handleLogin asserted UserRole.CLIENT from the client and never asked,
+   * so somebody on the staff roster signed in, was handed a member session, and found no
+   * Manage hub button anywhere. It appeared on the next full page load, when this ran
+   * for real, which is not a thing anybody would think to try. The Hub looked like it had
+   * no staff access at all.
+   *
+   * `signOutOnFailure` is false when called straight after a sign-in. On first load a
+   * failure means there is no session and the right answer is the sign-in panel. Straight
+   * after a sign-in it means one request did not come back, and dropping somebody out of
+   * an account they have just proved they own, over a moment of bad signal, is a worse
+   * answer than leaving them in the member view they would have had anyway.
+   */
+  const loadSession = React.useCallback((signOutOnFailure = true) => {
     const cached = localStorage.getItem('hmc_user');
-    clientApi.me()
+    return clientApi.me()
       .then((me) => {
         const base: User = cached ? JSON.parse(cached) : ({} as User);
         // The role comes from the server. This used to be hardcoded to CLIENT,
@@ -148,8 +222,15 @@ const App: React.FC = () => {
           role: staff ? (staff.isAdmin ? UserRole.ADMIN : UserRole.STAFF) : UserRole.CLIENT,
           staff,
           email: me.email || base.email || '',
-          firstName: me.profile?.firstName || base.firstName || (staff ? staff.name : 'Member'),
-          lastName: base.lastName || '',
+          // 'Member' is the placeholder handleLogin writes when nothing better is known. It
+          // was winning over the staff roster's name on every reload, so an administrator
+          // saw "Member" in the header instead of their own name. A placeholder is not a name.
+          firstName: me.profile?.firstName
+            || (base.firstName && base.firstName !== 'Member' ? base.firstName : '')
+            || (staff?.name ? staff.name.trim().split(/\s+/)[0] : '')
+            || 'Member',
+          lastName: (base.lastName || '')
+            || (staff?.name && !me.profile?.firstName ? staff.name.trim().split(/\s+/).slice(1).join(' ') : ''),
           phone: base.phone || '',
           zipCode: base.zipCode || '',
           badges: base.badges || ['Member'],
@@ -168,14 +249,20 @@ const App: React.FC = () => {
         setCurrentUser(restored);
         localStorage.setItem('hmc_user', JSON.stringify(restored));
         setView('portal');
+        return restored;
       })
       .catch(() => {
         // No valid session — require sign-in and drop any stale cache.
-        localStorage.removeItem('hmc_user');
-        setCurrentUser(null);
-        setView('login');
+        if (signOutOnFailure) {
+          localStorage.removeItem('hmc_user');
+          setCurrentUser(null);
+          setView('login');
+        }
+        return null;
       });
   }, []);
+
+  useEffect(() => { loadSession(); }, [loadSession]);
 
   const handleLogin = (userData: Partial<User>, role: UserRole = UserRole.CLIENT) => {
     const activeUser: User = {
@@ -199,6 +286,21 @@ const App: React.FC = () => {
     localStorage.setItem('hmc_user', JSON.stringify(activeUser));
     setView('portal');
     setActiveTab('dash');
+
+    /**
+     * Then ask the server who they actually are.
+     *
+     * The object above is what this browser knows: an email, and whatever the onboarding
+     * form just collected. It is enough to show the Hub immediately instead of holding
+     * somebody on a spinner, and it is not enough to decide what they may do. Role and
+     * staff standing are the server's to say, and asserting CLIENT here while never asking
+     * is why somebody on the staff roster signed in and found a member's Hub with no way
+     * into the console. The answer lands a moment later and fills in the rest.
+     *
+     * A failure here changes nothing. They are signed in, and they see the member Hub,
+     * which is what they saw before this call existed.
+     */
+    loadSession(false).catch(() => {});
   };
 
   const handleUpdateUser = (data: Partial<User>) => {
@@ -241,7 +343,7 @@ const App: React.FC = () => {
 
   const renderPortalContent = () => {
     if (staffView && currentUser?.staff) {
-      return <StaffDashboard staff={currentUser.staff} onExit={() => setStaffView(false)} />;
+      return <StaffDashboard staff={currentUser.staff} selfEmail={currentUser.email} onExit={() => setStaffView(false)} />;
     }
 
     return (

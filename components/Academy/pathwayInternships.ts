@@ -31,7 +31,7 @@ const PROFESSIONAL_ORIENTATION: Course = {
   delivery: 'self-paced',
   title: 'Professional Orientation + Expectations',
   promise:
-    'Arrive in week one knowing what is expected of you, what you are owed, and what to do when the work does not appear.',
+    'Start week one knowing what is expected of you, what you should get, and what to do if no work shows up.',
   about: [
     'The most common way an internship disappoints is not conflict. It is a learner who waited to be given work, and a supervisor who assumed a self-starter, and eight weeks passing before either says so.',
     'This course is about the first two weeks, because that is where a placement is decided. It covers what to establish before you start, how to be useful before anybody trusts you with anything, and the specific move to make in week three if there is still nothing to do.',
@@ -45,7 +45,7 @@ const PROFESSIONAL_ORIENTATION: Course = {
   minutes: 27,
   prerequisites: 'None. Complete this before your placement begins rather than during it.',
   whoFor:
-    'Interns, fellows, student placements, and anyone about to spend a term inside an organisation they do not know yet.',
+    'Interns, fellows, and anyone about to spend a term at a place they do not know yet.',
   lessons: [
     {
       id: 'if-1-l1',
@@ -71,7 +71,7 @@ const PROFESSIONAL_ORIENTATION: Course = {
           id: 'if-1-c1',
           q: 'Why does a learning agreement need to name a single accountable supervisor rather than a team?',
           options: [
-            'Because organisations require a named contact for records',
+            'Because organizations require a named contact for records',
             'Because if two people believe they are supervising, neither is, and nobody owns the work not appearing',
             'Because a team cannot give feedback',
             'Because the learner should only speak to one person',
@@ -91,7 +91,7 @@ const PROFESSIONAL_ORIENTATION: Course = {
           { label: 'Real work', text: 'Something that would have to be done by somebody if you were not there. An intern given only invented tasks has been given a seat, not a placement.' },
           { label: 'Supervision that happens', text: 'The scheduled conversation, taking place, with somebody who has looked at what you did.' },
           { label: 'Feedback before the end', text: 'A midpoint review exists so that the final evaluation is not the first time you hear something. Being told in the last week is not feedback, it is a verdict.' },
-          { label: 'Safety and a clear scope', text: 'To know what you are not authorised to do, before the moment you are asked to do it.' },
+          { label: 'Safety and a clear scope', text: 'To know what you are not authorized to do, before the moment you are asked to do it.' },
         ] },
         { kind: 'steps', title: 'Not owed', items: [
           { label: 'A job at the end', text: 'Some placements lead to one. A placement that does not has not failed, and treating the outcome as promised sours the term you actually have.' },
@@ -126,7 +126,7 @@ const PROFESSIONAL_ORIENTATION: Course = {
           'Trust arrives in small increments and it arrives faster than most learners expect, provided the increments are visible. The first fortnight is about making them visible.',
         ] },
         { kind: 'list', title: 'The first fortnight', items: [
-          'Learn the vocabulary. Every organisation has fifteen internal terms, and using them correctly by week two signals that you are paying attention more effectively than any amount of enthusiasm.',
+          'Learn the vocabulary. Every organization has fifteen internal terms, and using them correctly by week two signals that you are paying attention more effectively than any amount of enthusiasm.',
           'Find the thing nobody has time for. There is always a list that has been on somebody\'s desk for a month. Volunteering for it is the fastest route to real work.',
           'Write down what you were told and refer back to it. A learner who does not need to be told twice is a learner who gets told bigger things.',
           'Close the loop out loud. "That is done, and here is where I put it." Supervisors are tracking many things and cannot see your progress without being shown.',
@@ -165,7 +165,7 @@ const PROFESSIONAL_ORIENTATION: Course = {
           'It states the problem as spare capacity rather than as neglect, it arrives with options, and it ends with a question the supervisor can answer in one sentence. Every version of this that reads as a complaint about the placement makes the remaining weeks harder.',
         ] },
         { kind: 'concept', title: 'And if nothing changes', text: [
-          'If the conversation happens and the position is the same two weeks later, that is the point to involve whoever placed you: your programme coordinator, your school, or HMC. That is not escalating against your supervisor. A placement with no work is a problem for the organisation as much as for you, and the person who arranged it is the only one who can fix a structural cause.',
+          'If the conversation happens and the position is the same two weeks later, that is the point to involve whoever placed you: your program coordinator, your school, or HMC. That is not escalating against your supervisor. A placement with no work is a problem for the organization as much as for you, and the person who arranged it is the only one who can fix a structural cause.',
         ] },
         { kind: 'check', check: {
           id: 'if-1-c4',
@@ -173,7 +173,7 @@ const PROFESSIONAL_ORIENTATION: Course = {
           options: [
             'Wait, since placements often take time to get going',
             'Raise it as spare capacity, with two concrete options, and ask which would help',
-            'Report the supervisor to the programme immediately',
+            'Report the supervisor to the program immediately',
             'Fill the time with self-directed study and say nothing',
           ],
           answer: 1,
@@ -200,7 +200,7 @@ const PROFESSIONAL_ORIENTATION: Course = {
       { id: 'supervisor', label: 'Your supervisor', help: 'The one named person accountable for your work, and how you reach them.', multiline: false },
       { id: 'outputs', label: 'What you will produce', help: 'One or two outputs somebody would notice the absence of. Not "support the team".', multiline: true },
       { id: 'cadence', label: 'Supervision', help: 'The standing slot: day, time, length, and what happens when it collides with something.', multiline: true },
-      { id: 'access', label: 'Access and scope', help: 'What you may use, which meetings you are in, and what you are explicitly not authorised to do.', multiline: true },
+      { id: 'access', label: 'Access and scope', help: 'What you may use, which meetings you are in, and what you are explicitly not authorized to do.', multiline: true },
       { id: 'ending', label: 'How it ends', help: 'What the final evaluation looks at, and what the portfolio artifact needs to be.', multiline: true },
     ],
   },
@@ -220,7 +220,7 @@ const PROJECT_PLANNING: Course = {
   delivery: 'self-paced',
   title: 'Project Planning + Milestones',
   promise:
-    'Turn a vague assignment into a plan with dates, and notice you are behind while there is still time to act.',
+    'Turn a vague task into a plan with dates, and spot that you are behind while there is still time to fix it.',
   about: [
     'A placement project usually arrives as a sentence. "Have a look at our volunteer retention." What happens next decides whether there is anything to show at the end.',
     'This course is about converting that sentence into something with a shape: a question you are answering, the smallest useful version of it, milestones that are evidence rather than effort, and a weekly check that surfaces slippage early.',
@@ -233,7 +233,7 @@ const PROJECT_PLANNING: Course = {
   ],
   minutes: 24,
   prerequisites: 'None. Course 1 first is recommended.',
-  whoFor: 'Interns and fellows holding a project, and anyone who has been handed an assignment as a sentence.',
+  whoFor: 'Interns and fellows running a project, and anyone handed a task in one vague sentence.',
   lessons: [
     {
       id: 'if-2-l1',
@@ -376,7 +376,7 @@ const PROJECT_PLANNING: Course = {
         'Nothing, provided the work is delivered on time',
         'Working harder is not a change of plan, and the supervisor loses the chance to reduce scope or move the date while that is still cheap',
         'The intern should not work extra hours',
-        'The intern should escalate to the programme coordinator',
+        'The intern should escalate to the program coordinator',
       ],
       answer: 1,
       why: 'Extra effort is the default answer for the weeks before somebody else notices, and it usually fails. The supervisor is the person who can trade scope against time, and they can only do it while there is time left to trade.',
@@ -397,7 +397,7 @@ const PROJECT_PLANNING: Course = {
   },
   furtherLearning: [
     { name: 'National Association of Colleges and Employers, Career Readiness Competencies', use: 'Critical thinking and professionalism as defined competencies, which is what a project plan evidences.' },
-    { name: 'U.S. Government Accountability Office, project and programme management guidance', use: 'Public-sector practice on milestones as verifiable deliverables rather than descriptions of activity.' },
+    { name: 'U.S. Government Accountability Office, project and program management guidance', use: 'Public-sector practice on milestones as verifiable deliverables rather than descriptions of activity.' },
   ],
 };
 
@@ -411,22 +411,22 @@ const ETHICS_AND_CONFIDENTIALITY: Course = {
   delivery: 'self-paced',
   title: 'Ethics, Confidentiality + Organizational Responsibility',
   promise:
-    'Know what you may look at, what you may repeat, and what to do the moment you realise you have seen something you should not have.',
+    'Know what you can look at, what you can repeat, and what to do the moment you see something you should not have.',
   about: [
     'A placement gives a learner access before it gives them training. That is the ordinary condition of an internship and it is why this course exists early in the pathway rather than late.',
-    'It is written around three rules that hold in a health organisation, a school, a council office or a law firm: access is not permission, the default is that you do not repeat it, and a mistake reported immediately is a small problem.',
+    'It is written around three rules that hold in a health organization, a school, a council office or a law firm: access is not permission, the default is that you do not repeat it, and a mistake reported immediately is a small problem.',
   ],
   objectives: [
-    'Apply the rule that being able to see something is not authorisation to look at it.',
-    'Recognise the ways confidential information leaks without anybody intending it.',
+    'Apply the rule that being able to see something is not authorization to look at it.',
+    'Recognize the ways confidential information leaks without anybody intending it.',
     'Report your own error immediately, and know why the delay is the damaging part.',
     'Name what you may and may not say about the placement publicly.',
   ],
   minutes: 26,
   prerequisites:
-    'None. Any placement involving health records, minors or sensitive systems carries additional HMC requirements assigned by role, and those are separate from this course.',
+    'None. Placements with health records, young people, or sensitive systems have extra HMC requirements. Those come with your role, not this course.',
   whoFor:
-    'Every intern and fellow, before their first day in a system that holds information about real people.',
+    'Every intern and fellow, before day one in a system that holds real people\'s information.',
   lessons: [
     {
       id: 'if-3-l1',
@@ -435,28 +435,28 @@ const ETHICS_AND_CONFIDENTIALITY: Course = {
       minutes: 5,
       blocks: [
         { kind: 'prose', text: [
-          'A placement will usually give you more access than your work requires, because access is granted in blocks and roles are approximate. What you can open and what you are authorised to open are two different sets, and the difference is where almost every ordinary breach happens.',
-          'The rule is that you look at what you need for the task in front of you, and nothing else. Not the neighbour who came to a clinic. Not the person you recognise on a list. Not yourself, in a records system, out of curiosity.',
+          'A placement will usually give you more access than your work requires, because access is granted in blocks and roles are approximate. What you can open and what you are authorized to open are two different sets, and the difference is where almost every ordinary breach happens.',
+          'The rule is that you look at what you need for the task in front of you, and nothing else. Not the neighbour who came to a clinic. Not the person you recognize on a list. Not yourself, in a records system, out of curiosity.',
         ] },
         { kind: 'vocab', items: [
           { term: 'Minimum necessary', plain: 'Looking at only the information you need for the specific task, even when your access would let you see much more.' },
           { term: 'Audit log', plain: 'The record of who looked at what and when. Most systems that hold information about people keep one, and it is usually reviewed only after a suspicion, which is a bad moment to be in it.' },
         ] },
         { kind: 'case', title: 'The ordinary version', scenario: true, text: [
-          'An intern is cleaning up a spreadsheet of event attendance and recognises a name from her old school. She opens the record to see whether it is the same person. It is. She closes it, tells nobody, and does nothing with what she saw.',
-          'Nothing was repeated, nothing was misused, and it is still a breach. The system recorded that a person with no work-related reason opened that record, and the organisation cannot distinguish her curiosity from something worse. That is the reason the rule is about looking rather than about repeating.',
+          'An intern is cleaning up a spreadsheet of event attendance and recognizes a name from her old school. She opens the record to see whether it is the same person. It is. She closes it, tells nobody, and does nothing with what she saw.',
+          'Nothing was repeated, nothing was misused, and it is still a breach. The system recorded that a person with no work-related reason opened that record, and the organization cannot distinguish her curiosity from something worse. That is the reason the rule is about looking rather than about repeating.',
         ] },
         { kind: 'check', check: {
           id: 'if-3-c1',
           q: 'An intern with valid system access opens a record out of curiosity, sees nothing remarkable, and tells no one. How should this be understood?',
           options: [
             'Not a breach, since nothing was disclosed or misused',
-            'A breach, because authorisation covers the task and not the access, and the access log cannot distinguish curiosity from anything worse',
+            'A breach, because authorization covers the task and not the access, and the access log cannot distinguish curiosity from anything worse',
             'A breach only if the person is identifiable',
             'A minor matter to mention if it comes up',
           ],
           answer: 1,
-          rationale: 'The rule attaches to looking, not to repeating. The organisation has a record of an unexplained access by somebody with no work reason for it, and from the outside that is indistinguishable from a serious event.',
+          rationale: 'The rule attaches to looking, not to repeating. The organization has a record of an unexplained access by somebody with no work reason for it, and from the outside that is indistinguishable from a serious event.',
         } },
       ],
     },
@@ -474,7 +474,7 @@ const ETHICS_AND_CONFIDENTIALITY: Course = {
           'The public post about the placement. Written with warmth about a moving day at work, describing one person closely enough that their own family would know them.',
         ] },
         { kind: 'concept', title: 'The identifiability test', text: [
-          'Before you repeat anything about a person, ask whether somebody who knows them would recognise them from what you are about to say. Not whether you named them. A neighbourhood, an age, a job and a condition together identify a person as surely as a name does.',
+          'Before you repeat anything about a person, ask whether somebody who knows them would recognize them from what you are about to say. Not whether you named them. A neighbourhood, an age, a job and a condition together identify a person as surely as a name does.',
           'If the answer is yes, or you are unsure, remove details until the answer is clearly no, or do not tell it.',
         ] },
         { kind: 'check', check: {
@@ -483,11 +483,11 @@ const ETHICS_AND_CONFIDENTIALITY: Course = {
           options: [
             'Because internal information should never be discussed publicly in any form',
             'Because a combination of details identifies a person as effectively as a name to anybody who knows them',
-            'Because the organisation has not approved the post',
+            'Because the organization has not approved the post',
             'It is not a problem, since no name was used',
           ],
           answer: 1,
-          rationale: 'Identifiability is not about names. Four ordinary details in combination are usually enough for the person\'s own circle to recognise them, which is the audience that matters most to them.',
+          rationale: 'Identifiability is not about names. Four ordinary details in combination are usually enough for the person\'s own circle to recognize them, which is the audience that matters most to them.',
         } },
         { kind: 'tryit', title: 'Check your own', text: [
           'Think of something you have already told somebody about a placement, a job or a shift.',
@@ -508,11 +508,11 @@ const ETHICS_AND_CONFIDENTIALITY: Course = {
         { kind: 'steps', title: 'Immediately', items: [
           { label: 'Tell your supervisor now', text: 'Before you have worked out how bad it is, and before you have decided whether it matters. Assessing it is their job and they need the time.' },
           { label: 'Say exactly what happened', text: 'What went where, to whom, when, and what it contained. Not a softened version. A softened version leads to the wrong response being chosen.' },
-          { label: 'Do not try to fix it quietly', text: 'Deleting, recalling or asking the recipient yourself before telling anybody removes information the organisation needs and turns an error into something that looks like concealment.' },
+          { label: 'Do not try to fix it quietly', text: 'Deleting, recalling or asking the recipient yourself before telling anybody removes information the organization needs and turns an error into something that looks like concealment.' },
           { label: 'Write it down afterwards', text: 'What happened and what was done. You will be glad of it, and so will the next person who does the same thing.' },
         ] },
         { kind: 'myths', items: [
-          { myth: 'Reporting it will end my placement.', reality: 'Prompt self-reporting of an ordinary error is treated as competence in every organisation worth being in. Concealment discovered later is the thing that ends placements.' },
+          { myth: 'Reporting it will end my placement.', reality: 'Prompt self-reporting of an ordinary error is treated as competence in every organization worth being in. Concealment discovered later is the thing that ends placements.' },
           { myth: 'I should check how serious it is first.', reality: 'You are not the person who assesses that, and the checking is what consumes the window in which the error was still easy to contain.' },
         ] },
         { kind: 'check', check: {
@@ -532,23 +532,23 @@ const ETHICS_AND_CONFIDENTIALITY: Course = {
     {
       id: 'if-3-l4',
       title: 'What you may say about the placement',
-      summary: 'You are a temporary representative of the organisation, and that has a shape.',
+      summary: 'You are a temporary representative of the organization, and that has a shape.',
       minutes: 5,
       blocks: [
         { kind: 'prose', text: [
-          'While you are there, people outside will read what you say as coming from the organisation, whether or not you intended it that way. That does not mean silence. It means knowing the three categories.',
+          'While you are there, people outside will read what you say as coming from the organization, whether or not you intended it that way. That does not mean silence. It means knowing the three categories.',
         ] },
         { kind: 'steps', title: 'Three categories', items: [
           { label: 'Yours to say', text: 'What you are learning, what you are working on in general terms, what you find interesting about the field. Your own experience is yours.' },
-          { label: 'Not yours to say', text: 'Anything about an identifiable person. Internal disagreements, funding difficulties, staffing problems. Anything a partner organisation told you in confidence. Numbers that have not been published.' },
-          { label: 'Not yours to say yet', text: 'Work in progress, a finding before the organisation has seen it, a plan before it is announced. Not secret, just not yours to time.' },
+          { label: 'Not yours to say', text: 'Anything about an identifiable person. Internal disagreements, funding difficulties, staffing problems. Anything a partner organization told you in confidence. Numbers that have not been published.' },
+          { label: 'Not yours to say yet', text: 'Work in progress, a finding before the organization has seen it, a plan before it is announced. Not secret, just not yours to time.' },
         ] },
         { kind: 'fieldnote', title: 'Speaking for it', text: [
           'If a journalist, a partner, a funder or a member of the public asks you something you are not sure you should answer, the correct answer is available and short: "I am on a placement here, so let me put you to the right person." Nobody has ever thought less of that reply.',
         ] },
         { kind: 'check', check: {
           id: 'if-3-c4',
-          q: 'A partner organisation asks an intern how a programme is performing. The intern has seen the numbers, which are not published. What should they do?',
+          q: 'A partner organization asks an intern how a program is performing. The intern has seen the numbers, which are not published. What should they do?',
           options: [
             'Share them, since the partner is entitled to know',
             'Give an approximate version to be helpful without being specific',
@@ -557,13 +557,13 @@ const ETHICS_AND_CONFIDENTIALITY: Course = {
           ],
           answer: 2,
           rationale: 'Unpublished numbers are not the intern\'s to time or to frame, and an approximation is worse than either silence or the real figure because it may be repeated as authoritative. Referring is short, accurate and costs nothing.',
-          distractors: 'Saying they do not know is untrue, and untruths from a placement are how an organisation loses a partner\'s trust in it.',
+          distractors: 'Saying they do not know is untrue, and untruths from a placement are how an organization loses a partner\'s trust in it.',
         } },
         { kind: 'takeaways', items: [
           'Access is not permission. Look at what the task needs and nothing else.',
           'Identifiability is not about names. Four ordinary details together are enough.',
           'Report your own error before assessing it. The delay is the damaging part.',
-          'Your experience is yours to talk about. The organisation\'s information is not.',
+          'Your experience is yours to talk about. The organization\'s information is not.',
         ] },
       ],
     },
@@ -598,7 +598,7 @@ const PORTFOLIO_AND_IMPACT: Course = {
   delivery: 'self-paced',
   title: 'Portfolio + Impact Documentation',
   promise:
-    'Leave with evidence of what you did that somebody who was not there can evaluate.',
+    'Leave with proof of your work that someone who was not there can judge.',
   about: [
     'The pathway requires an approved portfolio artifact, and most learners assemble it in the final week from memory. What they produce is a description of activity, because the evidence that would have supported a claim was not kept.',
     'This course is about collecting as you go and writing claims that survive a stranger reading them.',
@@ -625,7 +625,7 @@ const PORTFOLIO_AND_IMPACT: Course = {
         ] },
         { kind: 'example', title: 'Rewritten', text: [
           'Activity: "Supported the volunteer onboarding process." Impact: "Rewrote the onboarding checklist after sitting through four onboardings and finding that three of the eleven steps were being skipped every time. The revised version is now the one in use."',
-          'Activity: "Assisted with data entry for the resource directory." Impact: "Called 60 of the directory\'s 207 organisations to confirm their phone numbers and found 11 that could not be reached. All 11 are now flagged for follow up."',
+          'Activity: "Assisted with data entry for the resource directory." Impact: "Called 60 of the directory\'s 207 organizations to confirm their phone numbers and found 11 that could not be reached. All 11 are now flagged for follow up."',
           'Activity: "Attended weekly team meetings." Impact: not everything is impact, and this one is not. Leave it out rather than inflate it.',
         ] },
         { kind: 'why', text: [
@@ -708,7 +708,7 @@ const PORTFOLIO_AND_IMPACT: Course = {
           id: 'if-4-c3',
           q: 'Why does accurately distinguishing observed, assisted and led matter in a portfolio?',
           options: [
-            'Because programmes require standard language',
+            'Because programs require standard language',
             'Because overstatement is discovered in the follow-up question, and the discovery discredits everything else on the page',
             'Because leading is valued more highly',
             'Because supervisors check every entry',

@@ -168,7 +168,7 @@ export const COURSE_8_V2: Course = {
   readingLevel: 'adult',
   delivery: 'self-paced',
   title: 'Build Your Personal Health-Career Roadmap',
-  promise: 'Turn everything you researched into a working plan with 30, 60 and 90 day actions.',
+  promise: 'Turn what you learned into a plan with steps for the next 30, 60, and 90 days.',
   about: [
     'The final course turns exploration into a concrete plan. If you completed the artifact in each earlier course, most of this document already exists and this hour is arrangement, dating and honesty.',
     'The roadmap is not a permanent contract. It is a working document that should change as you gain information and experience, which is why it carries a review date.',

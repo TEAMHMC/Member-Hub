@@ -88,8 +88,8 @@ export const CREDENTIALS: CredentialSpec[] = [
     type: 'Course Completion',
     level: 'Discover',
     proves:
-      'The learner can map the health-professions ecosystem, verify education and licensure requirements against authoritative sources, and produce a realistic personal pathway plan.',
-    forWhom: 'Youth, college students, career changers, and individuals underrepresented in the health professions.',
+      'They can name the range of health careers, check what each one requires, and write a plan they can follow.',
+    forWhom: 'Young people, college students, career changers, and anyone who does not see themselves in health careers yet.',
     evidence: [
       'Enrollment in the published pathway version',
       'All 8 courses and required activities complete',
@@ -113,8 +113,8 @@ export const CREDENTIALS: CredentialSpec[] = [
     type: 'Course Completion',
     level: 'Discover',
     proves:
-      'The young person explored health, science, technology and community problem-solving through projects and mentoring, and completed a capstone build.',
-    forWhom: 'Young people in mentorship and STEAM programming, with appropriate consent and safeguarding in place.',
+      'They explored health, science, and tech through projects with a mentor, and finished a final build.',
+    forWhom: 'Young people in our mentoring and STEAM programs, once consent and safety checks are done.',
     evidence: [
       '8 courses complete',
       'Post-test at 80% or higher',
@@ -137,8 +137,8 @@ export const CREDENTIALS: CredentialSpec[] = [
     type: 'Applied Pathway Completion',
     level: 'Foundations',
     proves:
-      'The learner completed community health academic content and demonstrated the required field competencies under supervision in real HMC service settings.',
-    forWhom: 'Community health workers, promotoras, navigators, and field-based outreach volunteers.',
+      'They finished the coursework and showed the skills in real HMC settings, with a supervisor watching.',
+    forWhom: 'Community health workers, promotoras, navigators, and outreach volunteers.',
     evidence: [
       'Shared Foundations or approved equivalency',
       '8 pathway courses complete',
@@ -149,8 +149,8 @@ export const CREDENTIALS: CredentialSpec[] = [
       'Supervisor readiness sign-off',
     ],
     assessment: 'Post-test at 80%, integrated case lab',
-    applied: 'Required practicals plus supervised practicum hours',
-    signOff: 'Supervisor readiness sign-off required',
+    applied: 'Hands-on work, plus shift hours with a supervisor',
+    signOff: 'Your supervisor signs off that you are ready',
     expires: 'Academic content does not expire. Specific safety and clinical competencies can expire on the clinical governance schedule.',
     doesNotAuthorize: [
       'A California or Medi-Cal CHW certificate',
@@ -165,8 +165,8 @@ export const CREDENTIALS: CredentialSpec[] = [
     type: 'Applied Pathway Completion',
     level: 'Applied',
     proves:
-      'The learner completed structured clinical exposure, simulation cases, and a practical competency review within an authorized learner scope.',
-    forWhom: 'Pre-health, nursing, medical, PA and public-health students, and licensed professionals seeking field-medicine exposure.',
+      'They took part in clinical settings and simulations, and passed a skills check, all within what a learner is allowed to do.',
+    forWhom: 'Nursing, medical, PA, and public health students, plus licensed staff who want field experience.',
     evidence: [
       'Shared Foundations or approved equivalency',
       '8 pathway courses complete',
@@ -175,8 +175,8 @@ export const CREDENTIALS: CredentialSpec[] = [
       'Assigned practical competency review',
       'Reflection and debrief submitted',
     ],
-    assessment: 'Post-test at 80%, simulation case performance',
-    applied: 'Simulation lab plus practical competency review',
+    assessment: 'Score 80% on the final quiz, and do well in the simulation',
+    applied: 'Simulation lab, then a skills check',
     signOff: 'Authorized reviewer approval required',
     expires: 'Device and procedure competencies renew on the clinical governance schedule.',
     doesNotAuthorize: [
@@ -192,8 +192,8 @@ export const CREDENTIALS: CredentialSpec[] = [
     type: 'Fellowship / Internship Completion',
     level: 'Advanced',
     proves:
-      'The participant completed a defined supervised placement, an approved capstone or project, and a final evaluation.',
-    forWhom: 'Participants on a defined term with a supervisor, a learning agreement, and weekly assignments.',
+      'They finished a supervised placement, a final project, and an evaluation.',
+    forWhom: 'People doing a set term with a supervisor, an agreement, and weekly work.',
     evidence: [
       'Professional core complete',
       'Signed learning agreement',
@@ -203,8 +203,8 @@ export const CREDENTIALS: CredentialSpec[] = [
       'Final supervisor evaluation',
       'Approved portfolio artifact',
     ],
-    assessment: 'Capstone presentation and final evaluation',
-    applied: 'Full placement hours with weekly supervision',
+    assessment: 'Present your final project, then an evaluation',
+    applied: 'All your placement hours, with a check-in each week',
     signOff: 'Supervisor final evaluation required',
     expires: 'Does not expire',
     doesNotAuthorize: [
@@ -219,8 +219,8 @@ export const CREDENTIALS: CredentialSpec[] = [
     type: 'Course Completion',
     level: 'Leadership',
     proves:
-      'The participant completed mentor and peer-leadership content and passed a mentor practice case.',
-    forWhom: 'Experienced participants and professionals preparing to mentor, facilitate, or coordinate teams.',
+      'They finished the mentoring content and passed a practice case.',
+    forWhom: 'People with some experience who are getting ready to mentor, lead a group, or run a team.',
     evidence: [
       '8 courses complete',
       'Post-test at 80% or higher',

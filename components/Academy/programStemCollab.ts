@@ -263,7 +263,7 @@ export const STEM_CAMP: Course = {
   delivery: 'practical',
   title: 'STEM Collaborative Summer Camp',
   promise:
-    'Run the six-week medical STEM camp for grades 5 through 8, built around hands-on kits and taught by health professionals and engineers.',
+    'Run the six-week medical STEM camp for grades 5 to 8, built on hands-on kits and taught by health workers and engineers.',
   about: [
     'A six-week medical STEM camp for grades 5 through 8, built around hands-on kits and taught by health professionals and engineers who reflect the community being served. It is designed to be run again at a new site with a new cohort.',
     'Each week pairs a classic STEM subject with a health or health-technology subject, so students meet the science and its health application together rather than in separate units. The sequence builds from observable chemistry through body systems and diagnostics to design and invention, and closes on careers.',
@@ -279,9 +279,9 @@ export const STEM_CAMP: Course = {
   // locally and is not part of this figure.
   minutes: 270,
   prerequisites:
-    'Coordinator or instructor role. Youth safeguarding requirements must be satisfied before working with participants.',
+    'A coordinator or instructor role. Youth safety checks must be done before you work with young people.',
   whoFor:
-    'Camp coordinators, partner instructors, and community members administering the athletic and character-building curriculum.',
+    'Camp coordinators, partner instructors, and community members running the sports and character sessions.',
   requirements: [
     {
       id: 'safeguarding',
