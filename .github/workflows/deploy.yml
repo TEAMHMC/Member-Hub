@@ -31,6 +31,15 @@ jobs:
       # These gates exist because content defects reached production before.
       - run: npm test
       - run: npm run build
+      # Routing is invisible to the type check and to the build. The Hub had no
+      # addresses at all, so Back left the product instead of stepping back through
+      # it and no course could be linked to, and nothing above would have noticed.
+      # This drives the built output in a real browser, served the way Pages serves
+      # it, so it runs after the build rather than with the other gates.
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:render:routing
+      - run: npm run test:render:guest
+      - run: npm run test:render:catalog
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

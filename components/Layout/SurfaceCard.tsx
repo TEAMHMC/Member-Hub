@@ -3,6 +3,12 @@ import React from 'react';
 /**
  * The card the Hub uses everywhere something is offered.
  *
+ * A note on the greys. The eyebrow, the meta line and the fine print were all zinc-500,
+ * which measures 4.36:1 against this card's gradient where AA asks for 4.5:1. That is a
+ * small miss repeated on every card on every surface that uses one, and the meta line is
+ * where the hours and the lesson count live, so it is the text somebody squints at most.
+ * zinc-600 clears it with room to spare and is still visibly secondary to the title.
+ *
  * There were three different cards doing this job: a gradient one on the course list, a
  * plain white one on the home page, and another plain white one on the pathway catalogue.
  * Only the first was designed. The other two were containers, so the two pages a visitor
@@ -92,12 +98,12 @@ const SurfaceCard: React.FC<SurfaceCardProps> = ({
 
       <div className={badges ? 'mt-2' : ''}>
         {eyebrow && (
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500">{eyebrow}</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-600">{eyebrow}</p>
         )}
         <h3 className="text-[21px] font-semibold leading-tight tracking-tight text-zinc-900 mt-1.5 text-balance">
           {title}
         </h3>
-        {meta && <p className="text-[12px] text-zinc-500 mt-2">{meta}</p>}
+        {meta && <p className="text-[12px] text-zinc-600 mt-2">{meta}</p>}
       </div>
 
       {body && <p className="text-[13.5px] leading-relaxed text-zinc-700 flex-1">{body}</p>}
@@ -107,7 +113,7 @@ const SurfaceCard: React.FC<SurfaceCardProps> = ({
         <div className="mt-auto pt-2 space-y-3">
           {action}
           {secondary}
-          {note && <p className="text-[11.5px] text-zinc-500 leading-relaxed">{note}</p>}
+          {note && <p className="text-[11.5px] text-zinc-600 leading-relaxed">{note}</p>}
         </div>
       )}
     </div>
