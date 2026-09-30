@@ -157,7 +157,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   // is sent on its own. The server keeps whoever met them first.
   const attributeReturningMember = () => {
     if (!navRef) return;
-    clientApi.saveProfile({ referral: navRef }).catch(() => {}).finally(clearNavRef);
+    clientApi.saveProfile({ referral: navRef })
+      .catch((e) => { console.error('[navigator-ref] attribution save failed', { code: navRef.code, eventId: navRef.eventId, error: e }); })
+      .finally(clearNavRef);
   };
 
   // Google Identity Services, loaded only if the server gave us a client id.
@@ -294,7 +296,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         ...(navRef ? { referral: navRef } : {}),
       });
       clearNavRef();
-    } catch {
+    } catch (e) {
+      console.error('[onboarding] profile save failed', { hasReferral: !!navRef, error: e });
       // Not fatal to the sign-in. They are already authenticated, and blocking entry on a
       // profile write would lock somebody out of the Hub over a saved name. They will be
       // asked once more next time, which is the old behavior rather than a new failure.
