@@ -1367,6 +1367,12 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     // decision and outranks the catalog flag. Below that, readiness is derived from
     // whether there is any content, which cannot go stale because it is counted
     // rather than declared.
+    // Whether registering means "start whenever" or "join on a scheduled date."
+    // "Self-paced. Start any time." was shown for every published pathway regardless of
+    // this, so a pathway whose course is genuinely delivery: 'live' (The Unstoppable
+    // Experience) said both "Live class" on its course card and "Self-paced" right above
+    // the register button, on the same page.
+    const pathwayIsLive = p.courses.some((c) => c.delivery === 'live' || c.delivery === 'practical');
     const adminOpen = vis(p.id).state === 'open';
     const hasContent = pathwayHasContent(p);
     const published = hasContent && (adminOpen || p.status === 'published');
@@ -1450,9 +1456,13 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             <div>
               <p className="text-2xl font-semibold text-zinc-900">Register</p>
               <p className="text-sm text-zinc-500 mt-1">
-                {published
-                  ? 'Self-paced. Start any time.'
-                  : 'Start the courses that are open now. More are added over time, and your completion record opens once the full pathway is available.'}
+                {!published
+                  ? 'Start the courses that are open now. More are added over time, and your completion record opens once the full pathway is available.'
+                  : pathwayIsLive
+                  ? nextGuidedStart
+                    ? 'Register to hold your spot for the next guided start above.'
+                    : 'Live sessions. Register and we will email you as soon as the next date is scheduled.'
+                  : 'Self-paced. Start any time.'}
               </p>
             </div>
             <Btn onClick={() => {

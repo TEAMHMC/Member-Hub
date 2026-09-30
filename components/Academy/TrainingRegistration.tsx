@@ -36,6 +36,18 @@ const input =
   'w-full h-[48px] px-4 rounded-2xl border border-zinc-200 bg-white text-[15px] focus:ring-4 focus:ring-[#233DFF]/10 focus:border-[#233DFF]/30 outline-none transition-all placeholder:text-zinc-300';
 const label = 'block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1';
 
+// Was defined inside TrainingRegistration's own body, so every keystroke's setState
+// recreated it as a brand-new component type — React unmounted and remounted the
+// whole modal, including whichever field had focus, on every character typed. It
+// only ever used its own children prop, so hoisting it here is a pure fix.
+const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="fixed inset-0 z-[80] bg-zinc-900/40 backdrop-blur-sm flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+    <div className="w-full max-w-lg bg-white rounded-[32px] p-7 sm:p-9 my-8 space-y-6 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+      {children}
+    </div>
+  </div>
+);
+
 const TrainingRegistration: React.FC<Props> = ({ course, session, member, onClose, onAccountCreated }) => {
   const signedIn = !!member?.email;
 
@@ -147,14 +159,6 @@ const TrainingRegistration: React.FC<Props> = ({ course, session, member, onClos
     }
   };
 
-  const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <div className="fixed inset-0 z-[80] bg-zinc-900/40 backdrop-blur-sm flex items-start sm:items-center justify-center p-4 overflow-y-auto">
-      <div className="w-full max-w-lg bg-white rounded-[32px] p-7 sm:p-9 my-8 space-y-6 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-        {children}
-      </div>
-    </div>
-  );
-
   // ── Confirmation ───────────────────────────────────────────────────────
   if (step === 'done') {
     return (
@@ -172,6 +176,11 @@ const TrainingRegistration: React.FC<Props> = ({ course, session, member, onClos
                 Your place is held for {course.title} on{' '}
                 {new Date(session.startsAt).toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' })}. A
                 confirmation is on its way to {email}.
+              </>
+            ) : course.delivery === 'self-paced' ? (
+              <>
+                {course.title} is self-paced, so there is nothing to wait for. A confirmation is on its way to {email}
+                {' '}and you can start whenever you are ready.
               </>
             ) : (
               <>
@@ -295,7 +304,12 @@ const TrainingRegistration: React.FC<Props> = ({ course, session, member, onClos
           {session ? 'Register for this session' : 'Register your interest'}
         </p>
         <h2 className="text-2xl font-semibold text-zinc-900 tracking-tight leading-tight">{course.title}</h2>
-        {!session && (
+        {!session && course.delivery === 'self-paced' && (
+          <p className="text-[14px] text-zinc-600 leading-relaxed">
+            This training is self-paced. There is nothing to schedule — register and you can start right away.
+          </p>
+        )}
+        {!session && course.delivery !== 'self-paced' && (
           <p className="text-[14px] text-zinc-600 leading-relaxed">
             This training is delivered live. No date is scheduled right now, so we will hold your details and email you
             when the next session opens.
