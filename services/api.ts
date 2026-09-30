@@ -94,7 +94,40 @@ export interface HmcEvent {
   rsvpUrl?: string;
   lat?: number;
   lng?: number;
+  /** Which HMC programme this belongs to. Decides the map pin's colour. */
+  program?: string;
 }
+
+/**
+ * Pin colours, by programme.
+ *
+ * These are the Event Finder's, deliberately. A member who finds an event on the Event
+ * Finder and then opens the Hub is looking at the same events, and a wellness meetup that
+ * is purple on one and blue on the other reads as two different things rather than one
+ * HMC. The Hub previously drew every pin in Leaflet's default blue, so the map carried no
+ * information at all beyond location.
+ *
+ * Kept in step by hand today, because the two live in separate repositories with no shared
+ * package. The right home for this is the events API that already serves `program`, so both
+ * surfaces are told the colour rather than each deciding it.
+ */
+export const PROGRAM_COLORS: Record<string, string> = {
+  'Unstoppable Workshop': '#233dff',
+  'Unstoppable Wellness Meetup': '#7c3aed',
+  'Community Walk & Run': '#059669',
+  'Community Fair': '#ea580c',
+  'Community Wellness': '#db2777',
+  'Partner Event': '#0891b2',
+  'Training': '#4338ca',
+  'Volunteer': '#f59e0b',
+  'Conference': '#b91c1c',
+  'Meeting': '#0d9488',
+  'Panel': '#a21caf',
+  default: '#4b5563',
+};
+
+export const programColor = (program?: string): string =>
+  (program && PROGRAM_COLORS[program]) || PROGRAM_COLORS.default;
 
 export interface ClientMe {
   identified: boolean;

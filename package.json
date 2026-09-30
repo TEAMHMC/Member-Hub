@@ -24,7 +24,9 @@
     "test:course-editor": "tsx tests/course-editor.test.ts",
     "test:render:routing": "node tests/browser/routing.cjs",
     "test:render:guest": "node tests/browser/guest-progress.cjs",
-    "test:render:catalog": "node tests/browser/academy-catalog.cjs"
+    "test:render:catalog": "node tests/browser/academy-catalog.cjs",
+    "test:render:ordinal": "node tests/browser/course-ordinal.cjs",
+    "test:render:events": "node tests/browser/events-view.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.562.0",

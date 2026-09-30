@@ -1321,6 +1321,40 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     if (!p) return renderCatalog();
     const accent = LEVEL_ACCENT[p.level];
     const registered = state.enrolled.includes(p.id);
+
+    /**
+     * The next guided start, taken from real scheduled sessions.
+     *
+     * This used to render `p.guidedStart`, a date typed into the catalogue as a display
+     * string. A string cannot expire, so the promise underneath it, that a passed date
+     * would be replaced by the next one, could never come true: on 23 September the
+     * pathway was still advertising a start of 1 September. Worse, correcting it meant a
+     * deploy, which is the opposite of a cadence somebody can keep.
+     *
+     * Sessions come from the portal, where a recurring event carrying an academyCourseId
+     * already feeds this Academy. Only future sessions are considered, the soonest wins,
+     * and when nothing is scheduled the block does not appear rather than showing a date
+     * that has gone.
+     */
+    // Computed plainly rather than memoised. renderPathway is an ordinary function called
+    // conditionally from the render body, not a component, so a hook here changes the hook
+    // count between views and breaks every other screen. The work is a filter over a handful
+    // of sessions and costs nothing worth memoising.
+    const nextGuidedStart = (() => {
+      const now = Date.now();
+      const upcoming = p.courses
+        .flatMap((c) => scheduled[c.id] || [])
+        .map((s) => new Date(s.startsAt).getTime())
+        .filter((at) => Number.isFinite(at) && at >= now)
+        .sort((a, b) => a - b);
+      if (!upcoming.length) return null;
+      return {
+        label: new Date(upcoming[0]).toLocaleString('en-US', {
+          month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit',
+          timeZone: 'America/Los_Angeles', timeZoneName: 'short',
+        }),
+      };
+    })();
     // What a member is told about readiness, and where that comes from.
     //
     // This used to be p.status === 'published' alone: a flag typed by hand into the
@@ -1400,10 +1434,10 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           </section>
         )}
 
-        {p.guidedStart && (
+        {nextGuidedStart && (
           <div className="rounded-2xl border border-[#FF6E40]/25 bg-orange-50/50 p-6 space-y-1.5">
             <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF6E40]">Next guided start</p>
-            <p className="text-lg font-semibold text-zinc-900">{p.guidedStart}</p>
+            <p className="text-lg font-semibold text-zinc-900">{nextGuidedStart.label}</p>
             <p className="text-sm text-zinc-600">
               Register now and begin straight away, or start with the group on this date. If the date
               passes, you will be offered the next one.
@@ -1489,10 +1523,15 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             <div className="space-y-4">
               <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Courses</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {p.courses.map((raw) => mergedCourse(raw, overrides[raw.id])).map((c) => (
+                {p.courses.map((raw) => mergedCourse(raw, overrides[raw.id])).map((c, i) => (
                   <CourseCard
                     key={c.id}
-                    num={c.num}
+                    /* Position in the pathway, not the course's own `num`. That field is
+                       maintained by hand and duplicates what the array already knows, so it
+                       goes stale the moment a pathway is split or reordered: the facilitator
+                       training kept num 2 after it became the only course in its pathway and
+                       the card read "Course 2 of 1". */
+                    num={i + 1}
                     total={p.courses.length}
                     title={c.title}
                     promise={c.promise}
