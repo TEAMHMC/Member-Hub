@@ -447,6 +447,19 @@ export const context = {
     req<{ visitorId: string | null; actions: NextAction[] }>('/api/context/next-actions'),
 };
 
+// ── A visit, carried from the welcome chat ───────────────────────────────
+// Keyed by the visit token the person was given, never by who they are, so it needs no
+// sign-in and cannot show one person's place to another.
+export interface VisitView {
+  firstName: string | null;
+  volunteerFirstName: string | null;
+  event: { title: string; date: string | null; time: string | null; location: string | null } | null;
+  line: { status: 'waiting' | 'called' | 'done' | 'left'; peopleAhead: number; calledByName: string | null } | null;
+}
+export const visit = {
+  get: (token: string) => req<VisitView>(`/api/public/visit/${encodeURIComponent(token)}`),
+};
+
 // ── Events (Event Finder data, already live + cached) ────────────────────
 export const events = {
   list: () => req<HmcEvent[] | { events: HmcEvent[] }>('/api/public/events'),

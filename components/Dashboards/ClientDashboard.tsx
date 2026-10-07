@@ -7,6 +7,7 @@ import { context as ctxApi, client as clientApi, referrals as referralsApi, sunn
 import HealthCredits from './HealthCredits';
 import YourProgress from './YourProgress';
 import YourResults from './YourResults';
+import TodaysVisit from './TodaysVisit';
 import MemberReferrals from './MemberReferrals';
 import { isOpen as referralIsOpen } from './referralCopy';
 import { useEvents } from '../../services/hooks';
@@ -506,6 +507,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
                </>
              )}
         </div>
+        <div className="max-w-xl mx-auto pt-4 w-full"><TodaysVisit audience={user.audience} signedIn={!guest} onOpenAcademy={() => setActiveTab('academy')} /></div>
         {me && (me.credits.balance > 0 || me.referrals.length > 0) && (
           <div className="flex flex-wrap gap-3 justify-center pt-2">
             {me.credits.balance > 0 && (
@@ -1076,6 +1078,8 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
           <ButtonSecondary onClick={() => setActiveTab('events')}>Browse events</ButtonSecondary>
         </div>
       </div>
+
+      <div className="max-w-xl mx-auto w-full"><TodaysVisit audience="learner" signedIn={!guest} onOpenAcademy={() => setActiveTab('academy')} /></div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <Card className="flex flex-col gap-6 p-8 group hover:border-[#233DFF]/30 transition-all cursor-pointer" onClick={() => setActiveTab('academy')}>
