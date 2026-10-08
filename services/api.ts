@@ -7,10 +7,10 @@ const API_BASE =
   (import.meta as any).env?.VITE_API_BASE || 'https://volunteer.healthmatters.clinic';
 
 // Sibling tools in the ecosystem (deep-linked, carrying the shared visitorId).
-// URLs verified to resolve (2026-08-01): Check Yourself lives at a /resources
-// path, not a subdomain; Calm Kit and Event Finder are live subdomains.
+// Every tool is linked on its own domain, never through the healthmatters.clinic /resources
+// page that embeds it. Verified to resolve (2026-10-07): checkyourself, calmkit, eventfinder.
 export const TOOLS = {
-  checkYourself: 'https://healthmatters.clinic/resources/checkyourself',
+  checkYourself: 'https://checkyourself.healthmatters.clinic',
   calmKit: 'https://calmkit.healthmatters.clinic',
   eventFinder: 'https://eventfinder.healthmatters.clinic',
   resources: 'https://healthmatters.clinic/resources', // branded landing hub
@@ -445,6 +445,19 @@ export const context = {
     }).catch(() => ({ ok: false })),
   nextActions: () =>
     req<{ visitorId: string | null; actions: NextAction[] }>('/api/context/next-actions'),
+};
+
+// ── A visit, carried from the welcome chat ───────────────────────────────
+// Keyed by the visit token the person was given, never by who they are, so it needs no
+// sign-in and cannot show one person's place to another.
+export interface VisitView {
+  firstName: string | null;
+  volunteerFirstName: string | null;
+  event: { title: string; date: string | null; time: string | null; location: string | null } | null;
+  line: { status: 'waiting' | 'called' | 'done' | 'left'; peopleAhead: number; calledByName: string | null } | null;
+}
+export const visit = {
+  get: (token: string) => req<VisitView>(`/api/public/visit/${encodeURIComponent(token)}`),
 };
 
 // ── Events (Event Finder data, already live + cached) ────────────────────
