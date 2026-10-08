@@ -460,6 +460,40 @@ export const visit = {
   get: (token: string) => req<VisitView>(`/api/public/visit/${encodeURIComponent(token)}`),
 };
 
+// ── What HMC tells a visitor about volunteering and about partnering ─────
+// Served by the portal from the same constants the volunteer application, the training
+// tiers and the partnership types run on, so these pages cannot describe a step the portal
+// does not have. Public, and the same for everyone.
+export interface TrainingModuleInfo { id: string; title: string; description: string; minutes: number }
+export interface VolunteerInfo {
+  headline: string;
+  lead: string;
+  about: string;
+  formats: Array<{ name: string; detail: string }>;
+  programAreas: Array<{ id: string; name: string; tracks: string[] }>;
+  training: {
+    summary: string;
+    tiers: Array<{ id: string; name: string; when: string; unlocks: string; totalMinutes: number; modules: TrainingModuleInfo[] }>;
+    programs: Array<{ id: string; name: string; blurb: string; totalMinutes: number; modules: Array<TrainingModuleInfo & { alsoBaseline: boolean }> }>;
+  };
+  apply: { steps: Array<{ title: string; detail: string }>; agreements: string[]; resume: string };
+  faq: Array<{ q: string; a: string }>;
+}
+export interface PartnerInfo {
+  headline: string;
+  lead: string;
+  capabilities: Array<{ label: string; title: string; description: string }>;
+  types: Array<{ id: string; name: string; tagline: string; forWhom: string; description: string; youGet: string[]; weAsk: string[] }>;
+  eligibility: string[];
+  notAFit: string[];
+  steps: Array<{ number: string; title: string; description: string }>;
+  faq: Array<{ q: string; a: string }>;
+}
+export const info = {
+  volunteer: () => req<VolunteerInfo>('/api/public/volunteer-info'),
+  partner: () => req<PartnerInfo>('/api/public/partner-info'),
+};
+
 // ── Events (Event Finder data, already live + cached) ────────────────────
 export const events = {
   list: () => req<HmcEvent[] | { events: HmcEvent[] }>('/api/public/events'),

@@ -42,26 +42,15 @@ const Sidebar: React.FC<SidebarProps> = ({
   // console through the button below, so there is one set of surfaces to keep
   // working and staff see the same thing members see.
   /**
-   * Destinations that are not tabs in this app.
+   * Volunteering and partnering are pages in the Hub.
    *
-   * Volunteering and partnering both have their own product with their own account,
-   * and the Hub had no route to either, so the two questions it is asked most often
-   * after "what can I learn" had no answer in the nav. These are rendered as links
-   * that visibly leave, rather than as tabs that look like they load in place.
+   * They used to be links that left for two other sites, so somebody deciding whether to volunteer or to
+   * bring an organization in had to go elsewhere to find out what either involves. Each is now a page here,
+   * with the explanation and the detail, and the application or the account is the last step on it.
    */
-  const OUTBOUND = [
-    {
-      icon: <HeartHandshake size={18} />,
-      label: 'Volunteer',
-      id: 'volunteer',
-      href: 'https://volunteer.healthmatters.clinic',
-    },
-    {
-      icon: <Building2 size={18} />,
-      label: 'For Organizations',
-      id: 'partners',
-      href: 'https://partner.healthmatters.clinic',
-    },
+  const INFO_PAGES = [
+    { icon: <HeartHandshake size={18} />, label: 'Volunteer', id: 'volunteer' },
+    { icon: <Building2 size={18} />, label: 'For Organizations', id: 'organizations' },
   ];
 
   const getNavItems = () => {
@@ -75,7 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
         { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
         { icon: <ShieldCheck size={18} />, label: 'Resources', id: 'resources' },
-        ...OUTBOUND,
+        ...INFO_PAGES,
       ];
     }
     // A learner has no care relationship with HMC, so the screening,
@@ -86,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         { icon: <GraduationCap size={18} />, label: 'Academy', id: 'academy' },
         { icon: <Calendar size={18} />, label: 'Events', id: 'events' },
         ...(SHOW_CREDITS ? [{ icon: <Coins size={18} />, label: 'Credits', id: 'credits' }] : []),
-        ...OUTBOUND,
+        ...INFO_PAGES,
       ];
     }
     /**
@@ -112,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       ...(hasResults ? [{ icon: <Activity size={18} />, label: 'Results', id: 'health' }] : []),
       { icon: <ShieldCheck size={18} />, label: 'Resources', id: 'resources' },
       ...(SHOW_CREDITS ? [{ icon: <Coins size={18} />, label: 'Credits', id: 'credits' }] : []),
-      ...OUTBOUND,
+      ...INFO_PAGES,
     ];
   };
 

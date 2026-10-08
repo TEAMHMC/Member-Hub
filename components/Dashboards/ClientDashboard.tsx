@@ -8,6 +8,8 @@ import HealthCredits from './HealthCredits';
 import YourProgress from './YourProgress';
 import YourResults from './YourResults';
 import TodaysVisit from './TodaysVisit';
+import VolunteerPage from '../Pages/VolunteerPage';
+import OrganizationsPage from '../Pages/OrganizationsPage';
 import MemberReferrals from './MemberReferrals';
 import { isOpen as referralIsOpen } from './referralCopy';
 import { useEvents } from '../../services/hooks';
@@ -1119,7 +1121,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
   // this list did not contain it, so a learner clicking Credits was bounced to the Academy
   // with no explanation. A tab that is offered and then refused is worse than one that is
   // not offered.
-  const LEARNER_TABS = ['dash', 'academy', 'events', 'credits', 'profile'];
+  const LEARNER_TABS = ['dash', 'academy', 'events', 'credits', 'profile', 'volunteer', 'organizations'];
 
   /**
    * What is readable with no account.
@@ -1128,7 +1130,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
    * something a person was previously sent a link to and met a sign-in form instead: a
    * course, an event, the resource directory. Acting on any of them still asks.
    */
-  const PUBLIC_TABS = ['dash', 'academy', 'events', 'resources'];
+  const PUBLIC_TABS = ['dash', 'academy', 'events', 'resources', 'volunteer', 'organizations'];
 
   /**
    * Runs an action, or asks for an account first.
@@ -1164,6 +1166,8 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         return dynamicGoals.length === 0 || answering ? renderScreener() : renderGamePlan();
       case 'resources': return renderResources();
       case 'credits': return <HealthCredits />;
+      case 'volunteer': return <VolunteerPage />;
+      case 'organizations': return <OrganizationsPage />;
       case 'profile': return renderProfile();
       case 'dash': default: return renderHome();
     }

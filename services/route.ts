@@ -52,6 +52,8 @@ const TAB_TO_SEGMENT: Record<string, string> = {
   health: 'results',
   credits: 'credits',
   profile: 'profile',
+  volunteer: 'volunteer',
+  organizations: 'organizations',
   'check-yourself': 'check-yourself',
 };
 
