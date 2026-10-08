@@ -1,3 +1,4 @@
+import { HAIRLINE, SHAPE_SUNNY, SHAPE_PERSON, BUBBLE_TEXT } from './sunnyChatStyle';
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Loader2, Sparkles, Phone, Heart, Brain, Calendar } from 'lucide-react';
 import { sunny, context as ctxApi, toolLink, TOOLS, type SunnyTurn } from '../../services/api';
@@ -123,13 +124,13 @@ const SunnyNavigator: React.FC<Props> = ({ visitorId, pageTitle, pageContext }) 
       <button
         onClick={() => { setOpen((o) => !o); if (!open) ctxApi.event('tool_open', { tool: 'sunny' }); }}
         aria-label="Open Sunny, your wellness navigator"
-        className="fixed bottom-6 right-6 z-[90] h-14 w-14 rounded-full bg-[#233DFF] text-white shadow-xl shadow-[#233DFF]/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+        className={`fixed bottom-6 right-6 z-[90] h-14 w-14 rounded-full bg-[#233DFF] text-white shadow-xl shadow-[#233DFF]/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform ${HAIRLINE}`}
       >
         {open ? <X size={24} /> : <Sparkles size={24} />}
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-6 z-[90] w-[calc(100vw-3rem)] max-w-[400px] h-[560px] max-h-[calc(100vh-8rem)] bg-white rounded-[28px] shadow-2xl border border-zinc-100 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300">
+        <div className="fixed bottom-24 right-6 z-[90] w-[calc(100vw-3rem)] max-w-[400px] h-[560px] max-h-[calc(100vh-8rem)] bg-white rounded-[28px] shadow-2xl border border-[#0f0f0f] flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300">
           {/* Header */}
           <div className="px-5 py-4 bg-[#233DFF] text-white flex items-center gap-3 shrink-0">
             <div className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center">
@@ -156,8 +157,8 @@ const SunnyNavigator: React.FC<Props> = ({ visitorId, pageTitle, pageContext }) 
             {msgs.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                    m.role === 'user' ? 'bg-[#233DFF] text-white' : 'bg-zinc-100 text-zinc-800'
+                  className={`max-w-[80%] ${BUBBLE_TEXT} ${
+                    m.role === 'user' ? `${SHAPE_PERSON} bg-[#233DFF] text-white` : `${SHAPE_SUNNY} bg-zinc-100 text-zinc-800`
                   }`}
                 >
                   {m.content}
@@ -166,7 +167,7 @@ const SunnyNavigator: React.FC<Props> = ({ visitorId, pageTitle, pageContext }) 
             ))}
             {busy && (
               <div className="flex justify-start">
-                <div className="bg-zinc-100 text-zinc-500 rounded-2xl px-4 py-2.5 text-sm flex items-center gap-2">
+                <div className={`bg-zinc-100 text-zinc-500 ${SHAPE_SUNNY} ${BUBBLE_TEXT} flex items-center gap-2`}>
                   <Loader2 size={14} className="animate-spin" /> Sunny is thinking...
                 </div>
               </div>
@@ -182,9 +183,9 @@ const SunnyNavigator: React.FC<Props> = ({ visitorId, pageTitle, pageContext }) 
                 target="_blank"
                 rel="noreferrer"
                 onClick={() => ctxApi.event('tool_open', { from: 'sunny', tool: c.ev })}
-                className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:border-[#233DFF]/40 transition-colors"
+                className={`shrink-0 inline-flex items-center gap-2 bg-white text-zinc-800 hover:bg-zinc-50 transition-colors ${SHAPE_SUNNY} ${BUBBLE_TEXT} ${HAIRLINE}`}
               >
-                <c.icon size={13} /> {c.label}
+                <c.icon size={14} /> {c.label}
               </a>
             ))}
           </div>
@@ -198,12 +199,12 @@ const SunnyNavigator: React.FC<Props> = ({ visitorId, pageTitle, pageContext }) 
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Tell Sunny what you need..."
-              className="flex-1 h-11 rounded-2xl bg-zinc-100 px-4 text-sm outline-none focus:ring-2 focus:ring-[#233DFF]/20"
+              className={`flex-1 h-11 rounded-2xl bg-white px-4 text-sm outline-none focus:ring-2 focus:ring-[#233DFF]/20 ${HAIRLINE}`}
             />
             <button
               type="submit"
               disabled={busy || !input.trim()}
-              className="h-11 w-11 rounded-2xl bg-[#233DFF] text-white flex items-center justify-center disabled:opacity-40"
+              className={`h-11 w-11 rounded-2xl bg-[#233DFF] text-white flex items-center justify-center disabled:opacity-40 ${HAIRLINE}`}
             >
               <Send size={18} />
             </button>

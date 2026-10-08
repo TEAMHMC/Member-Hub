@@ -113,6 +113,8 @@ const parseAcademy = (parts: string[]): AcademyRoute => {
 export const parse = (pathname: string): Route => {
   const parts = pathname.split('/').filter(Boolean);
   if (parts.length === 0) return { tab: 'dash' };
+  // The Unstoppable Experience was a course and is now an event. Links people were sent to the course land on Events.
+  if (parts[0] === 'academy' && parts.includes('unstoppable-community')) return { tab: 'events' };
   if (parts[0] === 'academy') return { tab: 'academy', academy: parseAcademy(parts.slice(1)) };
   const tab = SEGMENT_TO_TAB[parts[0]];
   // An address the Hub does not know is Home, not a blank screen.

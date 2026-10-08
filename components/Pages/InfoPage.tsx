@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronDown, ArrowUpRight } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 /**
  * The frame the Volunteer and For Organizations pages share.
@@ -103,8 +103,8 @@ function InfoPage<T>({ eyebrow, load, fallbackHref, fallbackLabel, title, lead, 
           <p className="text-base font-semibold text-zinc-900">This page did not load.</p>
           <p className="text-sm text-zinc-600">Check your connection and try again. You can also go straight to the source.</p>
           <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={() => setAttempt(a => a + 1)} className="rounded-full bg-[#233DFF] text-white px-5 py-2.5 text-sm font-semibold">Try again</button>
-            <a href={fallbackHref} className="rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-semibold text-zinc-800">{fallbackLabel}</a>
+            <button type="button" onClick={() => setAttempt(a => a + 1)} className="hmc-btn hmc-btn-primary">Try again</button>
+            <a href={fallbackHref} className="hmc-btn hmc-btn-secondary">{fallbackLabel}</a>
           </div>
         </div>
       )}
@@ -126,7 +126,7 @@ function InfoPage<T>({ eyebrow, load, fallbackHref, fallbackLabel, title, lead, 
             <h2 className="text-2xl font-semibold tracking-tight">{cta.heading}</h2>
             <p className="text-zinc-300 leading-relaxed max-w-2xl">{cta.text}</p>
             <div className="flex flex-wrap items-center gap-4 pt-2">
-              <a href={cta.href} className="inline-flex items-center gap-2 rounded-full bg-white text-zinc-900 px-6 py-3 text-sm font-semibold">{cta.label}<ArrowUpRight size={16} /></a>
+              <a href={cta.href} className="hmc-btn hmc-btn-secondary">{cta.label}</a>
               <a href={`mailto:${cta.contact.email}`} className="text-sm text-zinc-300 underline">{cta.contact.label}: {cta.contact.email}</a>
             </div>
           </aside>

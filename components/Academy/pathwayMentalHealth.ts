@@ -157,14 +157,9 @@ export const UNSTOPPABLE_CE: Course = {
 //
 // The third audience, and the one that had nothing.
 //
-// The Academy served the licensed professional earning CE and the person preparing to
-// facilitate. The community participant, who is who the whole program is actually for,
-// was listed as a planned course and did not exist. Meanwhile healthmatters.clinic sends
-// people to the Hub to book exactly this. It sits in its own pathway,
-// unstoppable-community, because it is a different person from the other two.
-//
-// Migrated from the Unstoppable Experience Queue Cards. Open to anyone, no license and no
-// prerequisites, because that is what it is.
+// The content of the Unstoppable Experience, the live monthly hour open to everyone, migrated from the Unstoppable
+// Experience Queue Cards. It is an event and is no longer listed in the Academy (see catalog.ts); this stays so an event page
+// can show what happens before somebody joins.
 
 export const UNSTOPPABLE_EXPERIENCE: Course = {
   id: 'unstoppable-experience',
@@ -442,4 +437,5 @@ export const CMHW_FACILITATOR: Course = {
  * everybody arrives. Then the CE course for licensed professionals, then the certification
  * for the people who decide they want to run it themselves. Each has its own pathway.
  */
-export const MENTAL_HEALTH_COURSES: Course[] = [UNSTOPPABLE_EXPERIENCE, UNSTOPPABLE_CE, CMHW_FACILITATOR];
+// The Unstoppable Experience is deliberately not here: it is an event, not a course. See the note in catalog.ts.
+export const MENTAL_HEALTH_COURSES: Course[] = [UNSTOPPABLE_CE, CMHW_FACILITATOR];

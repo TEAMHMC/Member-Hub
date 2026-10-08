@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-22T23:58:00.639Z",
+  "generatedAt": "2026-10-08T21:08:09.468Z",
   "courses": [
     {
       "id": "hce-1",
@@ -182,13 +182,6 @@
       "pathwayId": "mentor-leader",
       "pathwayTitle": "Mentor + Leader",
       "delivery": "self-paced"
-    },
-    {
-      "id": "unstoppable-experience",
-      "title": "The Unstoppable Experience",
-      "pathwayId": "unstoppable-community",
-      "pathwayTitle": "The Unstoppable Experience",
-      "delivery": "live"
     },
     {
       "id": "cmhw-facilitator",

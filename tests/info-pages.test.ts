@@ -69,6 +69,14 @@ const api = read('services/api.ts');
   ok(/export const info =/.test(api) && /\/api\/public\/volunteer-info/.test(api) && /\/api\/public\/partner-info/.test(api), 'the API client has both calls');
 }
 
+// The action buttons are the shared HMC buttons, with the dot
+{
+  ok((frame.match(/hmc-btn hmc-btn-(primary|secondary)/g) || []).length === 3, 'Try again, the fallback link and the closing step are all shared HMC buttons');
+  ok(!/ArrowUpRight/.test(frame), 'the closing step has no stray arrow icon next to the shared dot');
+  ok(!/hmc-btn-arrow/.test(strip(dash)), 'no Home button uses the arrow variant, which removes the dot: Get support and Build my Playbook carry the dot like every other button');
+  ok(/hmc-btn hmc-btn-primary justify-center mt-6 w-full/.test(read('components/Layout/ErrorBoundary.tsx')), 'the error screen\'s reload button is a shared HMC button');
+}
+
 // Copy rules for words written in the Hub
 {
   const written = [frame, vol, org].map(strip).join('\n');
