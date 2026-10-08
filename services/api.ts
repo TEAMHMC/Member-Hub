@@ -7,10 +7,10 @@ const API_BASE =
   (import.meta as any).env?.VITE_API_BASE || 'https://volunteer.healthmatters.clinic';
 
 // Sibling tools in the ecosystem (deep-linked, carrying the shared visitorId).
-// URLs verified to resolve (2026-08-01): Check Yourself lives at a /resources
-// path, not a subdomain; Calm Kit and Event Finder are live subdomains.
+// Every tool is linked on its own domain, never through the healthmatters.clinic /resources
+// page that embeds it. Verified to resolve (2026-10-07): checkyourself, calmkit, eventfinder.
 export const TOOLS = {
-  checkYourself: 'https://healthmatters.clinic/resources/checkyourself',
+  checkYourself: 'https://checkyourself.healthmatters.clinic',
   calmKit: 'https://calmkit.healthmatters.clinic',
   eventFinder: 'https://eventfinder.healthmatters.clinic',
   resources: 'https://healthmatters.clinic/resources', // branded landing hub
