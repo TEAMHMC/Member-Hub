@@ -401,7 +401,7 @@ import { CES_FOUNDATION_COURSES, CES_PRE, CES_POST } from './pathwayClinicalFoun
 import { MENTOR_LEADER_COURSES, MENTOR_PRE, MENTOR_POST } from './pathwayMentorLeader';
 import { INTERNSHIP_COURSES } from './pathwayInternships';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
-import { CMHW_FACILITATOR, UNSTOPPABLE_CE, UNSTOPPABLE_EXPERIENCE } from './pathwayMentalHealth';
+import { CMHW_FACILITATOR, UNSTOPPABLE_CE } from './pathwayMentalHealth';
 import { STEM_CAMP } from './programStemCollab';
 import { COURSE_1_V2 } from './course1V2';
 import { COURSE_2_V2 } from './course2V2';
@@ -794,32 +794,12 @@ export const PATHWAYS: Pathway[] = [
   },
 ];
 
-// The third Unstoppable audience, and the one the other two exist for: the community
-// participant. It was listed as planned work on the facilitator pathway, which gated the
-// facilitator credential on a course its holders never take. It has its own pathway
-// because it has its own person. No license, no referral, nothing to finish first.
-// Listed first of the three because it is how almost everybody arrives.
-
-PATHWAYS.push({
-  family: 'Mental Health + Community Education',
-  id: 'unstoppable-community',
-  title: 'The Unstoppable Experience',
-  level: 'Discover',
-  status: 'published',
-  purpose:
-    'A live monthly hour to pause and talk about mental health with people who get it. Open to everyone.',
-  format: 'One live online session a month. Read what happens before you join.',
-  credentialTitle: 'Unstoppable Experience Participant',
-  credentialType: 'Course Completion',
-  gates: [
-    'Join a session',
-  ],
-  courses: [UNSTOPPABLE_EXPERIENCE],
-  plannedCourses: [],
-  version: '1.0',
-  effectiveDate: 'Migrated from the Unstoppable Experience Queue Cards, September 22, 2026',
-  nextReview: 'After the first three monthly sessions run from the Hub',
-});
+// The Unstoppable Experience is an event, not a training, and is not listed in the Academy. It is a live monthly
+// session open to everyone, with nothing to finish and no credential, so it belongs on the events calendar where people
+// find and RSVP to sessions. It was registered here as the pathway 'unstoppable-community' with a participation
+// credential, which put an open community hour next to coursework and licensed continuing education. The session content
+// still lives in pathwayMentalHealth.ts (UNSTOPPABLE_EXPERIENCE) so an event page can use it. The old course address now
+// opens Events (services/route.ts).
 
 // These are two different programs for two different people, and they were one
 // pathway. The continuing education course is for licensed professionals and needs a

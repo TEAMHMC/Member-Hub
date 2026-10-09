@@ -65,7 +65,7 @@ class ErrorBoundary extends React.Component<Props, State> {
           </p>
           <button
             onClick={this.reload}
-            className="mt-6 w-full px-5 py-3 rounded-full bg-[#233DFF] text-white text-[11px] font-black uppercase tracking-wider"
+            className="hmc-btn hmc-btn-primary justify-center mt-6 w-full"
           >
             Reload the page
           </button>
