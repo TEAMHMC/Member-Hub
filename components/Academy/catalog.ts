@@ -403,6 +403,7 @@ import { CES_FOUNDATION_COURSES, CES_PRE, CES_POST } from './pathwayClinicalFoun
 import { MENTOR_LEADER_COURSES, MENTOR_PRE, MENTOR_POST } from './pathwayMentorLeader';
 import { ML_MORE_COURSES } from './pathwayMentorLeaderMore';
 import { INTERNSHIP_COURSES } from './pathwayInternships';
+import { IF_MORE_COURSES } from './pathwayInternshipsMore';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
 import { CMHW_FACILITATOR, UNSTOPPABLE_CE } from './pathwayMentalHealth';
 import { STEM_CAMP } from './programStemCollab';
@@ -715,7 +716,7 @@ export const PATHWAYS: Pathway[] = [
     id: 'internships-fellowships',
     title: 'Internships + Fellowships',
     level: 'Advanced',
-    status: 'in-development',
+    status: 'published',
     purpose:
       'Spend a term on real project work with a supervisor. Leave with proof of what you did.',
     format: '11 courses and a placement that lasts one term, with a supervisor and a final project.',
@@ -730,23 +731,11 @@ export const PATHWAYS: Pathway[] = [
       'Final supervisor evaluation',
       'Approved portfolio artifact',
     ],
-    // Four written, seven to go. Three of the seven are not courses in any honest sense:
-    // the midpoint review, the capstone presentation and the final evaluation are scheduled
-    // events with a supervisor in the room, and writing them as self-paced reading would
-    // misrepresent what they are.
-    plannedCourses: [
-      'Research + Evidence Use',
-      'Communication + Documentation',
-      'Team Collaboration',
-      'Professional Feedback + Growth',
-      'Midpoint Review',
-      'Capstone Presentation',
-      'Final Evaluation + Career Reflection',
-    ],
-    courses: INTERNSHIP_COURSES,
-    version: '1.0 partial',
-    effectiveDate: 'Four of eleven courses written, August 28, 2026',
-    nextReview: 'When a placement agreement exists, since the remaining gates depend on one',
+    plannedCourses: [],
+    courses: [...INTERNSHIP_COURSES, ...IF_MORE_COURSES],
+    version: '1.0',
+    effectiveDate: 'October 2026',
+    nextReview: 'October 2027, and whenever a placement agreement changes the gates',
   },
   {
     id: 'mentor-leader',
