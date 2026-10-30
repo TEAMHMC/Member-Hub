@@ -433,7 +433,7 @@ const HCE_POST: Check[] = [
     options: [
         'Its graduates are automatically licensed',
         'The state guarantees employment for graduates',
-        'The program is free',
+        'The program has no waiting list',
         'A recognized accrediting body reviewed the program against established standards',
       ],
     answer: 3,
@@ -617,7 +617,7 @@ export const PATHWAYS: Pathway[] = [
       'Technology + Health',
       'Designing for People',
       'Meet the People Behind Healthcare',
-      'Build Something That Matters — Capstone',
+      'Build Something That Matters: Capstone',
     ],
     // The self-paced eight-course sequence above is separate from the delivered
     // camp below, and is not counted as released by it. The camp is a site-based
@@ -706,9 +706,9 @@ export const PATHWAYS: Pathway[] = [
       'Social Needs in Clinical Care',
       'Trauma-Informed Clinical Encounters',
       'Referral + Follow-Up Planning',
-      'Simulation Case 1 — Chronic Disease + Access Barriers',
-      'Simulation Case 2 — Mental Health / Substance Use + Safety',
-      'Simulation Case 3 — Unhoused Patient + Continuity of Care',
+      'Simulation Case 1: Chronic Disease + Access Barriers',
+      'Simulation Case 2: Mental Health / Substance Use + Safety',
+      'Simulation Case 3: Unhoused Patient + Continuity of Care',
       'Debrief + Reflection',
       'Practical / Simulation Competency Review',
     ],

@@ -1615,7 +1615,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                     setShowCert(p.id);
                   }}
                 >
-                  {eligible ? 'Issue my completion record' : 'Complete all gates to unlock'}
+                  {eligible ? 'Issue my completion record' : 'Finish every requirement to issue your record'}
                 </Btn>
               )}
               <p className="text-[11px] text-zinc-400 leading-relaxed">

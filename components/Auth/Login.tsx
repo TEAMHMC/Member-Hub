@@ -537,7 +537,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   { id: 'care', title: 'Health support for myself or my family',
                     detail: 'Screenings, results, help with food, housing and care, and a plan you can follow.' },
                   { id: 'learner', title: 'Courses and training',
-                    detail: 'Free self-paced courses and scheduled trainings that open doors into health careers.' },
+                    detail: 'Self-paced courses and scheduled trainings that open doors into health careers.' },
                   { id: 'both', title: 'Both', detail: 'You get everything. You can change this later in your profile.' },
                 ] as const).map((o) => (
                   <button
