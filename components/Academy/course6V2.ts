@@ -272,7 +272,7 @@ export const COURSE_6_V2: Course = {
   ],
   minutes: 46,
   prerequisites: 'None. Course 3 first makes this one easier.',
-  whoFor: 'Anyone weighing what a program costs, including people who assume they cannot afford it.',
+  whoFor: 'Anyone comparing what programs cost and what help is available to pay for them.',
   freshness:
     'Aid amounts, interest rates, deadlines and eligibility rules change, often annually. Verify at StudentAid.gov and with the school\'s financial aid office at the time you apply.',
   lessons: [

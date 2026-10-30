@@ -611,7 +611,7 @@ const PORTFOLIO_AND_IMPACT: Course = {
   ],
   minutes: 24,
   prerequisites: 'None. Start it in week one, not week eleven.',
-  whoFor: 'Interns and fellows, and anyone who will be asked what they actually did.',
+  whoFor: 'Interns and fellows, and anyone who will be asked to describe their work.',
   lessons: [
     {
       id: 'if-4-l1',
