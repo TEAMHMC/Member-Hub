@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-08T21:08:09.468Z",
+  "generatedAt": "2026-10-30T10:44:26.208Z",
   "courses": [
     {
       "id": "hce-1",
@@ -98,6 +98,76 @@
       "pathwayId": "field-based-community-health",
       "pathwayTitle": "Field-Based Community Health",
       "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-6",
+      "title": "Communication + Active Listening",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-7",
+      "title": "Cultural Humility + Trauma-Informed Engagement",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-8",
+      "title": "Mental Health + Substance Use Awareness",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-9",
+      "title": "Harm Reduction Foundations",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-10",
+      "title": "Motivational Interviewing Foundations",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-11",
+      "title": "De-escalation + Conflict Response",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-12",
+      "title": "Data Collection + Documentation",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-13",
+      "title": "Applied Community Health Case Lab",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "practical"
+    },
+    {
+      "id": "fbch-14",
+      "title": "Field Readiness Assessment",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "practical"
+    },
+    {
+      "id": "fbch-15",
+      "title": "Practicum / Supervised Service",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "practicum"
     },
     {
       "id": "ces-1",

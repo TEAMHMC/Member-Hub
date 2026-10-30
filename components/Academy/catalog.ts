@@ -397,6 +397,8 @@ const HCE_PRE: Check[] = [
 
 import { CARE_NAVIGATION_COVERAGE } from './pathwayFieldBased';
 import { FBCH_CORE_COURSES, FBCH_PRE, FBCH_POST } from './pathwayFieldBasedCore';
+import { FBCH_COMMUNICATION, FBCH_CULTURAL_TRAUMA, FBCH_MH_SUD, FBCH_HARM_REDUCTION, FBCH_MI } from './pathwayFieldBasedMoreA';
+import { FBCH_DEESCALATION, FBCH_DATA_DOCS, FBCH_CASE_LAB, FBCH_READINESS, FBCH_PRACTICUM } from './pathwayFieldBasedMoreB';
 import { CES_FOUNDATION_COURSES, CES_PRE, CES_POST } from './pathwayClinicalFoundations';
 import { MENTOR_LEADER_COURSES, MENTOR_PRE, MENTOR_POST } from './pathwayMentorLeader';
 import { INTERNSHIP_COURSES } from './pathwayInternships';
@@ -632,7 +634,7 @@ export const PATHWAYS: Pathway[] = [
     id: 'field-based-community-health',
     title: 'Field-Based Community Health',
     level: 'Foundations',
-    status: 'in-development',
+    status: 'published',
     purpose:
       'Get ready for outreach, navigation, and street medicine work in the field.',
     format: '15 courses at your own pace, plus hands-on shifts with a supervisor.',
@@ -647,23 +649,12 @@ export const PATHWAYS: Pathway[] = [
       'Finish your assigned shifts or service hours',
       'Your supervisor signs off that you are ready',
     ],
-    // Five written of the fifteen. Care Navigation and Coverage is the approved coverage
-    // course; the four below it are the written core. What remains listed is what remains
-    // to be written, plus three items that are not self-paced courses at all: the case lab,
-    // the readiness assessment and the practicum are supervised and scheduled.
-    plannedCourses: [
-      'Communication + Active Listening',
-      'Cultural Humility + Trauma-Informed Engagement',
-      'Mental Health + Substance Use Awareness',
-      'Harm Reduction Foundations',
-      'Motivational Interviewing Foundations',
-      'De-escalation + Conflict Response',
-      'Data Collection + Documentation',
-      'Applied Community Health Case Lab',
-      'Field Readiness Assessment',
-      'Practicum / Supervised Service',
+    plannedCourses: [],
+    courses: [
+      CARE_NAVIGATION_COVERAGE, ...FBCH_CORE_COURSES,
+      FBCH_COMMUNICATION, FBCH_CULTURAL_TRAUMA, FBCH_MH_SUD, FBCH_HARM_REDUCTION, FBCH_MI,
+      FBCH_DEESCALATION, FBCH_DATA_DOCS, FBCH_CASE_LAB, FBCH_READINESS, FBCH_PRACTICUM,
     ],
-    courses: [CARE_NAVIGATION_COVERAGE, ...FBCH_CORE_COURSES],
     preTest: FBCH_PRE,
     postTest: FBCH_POST,
     sourceKey: [
@@ -671,8 +662,8 @@ export const PATHWAYS: Pathway[] = [
       { key: 'DPSS', label: 'Los Angeles County Department of Public Social Services, Work Requirements' },
       { key: 'CoveredCA', label: 'Covered California, Find an Enroller' },
     ],
-    version: '1.0 partial',
-    effectiveDate: 'Coverage content verified August 3, 2026. Written core added August 28, 2026',
+    version: '1.0',
+    effectiveDate: 'October 2026. Coverage content verified August 3, 2026',
     nextReview: 'Before each renewal season and before any large outreach push, since the coverage course quotes dated policy',
   },
   {
