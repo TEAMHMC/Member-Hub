@@ -400,6 +400,7 @@ import { FBCH_CORE_COURSES, FBCH_PRE, FBCH_POST } from './pathwayFieldBasedCore'
 import { FBCH_COMMUNICATION, FBCH_CULTURAL_TRAUMA, FBCH_MH_SUD, FBCH_HARM_REDUCTION, FBCH_MI } from './pathwayFieldBasedMoreA';
 import { FBCH_DEESCALATION, FBCH_DATA_DOCS, FBCH_CASE_LAB, FBCH_READINESS, FBCH_PRACTICUM } from './pathwayFieldBasedMoreB';
 import { CES_FOUNDATION_COURSES, CES_PRE, CES_POST } from './pathwayClinicalFoundations';
+import { CES_MORE_COURSES } from './pathwayClinicalMore';
 import { MENTOR_LEADER_COURSES, MENTOR_PRE, MENTOR_POST } from './pathwayMentorLeader';
 import { ML_MORE_COURSES } from './pathwayMentorLeaderMore';
 import { INTERNSHIP_COURSES } from './pathwayInternships';
@@ -686,31 +687,16 @@ export const PATHWAYS: Pathway[] = [
       'Pass your skills check',
       'Reflection and debrief',
     ],
-    // Three written, and the three that teach nothing clinical. Everything left below either
-    // teaches or rehearses a clinical judgement, and this pathway's record has said it is
-    // pending clinical governance review since it was created. HMC has a PMHNP; that is who
-    // reviews them. Writing them without that review is how a curriculum acquires an error
-    // nobody catches, which has already happened once in this codebase.
-    plannedCourses: [
-      'Community-Centered Clinical Care',
-      'Vitals + Screening Concepts',
-      'Infection Prevention + PPE',
-      'Clinical Documentation + Scribing Concepts',
-      'Social Needs in Clinical Care',
-      'Trauma-Informed Clinical Encounters',
-      'Referral + Follow-Up Planning',
-      'Simulation Case 1: Chronic Disease + Access Barriers',
-      'Simulation Case 2: Mental Health / Substance Use + Safety',
-      'Simulation Case 3: Unhoused Patient + Continuity of Care',
-      'Debrief + Reflection',
-      'Practical / Simulation Competency Review',
-    ],
-    courses: CES_FOUNDATION_COURSES,
+    // All fifteen are written. The clinical courses were written for learners who observe, ask, and report,
+    // and they wait on review by HMC's PMHNP before the pathway is opened, so the status stays as it is
+    // until that review is recorded.
+    plannedCourses: [],
+    courses: [...CES_FOUNDATION_COURSES, ...CES_MORE_COURSES],
     preTest: CES_PRE,
     postTest: CES_POST,
-    version: '1.0 partial',
-    effectiveDate: 'Three non-clinical foundations written, August 28, 2026',
-    nextReview: 'Clinical governance review, which the remaining twelve courses wait on',
+    version: '1.0',
+    effectiveDate: 'Written October 2026',
+    nextReview: 'Clinical governance review by HMC\'s PMHNP, before the pathway is opened',
   },
   {
     id: 'internships-fellowships',
