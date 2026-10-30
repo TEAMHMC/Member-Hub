@@ -402,6 +402,7 @@ import { MENTOR_LEADER_COURSES, MENTOR_PRE, MENTOR_POST } from './pathwayMentorL
 import { INTERNSHIP_COURSES } from './pathwayInternships';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
 import { CMHW_FACILITATOR, UNSTOPPABLE_CE } from './pathwayMentalHealth';
+import { COMMUNITY_MENTAL_HEALTH_WORKER } from './pathwayHrtp';
 import { STEM_CAMP } from './programStemCollab';
 import { COURSE_1_V2 } from './course1V2';
 import { COURSE_2_V2 } from './course2V2';
@@ -856,6 +857,9 @@ PATHWAYS.push({
   effectiveDate: 'Migrated from the Volunteer Portal training system',
   nextReview: 'With the LACDMH approval renewal',
 });
+
+// HMC's community mental health worker training, as far as it can be learned in text. See pathwayHrtp.ts.
+PATHWAYS.push(COMMUNITY_MENTAL_HEALTH_WORKER);
 
 export const LEARNING_MODEL = ['Discover', 'Learn', 'Practice', 'Serve', 'Demonstrate', 'Advance'];
 
