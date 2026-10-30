@@ -397,13 +397,19 @@ const HCE_PRE: Check[] = [
 
 import { CARE_NAVIGATION_COVERAGE } from './pathwayFieldBased';
 import { FBCH_CORE_COURSES, FBCH_PRE, FBCH_POST } from './pathwayFieldBasedCore';
+import { FBCH_COMMUNICATION, FBCH_CULTURAL_TRAUMA, FBCH_MH_SUD, FBCH_HARM_REDUCTION, FBCH_MI } from './pathwayFieldBasedMoreA';
+import { FBCH_DEESCALATION, FBCH_DATA_DOCS, FBCH_CASE_LAB, FBCH_READINESS, FBCH_PRACTICUM } from './pathwayFieldBasedMoreB';
 import { CES_FOUNDATION_COURSES, CES_PRE, CES_POST } from './pathwayClinicalFoundations';
+import { CES_MORE_COURSES } from './pathwayClinicalMore';
 import { MENTOR_LEADER_COURSES, MENTOR_PRE, MENTOR_POST } from './pathwayMentorLeader';
+import { ML_MORE_COURSES } from './pathwayMentorLeaderMore';
 import { INTERNSHIP_COURSES } from './pathwayInternships';
+import { IF_MORE_COURSES } from './pathwayInternshipsMore';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
 import { CMHW_FACILITATOR, UNSTOPPABLE_CE } from './pathwayMentalHealth';
 import { COMMUNITY_MENTAL_HEALTH_WORKER } from './pathwayHrtp';
 import { STEM_CAMP } from './programStemCollab';
+import { YS_MORE_COURSES } from './pathwayYouthMore';
 import { COURSE_1_V2 } from './course1V2';
 import { COURSE_2_V2 } from './course2V2';
 import { COURSE_3_V2 } from './course3V2';
@@ -434,7 +440,7 @@ const HCE_POST: Check[] = [
     options: [
         'Its graduates are automatically licensed',
         'The state guarantees employment for graduates',
-        'The program is free',
+        'The program has no waiting list',
         'A recognized accrediting body reviewed the program against established standards',
       ],
     answer: 3,
@@ -610,30 +616,23 @@ export const PATHWAYS: Pathway[] = [
       'Capstone at or above threshold',
       'Youth account set up, with consent and safety checks done',
     ],
-    plannedCourses: [
-      'Health Starts Here',
-      'Inside the Human Body',
-      'Mind + Brain',
-      'Data Can Tell a Story',
-      'Technology + Health',
-      'Designing for People',
-      'Meet the People Behind Healthcare',
-      'Build Something That Matters — Capstone',
-    ],
-    // The self-paced eight-course sequence above is separate from the delivered
-    // camp below, and is not counted as released by it. The camp is a site-based
+    plannedCourses: [],
+    // The eight self-paced courses and the delivered camp are separate. The self-paced courses are
+    // written for young people with a mentor, and because the learners are minors the pathway stays
+    // closed until the safeguarding and consent steps and the content have been reviewed.
+    // The camp is separate from them. The camp is a site-based
     // program run with partner instructors over six weeks; its written
     // curriculum needs only paper and pencil, so no site is blocked by kits.
-    courses: [STEM_CAMP],
-    version: '0.9 draft',
-    effectiveDate: 'In development',
-    nextReview: 'Pending curriculum review',
+    courses: [STEM_CAMP, ...YS_MORE_COURSES],
+    version: '1.0 draft',
+    effectiveDate: 'Written October 2026',
+    nextReview: 'Safeguarding, consent, and content review before the pathway is opened to young people',
   },
   {
     id: 'field-based-community-health',
     title: 'Field-Based Community Health',
     level: 'Foundations',
-    status: 'in-development',
+    status: 'published',
     purpose:
       'Get ready for outreach, navigation, and street medicine work in the field.',
     format: '15 courses at your own pace, plus hands-on shifts with a supervisor.',
@@ -648,23 +647,12 @@ export const PATHWAYS: Pathway[] = [
       'Finish your assigned shifts or service hours',
       'Your supervisor signs off that you are ready',
     ],
-    // Five written of the fifteen. Care Navigation and Coverage is the approved coverage
-    // course; the four below it are the written core. What remains listed is what remains
-    // to be written, plus three items that are not self-paced courses at all: the case lab,
-    // the readiness assessment and the practicum are supervised and scheduled.
-    plannedCourses: [
-      'Communication + Active Listening',
-      'Cultural Humility + Trauma-Informed Engagement',
-      'Mental Health + Substance Use Awareness',
-      'Harm Reduction Foundations',
-      'Motivational Interviewing Foundations',
-      'De-escalation + Conflict Response',
-      'Data Collection + Documentation',
-      'Applied Community Health Case Lab',
-      'Field Readiness Assessment',
-      'Practicum / Supervised Service',
+    plannedCourses: [],
+    courses: [
+      CARE_NAVIGATION_COVERAGE, ...FBCH_CORE_COURSES,
+      FBCH_COMMUNICATION, FBCH_CULTURAL_TRAUMA, FBCH_MH_SUD, FBCH_HARM_REDUCTION, FBCH_MI,
+      FBCH_DEESCALATION, FBCH_DATA_DOCS, FBCH_CASE_LAB, FBCH_READINESS, FBCH_PRACTICUM,
     ],
-    courses: [CARE_NAVIGATION_COVERAGE, ...FBCH_CORE_COURSES],
     preTest: FBCH_PRE,
     postTest: FBCH_POST,
     sourceKey: [
@@ -672,8 +660,8 @@ export const PATHWAYS: Pathway[] = [
       { key: 'DPSS', label: 'Los Angeles County Department of Public Social Services, Work Requirements' },
       { key: 'CoveredCA', label: 'Covered California, Find an Enroller' },
     ],
-    version: '1.0 partial',
-    effectiveDate: 'Coverage content verified August 3, 2026. Written core added August 28, 2026',
+    version: '1.0',
+    effectiveDate: 'October 2026. Coverage content verified August 3, 2026',
     nextReview: 'Before each renewal season and before any large outreach push, since the coverage course quotes dated policy',
   },
   {
@@ -694,37 +682,22 @@ export const PATHWAYS: Pathway[] = [
       'Pass your skills check',
       'Reflection and debrief',
     ],
-    // Three written, and the three that teach nothing clinical. Everything left below either
-    // teaches or rehearses a clinical judgement, and this pathway's record has said it is
-    // pending clinical governance review since it was created. HMC has a PMHNP; that is who
-    // reviews them. Writing them without that review is how a curriculum acquires an error
-    // nobody catches, which has already happened once in this codebase.
-    plannedCourses: [
-      'Community-Centered Clinical Care',
-      'Vitals + Screening Concepts',
-      'Infection Prevention + PPE',
-      'Clinical Documentation + Scribing Concepts',
-      'Social Needs in Clinical Care',
-      'Trauma-Informed Clinical Encounters',
-      'Referral + Follow-Up Planning',
-      'Simulation Case 1 — Chronic Disease + Access Barriers',
-      'Simulation Case 2 — Mental Health / Substance Use + Safety',
-      'Simulation Case 3 — Unhoused Patient + Continuity of Care',
-      'Debrief + Reflection',
-      'Practical / Simulation Competency Review',
-    ],
-    courses: CES_FOUNDATION_COURSES,
+    // All fifteen are written. The clinical courses were written for learners who observe, ask, and report,
+    // and they wait on review by HMC's PMHNP before the pathway is opened, so the status stays as it is
+    // until that review is recorded.
+    plannedCourses: [],
+    courses: [...CES_FOUNDATION_COURSES, ...CES_MORE_COURSES],
     preTest: CES_PRE,
     postTest: CES_POST,
-    version: '1.0 partial',
-    effectiveDate: 'Three non-clinical foundations written, August 28, 2026',
-    nextReview: 'Clinical governance review, which the remaining twelve courses wait on',
+    version: '1.0 draft',
+    effectiveDate: 'Written October 2026',
+    nextReview: 'Clinical governance review by HMC\'s PMHNP, before the pathway is opened',
   },
   {
     id: 'internships-fellowships',
     title: 'Internships + Fellowships',
     level: 'Advanced',
-    status: 'in-development',
+    status: 'published',
     purpose:
       'Spend a term on real project work with a supervisor. Leave with proof of what you did.',
     format: '11 courses and a placement that lasts one term, with a supervisor and a final project.',
@@ -739,29 +712,17 @@ export const PATHWAYS: Pathway[] = [
       'Final supervisor evaluation',
       'Approved portfolio artifact',
     ],
-    // Four written, seven to go. Three of the seven are not courses in any honest sense:
-    // the midpoint review, the capstone presentation and the final evaluation are scheduled
-    // events with a supervisor in the room, and writing them as self-paced reading would
-    // misrepresent what they are.
-    plannedCourses: [
-      'Research + Evidence Use',
-      'Communication + Documentation',
-      'Team Collaboration',
-      'Professional Feedback + Growth',
-      'Midpoint Review',
-      'Capstone Presentation',
-      'Final Evaluation + Career Reflection',
-    ],
-    courses: INTERNSHIP_COURSES,
-    version: '1.0 partial',
-    effectiveDate: 'Four of eleven courses written, August 28, 2026',
-    nextReview: 'When a placement agreement exists, since the remaining gates depend on one',
+    plannedCourses: [],
+    courses: [...INTERNSHIP_COURSES, ...IF_MORE_COURSES],
+    version: '1.0',
+    effectiveDate: 'October 2026',
+    nextReview: 'October 2027, and whenever a placement agreement changes the gates',
   },
   {
     id: 'mentor-leader',
     title: 'Mentor + Leader',
     level: 'Leadership',
-    status: 'in-development',
+    status: 'published',
     purpose:
       'Learn to mentor one person, lead a group, and help others grow.',
     format: 'Self-paced core plus mentor practice case | 12 courses',
@@ -774,24 +735,13 @@ export const PATHWAYS: Pathway[] = [
       'Readiness acknowledgement',
       'Extra checks if you will work with young people or sensitive information',
     ],
-    // Five of the twelve are written. The seven below are the ones still to write, so this
-    // list reads as a plan rather than as a promise: a planned title next to a written
-    // course is how a catalogue starts advertising work nobody has done.
-    plannedCourses: [
-      'Goal Setting + Development Planning',
-      'Inclusive Mentorship',
-      'Facilitating Groups + Learning',
-      'Supporting Reflection + Portfolio Development',
-      'Peer Leadership + Team Coordination',
-      'Mentor Practice Case',
-      'Mentor / Leader Readiness Review',
-    ],
-    courses: MENTOR_LEADER_COURSES,
+    plannedCourses: [],
+    courses: [...MENTOR_LEADER_COURSES, ...ML_MORE_COURSES],
     preTest: MENTOR_PRE,
     postTest: MENTOR_POST,
-    version: '1.0 partial',
-    effectiveDate: 'Five of twelve courses written, August 28, 2026',
-    nextReview: 'When the remaining seven are written, and before the mentor practice case is used to gate a credential',
+    version: '1.0',
+    effectiveDate: 'October 2026',
+    nextReview: 'October 2027, and before the mentor practice case is used to gate a credential',
   },
 ];
 

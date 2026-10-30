@@ -470,7 +470,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
     },
     {
       title: "Nearby Events",
-      description: "Find free health fairs and clinic dates in your neighborhood to get your blood pressure and vitals verified.",
+      description: "Find health fairs and clinic dates in your neighborhood to get your blood pressure and vitals verified.",
       icon: <Calendar className="text-[#FF6F91]" size={32} />
     }
   ];
@@ -736,7 +736,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
                  <Brain size={48} className="mx-auto text-zinc-200" strokeWidth={1} />
                  <div className="space-y-2">
                    <p className="text-sm font-semibold text-zinc-600">Answer a few questions to build your Playbook</p>
-                   <p className="text-xs text-zinc-400 max-w-[180px] mx-auto leading-relaxed">This will unlock your personalized health insights and local resources.</p>
+                   <p className="text-xs text-zinc-400 max-w-[180px] mx-auto leading-relaxed">This builds your personalized health insights and local resources.</p>
                  </div>
                  <ButtonPrimary onClick={gated('to build and keep your Wellness Playbook', () => { setAnswering(true); setActiveTab('game-plan'); })} className="px-10">Build my Playbook</ButtonPrimary>
               </Card>
@@ -769,7 +769,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
             <Brain size={20} />
           </div>
           <div>
-            <p className="text-sm font-semibold text-zinc-900">Check Yourself &mdash; free mental health screening</p>
+            <p className="text-sm font-semibold text-zinc-900">Check Yourself: mental health screening</p>
             <p className="text-xs text-zinc-500 mt-1">A private, culturally-attuned check-in on how you are really doing. About 3 minutes, no judgment. Get a plain-language summary you can share with a provider.</p>
           </div>
         </div>
