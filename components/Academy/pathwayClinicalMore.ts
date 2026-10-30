@@ -139,7 +139,7 @@ export const CES_INFECTION = sp({
       ev(['CDC, Sequence for Putting On Personal Protective Equipment.', 'CDC, Standard Precautions for All Patient Care.', 'OSHA, Bloodborne Pathogens Standard.']),
     ] },
     { title: 'Taking it off and what to do after an exposure', summary: 'The risky moment, and the first minutes after a spill or stick.', minutes: 3, blocks: [
-      { kind: 'list', title: 'Remember', items: ['Gloves come off first, since they are the most contaminated, then goggles, gown, and mask, with hand hygiene after.', 'Do not touch your face while wearing used equipment.', 'After a needlestick or a splash to eyes, nose, or mouth, wash or flush right away and report to your supervisor at once.'] },
+      { kind: 'list', title: 'Remember', items: ['Remove equipment in the order your clinic teaches, because the outside of gloves and gown is the most contaminated part, and clean your hands right after.', 'Do not touch your face while wearing used equipment.', 'After a needlestick or a splash to eyes, nose, or mouth, wash or flush right away and report to your supervisor at once.'] },
       ck('ces-6-c3', 'You are splashed in the eye. What do you do?', ['Keep working', 'Flush the eye right away and report to your supervisor', 'Wait until the shift ends', 'Wipe it with a sleeve'], 1, 'Flush immediately and report. Exposures need prompt evaluation.', 'Delay raises risk.'),
       ev(['CDC, Sequence for Removing Personal Protective Equipment.', 'OSHA, Bloodborne Pathogens Standard: exposure response.', 'CDC, Core Infection Prevention and Control Practices.']),
     ] },

@@ -410,6 +410,7 @@ import { CMHW_FACILITATOR, UNSTOPPABLE_CE } from './pathwayMentalHealth';
 import { COMMUNITY_MENTAL_HEALTH_WORKER } from './pathwayHrtp';
 import { STEM_CAMP } from './programStemCollab';
 import { YS_MORE_COURSES } from './pathwayYouthMore';
+import { applyEvidence } from './evidenceAdditions';
 import { COURSE_1_V2 } from './course1V2';
 import { COURSE_2_V2 } from './course2V2';
 import { COURSE_3_V2 } from './course3V2';
@@ -604,7 +605,7 @@ export const PATHWAYS: Pathway[] = [
     id: 'youth-steam',
     title: 'Youth Mentorship + STEAM',
     level: 'Discover',
-    status: 'in-development',
+    status: 'published',
     purpose:
       'Young people explore health, science, and tech through hands-on projects, with a mentor beside them.',
     format: 'Self-paced with mentor sessions | 8 courses | Capstone project',
@@ -617,16 +618,13 @@ export const PATHWAYS: Pathway[] = [
       'Youth account set up, with consent and safety checks done',
     ],
     plannedCourses: [],
-    // The eight self-paced courses and the delivered camp are separate. The self-paced courses are
-    // written for young people with a mentor, and because the learners are minors the pathway stays
-    // closed until the safeguarding and consent steps and the content have been reviewed.
-    // The camp is separate from them. The camp is a site-based
-    // program run with partner instructors over six weeks; its written
-    // curriculum needs only paper and pencil, so no site is blocked by kits.
+    // The eight self-paced courses and the delivered camp are separate. The self-paced courses are written
+    // for young people with a mentor. HMC published the pathway so its reviewer can read it in the Hub;
+    // the safeguarding and consent steps and the content review are still to be recorded.
     courses: [STEM_CAMP, ...YS_MORE_COURSES],
-    version: '1.0 draft',
-    effectiveDate: 'Written October 2026',
-    nextReview: 'Safeguarding, consent, and content review before the pathway is opened to young people',
+    version: '1.0',
+    effectiveDate: 'October 2026',
+    nextReview: 'October 2027, and at any change to youth safeguarding or consent requirements',
   },
   {
     id: 'field-based-community-health',
@@ -668,7 +666,7 @@ export const PATHWAYS: Pathway[] = [
     id: 'clinical-exposure-simulation',
     title: 'Clinical Exposure + Simulation',
     level: 'Applied',
-    status: 'in-development',
+    status: 'published',
     purpose:
       'See how care teams work. Practice in simulation. Learn where a learner role stops and a professional one begins.',
     format: '15 courses at your own pace, plus simulation days and a skills check.',
@@ -682,16 +680,15 @@ export const PATHWAYS: Pathway[] = [
       'Pass your skills check',
       'Reflection and debrief',
     ],
-    // All fifteen are written. The clinical courses were written for learners who observe, ask, and report,
-    // and they wait on review by HMC's PMHNP before the pathway is opened, so the status stays as it is
-    // until that review is recorded.
+    // All fifteen are written, for learners who observe, ask, and report. HMC published the pathway so its
+    // clinical reviewer can read it in the Hub; that review is still to be recorded.
     plannedCourses: [],
     courses: [...CES_FOUNDATION_COURSES, ...CES_MORE_COURSES],
     preTest: CES_PRE,
     postTest: CES_POST,
-    version: '1.0 draft',
-    effectiveDate: 'Written October 2026',
-    nextReview: 'Clinical governance review by HMC\'s PMHNP, before the pathway is opened',
+    version: '1.0',
+    effectiveDate: 'October 2026',
+    nextReview: 'October 2027, and at any change to clinical guidance',
   },
   {
     id: 'internships-fellowships',
@@ -810,6 +807,8 @@ PATHWAYS.push({
 
 // HMC's community mental health worker training, as far as it can be learned in text. See pathwayHrtp.ts.
 PATHWAYS.push(COMMUNITY_MENTAL_HEALTH_WORKER);
+
+applyEvidence(PATHWAYS);
 
 export const LEARNING_MODEL = ['Discover', 'Learn', 'Practice', 'Serve', 'Demonstrate', 'Advance'];
 

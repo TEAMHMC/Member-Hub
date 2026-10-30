@@ -38,7 +38,7 @@ export const ML_GOALS: Course = {
           { label: 'What is already working?', text: '"What have you done toward this so far?" Start from strengths.' },
         ] },
         { kind: 'check', check: { id: 'ml-6-c1', q: 'Who should set the goal in a mentoring relationship?', options: ['The mentor', 'The mentee, with the mentor\'s help in making it specific', 'The supervisor', 'The program'], answer: 1, rationale: 'People commit more to goals they choose. The mentor helps make the goal clear and doable.', distractors: 'A goal handed down is less likely to be pursued.' } },
-        ev(['Locke and Latham, "Building a Practically Useful Theory of Goal Setting and Task Motivation," American Psychologist (2002): specific goals and commitment.', 'Miller and Rollnick, Motivational Interviewing, third edition (2013): drawing out the person\'s own reasons.', 'NIH National Research Mentoring Network, Entering Mentoring: aligning expectations and setting goals.']),
+        ev(['Locke and Latham, "Building a Practically Useful Theory of Goal Setting and Task Motivation," American Psychologist (2002): specific goals and commitment.', 'Miller and Rollnick, Motivational Interviewing, third edition (2013): drawing out the person\'s own reasons.', 'NIH National Research Mentoring Network, Entering Mentoring: aligning expectations.']),
       ],
     },
     {
@@ -507,7 +507,7 @@ export const ML_PRACTICE_CASE: Course = {
           'A concern that would need escalation, and who you would tell.',
         ] },
         { kind: 'check', check: { id: 'ml-11-c2', q: 'What should every plan include?', options: ['A guarantee of results', 'A concern that would need escalation, and who you would tell', 'The mentee\'s private history', 'A list of rules'], answer: 1, rationale: 'Knowing when to escalate and to whom is part of safe mentoring.', distractors: 'Guarantees and private history do not belong in a plan.' } },
-        ev(['NIH National Research Mentoring Network, Entering Mentoring: setting expectations and boundaries.', 'Locke and Latham, American Psychologist (2002): specific goals.', 'California HCAI, CHW/P/R Training Program Best Practices Framework.']),
+        ev(['NIH National Research Mentoring Network, Entering Mentoring: aligning expectations.', 'Locke and Latham, American Psychologist (2002): specific goals.', 'California HCAI, CHW/P/R Training Program Best Practices Framework.']),
       ],
     },
     {
@@ -579,7 +579,7 @@ export const ML_READINESS: Course = {
           { label: 'Extra checks', text: 'If your role involves young people or sensitive information, your program sets screening and training you complete before you begin.' },
         ] },
         { kind: 'check', check: { id: 'ml-12-c1', q: 'Who decides the extra checks for your role?', options: ['You', 'Your program, based on who you will work with', 'The mentee', 'No one'], answer: 1, rationale: 'Programs set the checks that protect the people you will serve.', distractors: 'Safety checks are not optional or self-decided.' } },
-        ev(['California HCAI, CHW/P/R Training Program Best Practices Framework: supervision and professional conduct.', 'NIH National Research Mentoring Network, Entering Mentoring: boundaries and responsibilities.', 'U.S. HHS, HIPAA Privacy Rule: protecting private information.']),
+        ev(['California HCAI, CHW/P/R Training Program Best Practices Framework: supervision and professional conduct.', 'NIH National Research Mentoring Network, Entering Mentoring: aligning expectations and responsibilities.', 'U.S. HHS, HIPAA Privacy Rule: protecting private information.']),
       ],
     },
     {
