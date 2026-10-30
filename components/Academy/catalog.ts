@@ -408,6 +408,7 @@ import { IF_MORE_COURSES } from './pathwayInternshipsMore';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
 import { CMHW_FACILITATOR, UNSTOPPABLE_CE } from './pathwayMentalHealth';
 import { STEM_CAMP } from './programStemCollab';
+import { YS_MORE_COURSES } from './pathwayYouthMore';
 import { COURSE_1_V2 } from './course1V2';
 import { COURSE_2_V2 } from './course2V2';
 import { COURSE_3_V2 } from './course3V2';
@@ -614,24 +615,17 @@ export const PATHWAYS: Pathway[] = [
       'Capstone at or above threshold',
       'Youth account set up, with consent and safety checks done',
     ],
-    plannedCourses: [
-      'Health Starts Here',
-      'Inside the Human Body',
-      'Mind + Brain',
-      'Data Can Tell a Story',
-      'Technology + Health',
-      'Designing for People',
-      'Meet the People Behind Healthcare',
-      'Build Something That Matters: Capstone',
-    ],
-    // The self-paced eight-course sequence above is separate from the delivered
-    // camp below, and is not counted as released by it. The camp is a site-based
+    plannedCourses: [],
+    // The eight self-paced courses and the delivered camp are separate. The self-paced courses are
+    // written for young people with a mentor, and because the learners are minors the pathway stays
+    // closed until the safeguarding and consent steps and the content have been reviewed.
+    // The camp is separate from them. The camp is a site-based
     // program run with partner instructors over six weeks; its written
     // curriculum needs only paper and pencil, so no site is blocked by kits.
-    courses: [STEM_CAMP],
-    version: '0.9 draft',
-    effectiveDate: 'In development',
-    nextReview: 'Pending curriculum review',
+    courses: [STEM_CAMP, ...YS_MORE_COURSES],
+    version: '1.0 draft',
+    effectiveDate: 'Written October 2026',
+    nextReview: 'Safeguarding, consent, and content review before the pathway is opened to young people',
   },
   {
     id: 'field-based-community-health',
