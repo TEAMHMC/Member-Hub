@@ -287,7 +287,7 @@ export const CHW_EVALUATION: Course = {
   delivery: 'self-paced',
   title: 'Evaluation and Research Basics',
   promise:
-    'Tell outputs from outcomes, count accurately, keep honest records that support payment, and read a small table without overclaiming.',
+    'Tell outputs from outcomes, count accurately, keep honest records that protect people and your job, and read a small table without overclaiming.',
   about: [
     'Programs are funded, and workers are hired, because someone can show that the work helps. This course teaches how a worker contributes to that honestly.',
     'It also explains the numbers a County-funded program reports.',
@@ -295,7 +295,7 @@ export const CHW_EVALUATION: Course = {
   objectives: [
     'Tell outputs from outcomes.',
     'Count and categorize simply and accurately.',
-    'Describe consent, privacy, and honest reporting, and why records support payment.',
+    'Describe consent, privacy, and honest reporting, and why your records protect your job.',
     'Read a small before-and-after table without overclaiming.',
   ],
   minutes: 120,
@@ -371,12 +371,12 @@ export const CHW_EVALUATION: Course = {
     },
     {
       id: 'chw-eval-l3',
-      title: 'Honest records and records that support payment',
-      summary: 'Consent, privacy, accuracy, and why payers ask for documentation.',
+      title: 'Honest records that protect people and your job',
+      summary: 'Consent, privacy, accuracy, and why your notes keep your position funded.',
       minutes: 15,
       blocks: [
         { kind: 'why', text: [
-          'A record can help a person or harm them. It can also decide whether an employer is paid for your work. The same habits cover both: be accurate, be private, and never inflate.',
+          'A record can help a person or harm them. It can also decide whether your employer can keep paying for your position. The same habits cover both: be accurate, be private, and never inflate.',
         ] },
         { kind: 'concept', title: 'Consent and privacy', text: [
           'Tell people what you are recording and why, and record only what you need. Share information only as the person agrees or as the law requires. Keep records in the approved system. Do not take pictures of documents or screens with a personal phone unless your program allows it.',
@@ -384,7 +384,7 @@ export const CHW_EVALUATION: Course = {
         { kind: 'concept', title: 'Never inflate', text: [
           'Report what happened, not what would look good. If you counted something wrongly, correct it openly and tell your supervisor. Honest numbers that are modest protect a program and the people it serves. Inflated numbers can lose a contract and, in billing, can be treated as fraud.',
         ] },
-        { kind: 'concept', title: 'Records that support payment', text: [
+        { kind: 'concept', title: 'Records your position depends on', text: [
           'Health plans and the State pay for community health worker services. They expect each record to show who delivered the service, who received it, the date, what was done, and how long it took. The record has to support the time that is billed. Services in the Medi-Cal community health worker benefit are also tied to a written plan of care.',
           'This is why you write your note the same day, in facts, with the real time. It protects the person, your employer, and you.',
         ] },
@@ -407,9 +407,9 @@ export const CHW_EVALUATION: Course = {
         { kind: 'takeaways', items: [
           'Record only what you need, with consent and privacy.',
           'Never inflate. Correct mistakes openly.',
-          'Your note supports the person and the payment.',
+          'Your note supports the person and your position.',
         ] },
-        {"kind":"case","title":"Two notes about the same visit","scenario":false,"text":["Note A: \"Oct 14, 2:00 to 2:40 p.m. Visit with Mr. Lee at his apartment, with his consent. Reviewed his plan to get to his specialist on Oct 21. Arranged a ride with the clinic. He asked for help reading a pharmacy letter. I read it aloud and told him to bring it to the nurse. Next: check in Oct 20.\"","Note B: \"Saw Mr. Lee. Went fine. Helped him with stuff.\"","Note A shows who, when, how long, what was done, and what is next. It could support a payment and protect Mr. Lee and the worker. Note B could not."]},
+        {"kind":"case","title":"Two notes about the same visit","scenario":false,"text":["Note A: \"Oct 14, 2:00 to 2:40 p.m. Visit with Mr. Lee at his apartment, with his consent. Reviewed his plan to get to his specialist on Oct 21. Arranged a ride with the clinic. He asked for help reading a pharmacy letter. I read it aloud and told him to bring it to the nurse. Next: check in Oct 20.\"","Note B: \"Saw Mr. Lee. Went fine. Helped him with stuff.\"","Note A shows who, when, how long, what was done, and what is next. It protects Mr. Lee and the worker, and the program can rely on it. Note B could not."]},
         {"kind":"list","title":"What a plan of care usually shows","items":["The person's goals in their own words.","The services needed to reach them.","How often and for how long each will happen.","Who is responsible for each step.","When the plan will be reviewed."]},
         {"kind":"case","title":"Pressure to report more","scenario":true,"text":["It is the end of the month. Your supervisor says the program is two short of its target and asks whether you could count two phone calls as completed referrals. You know neither person was connected. What do you do?","Answer: Say, politely, that you can count only what was completed, and that you would be happy to keep working on those two. Offer to tell the program lead what is getting in the way. If you are asked again, or you are told to change a record, tell the next person up in your program, and write down what was asked. Honest numbers protect the program, the people it serves, and you."]},
         ev([

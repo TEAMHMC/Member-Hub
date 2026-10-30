@@ -16,7 +16,7 @@ export const COMMUNITY_MENTAL_HEALTH_WORKER: Pathway = {
   level: 'Foundations',
   status: 'published',
   purpose:
-    'Learn the foundations of community mental health and community health work: the role, how it is paid for, how to connect people to services, how to reach them, and how to keep honest records.',
+    'Learn the foundations of community mental health and community health work: the role, where the jobs are and how to move up, how to connect people to services, how to reach them, and how to keep honest records.',
   format: 'Four courses at your own pace, about 11 hours. Each ends with a practice file you keep.',
   credentialTitle: 'HMC Community Mental Health Worker Pathway Completion',
   credentialType: 'Course Completion',
