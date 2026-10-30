@@ -84,7 +84,7 @@ export const IF_RESEARCH: Course = {
           { label: 'The citation', text: 'The Community Guide page, with the date you read it.' },
         ] },
         { kind: 'check', check: { id: 'if-5-c4', q: 'Why add the limits sentence?', options: ['To lengthen the report', 'To keep the claim honest about what the evidence covers', 'To avoid the claim', 'It is a rule'], answer: 1, rationale: 'Naming limits keeps your claim accurate and builds trust in your work.', distractors: 'The aim is honesty, not length or avoidance.' } },
-        ev(['The Community Guide: Community Health Workers, task force findings.', 'CDC, Framework for Program Evaluation in Public Health: credible evidence.', 'Greenhalgh, How to Read a Paper (2019).']),
+        ev(['The Community Guide: Community Health Workers, task force findings.', 'CDC, Program Evaluation Framework, 2024: gather credible evidence.', 'Greenhalgh, How to Read a Paper (2019).']),
       ],
     },
   ],
@@ -427,7 +427,7 @@ export const IF_CAPSTONE = eventCourse({
         { label: 'The next step', text: 'What the team could do with it.' },
       ] },
       { kind: 'check', check: { id: 'if-10-c1', q: 'What should a capstone end with?', options: ['An apology', 'A clear next step for the team', 'A long list of thanks', 'More questions only'], answer: 1, rationale: 'A next step makes the work useful beyond your term.', distractors: 'Apologies and open questions leave the audience with nothing to do.' } },
-      ev(['plainlanguage.gov, Federal Plain Language Guidelines: organize around the reader\'s needs.', 'CDC, Framework for Program Evaluation in Public Health: sharing lessons learned.', 'Greenhalgh, How to Read a Paper (2019): stating limits.']),
+      ev(['plainlanguage.gov, Federal Plain Language Guidelines: organize around the reader\'s needs.', 'CDC, Program Evaluation Framework, 2024: learn from and use evaluation insights.', 'Greenhalgh, How to Read a Paper (2019): stating limits.']),
     ] },
     { title: 'Slides and delivery', summary: 'Less on the slide, more in your voice.', minutes: 10, blocks: [
       { kind: 'list', title: 'Habits', items: ['One idea per slide, with large text.', 'Show one chart or example, not a table of everything.', 'Practice out loud and time yourself.', 'Look at the audience, not the screen.', 'Cut what you cannot say in ten minutes.'] },

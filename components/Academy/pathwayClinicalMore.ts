@@ -166,7 +166,7 @@ export const CES_DOCUMENTATION = sp({
         { label: 'Plan', text: 'What happens next: tests, treatment, and follow-up.' },
       ] },
       ck('ces-7-c1', 'In SOAP, which part is the clinician\'s judgment?', ['Subjective', 'Objective', 'Assessment', 'Plan'], 2, 'Assessment is the clinician\'s interpretation of the information.', 'Subjective and objective are information; plan is what to do.'),
-      ev(['Weed, "Medical Records That Guide and Teach," New England Journal of Medicine (1968): the problem-oriented record.', 'CMS, Evaluation and Management Documentation Guidelines.', 'American Medical Association, Medical scribe resources.']),
+      ev(['Weed, "Medical Records That Guide and Teach," New England Journal of Medicine (1968): the problem-oriented record.', 'CMS, Evaluation and Management Documentation Guidelines.', 'CMS, MLN Complying with Medicare Signature Requirements: the practitioner signs the entry, and a scribe\'s role does not change that.']),
     ] },
     { title: 'Accuracy and abbreviations', summary: 'Small errors can have large effects.', minutes: 2, blocks: [
       { kind: 'prose', text: ['A misread abbreviation can lead to a wrong medication or dose. The Joint Commission maintains an official "Do Not Use" list of abbreviations, such as "U" for units and "QD" for daily, because they are too often mistaken for something else.'] },
@@ -177,7 +177,7 @@ export const CES_DOCUMENTATION = sp({
     { title: 'Privacy and the scribe role', summary: 'What you may see, and what you may do.', minutes: 3, blocks: [
       { kind: 'list', title: 'Rules', items: ['Access only the records your role needs.', 'Never discuss patients where others can hear.', 'Do not photograph screens, notes, or labels.', 'A scribe records what the clinician says and does. The clinician reviews and signs.'] },
       ck('ces-7-c3', 'Who is responsible for the final content of a note?', ['The scribe', 'The clinician who reviews and signs it', 'The patient', 'The front desk'], 1, 'The clinician is responsible for the record and signs it.', 'A scribe assists but does not own the note.'),
-      ev(['U.S. HHS, HIPAA Privacy Rule: minimum necessary standard.', 'American Medical Association, Medical scribes: roles and responsibilities.', 'California HCAI, CHW/P/R Training Program Best Practices Framework.']),
+      ev(['U.S. HHS, HIPAA Privacy Rule: minimum necessary standard.', 'CMS, Medicare Claims Processing Manual, Chapter 12, Section 30.6.1: documentation by a scribe should identify the scribe and the practitioner for whom they documented.', 'California HCAI, CHW/P/R Training Program Best Practices Framework.']),
     ] },
   ],
   further: [
@@ -213,7 +213,7 @@ export const CES_SOCIAL = sp({
         { label: 'Follow up', text: 'Check whether the person connected.' },
       ] },
       ck('ces-8-c3', 'What makes a referral stronger?', ['A phone number on paper', 'A warm handoff and follow-up', 'A pamphlet', 'A suggestion'], 1, 'A warm handoff and follow-up improve the chance the person connects.', 'Information alone often fails.'),
-      ev(['CMS, Accountable Health Communities model.', 'The Community Guide, Community Health Workers: navigation and follow-up.', 'California HCAI, CHW/P/R Training Program Best Practices Framework.']),
+      ev(['CMS, Accountable Health Communities model.', 'The Community Guide, Community Health Workers: navigation and care coordination.', 'California HCAI, CHW/P/R Training Program Best Practices Framework.']),
     ] },
   ],
   further: [
@@ -269,12 +269,12 @@ export const CES_REFERRAL = sp({
         { label: 'Result', text: 'The result returns and is reviewed.' },
       ] },
       ck('ces-10-c1', 'When is a referral complete?', ['When it is written', 'When the patient has been seen and the result returns to the team', 'When it is sent', 'When the patient is told'], 1, 'Closing the loop means the result is back and acted on.', 'Sending or telling is not completion.'),
-      ev(['AHRQ, Care Coordination Measures Atlas: definition of care coordination.', 'AHRQ, Closing the Referral Loop: tools and strategies.', 'Institute of Medicine (2001).']),
+      ev(['AHRQ, Care Coordination Measures Atlas: definition of care coordination.', 'Institute for Healthcare Improvement and National Patient Safety Foundation, Closing the Loop: A Guide to Safer Ambulatory Referrals in the EHR Era (2017): a closed-loop referral process.', 'Institute of Medicine (2001).']),
     ] },
     { title: 'What a referral needs', summary: 'Who, why, when, and how.', minutes: 2, blocks: [
       { kind: 'list', title: 'A referral includes', items: ['Who the patient is and how to reach them.', 'The reason for the referral.', 'How urgent it is.', 'What the patient needs to get there.', 'Who to call with questions.'] },
       ck('ces-10-c2', 'What should a referral state?', ['Only the name', 'The reason, urgency, and how to reach the patient', 'The patient\'s opinion of the clinic', 'Nothing'], 1, 'The receiving provider needs the reason, urgency, and a way to reach the patient.', 'Missing information delays care.'),
-      ev(['AHRQ, Closing the Referral Loop.', 'CMS, Documentation Guidelines.', 'The Joint Commission, Handoff communication.']),
+      ev(['Institute for Healthcare Improvement and National Patient Safety Foundation, Closing the Loop: A Guide to Safer Ambulatory Referrals in the EHR Era (2017).', 'CMS, Documentation Guidelines.', 'The Joint Commission, Sentinel Event Alert 58: Inadequate hand-off communication (2017).']),
     ] },
     { title: 'Follow-up and a learner\'s part', summary: 'Checking in, within your role.', minutes: 3, blocks: [
       { kind: 'steps', title: 'Follow-up', items: [
@@ -346,7 +346,7 @@ export const CES_SIM1 = eventCourse({
     { title: 'Escalate when', summary: 'What needs a clinician right away.', minutes: 15, blocks: [
       { kind: 'list', title: 'Tell licensed staff immediately if', items: ['He reports chest pain, severe headache, confusion, or trouble breathing.', 'He reports very high or very low blood sugar symptoms.', 'He says he has stopped his medicine and feels unwell.'] },
       { kind: 'reflect', title: 'After the case', prompts: ['What barrier surprised you?', 'What would you report first?'] },
-      ev(['CDC, Diabetes and High Blood Pressure: warning signs.', 'California HCAI, CHW/P/R Training Program Best Practices Framework.', 'Whelton et al., 2017 ACC/AHA Guideline.']),
+      ev(['CDC, About Diabetes: symptoms and when to seek care.', 'California HCAI, CHW/P/R Training Program Best Practices Framework.', 'Whelton et al., 2017 ACC/AHA Guideline.']),
     ] },
   ],
 });
@@ -403,7 +403,7 @@ export const CES_SIM3 = eventCourse({
         { label: 'Warm handoff', text: 'With his permission, connect him to the street medicine or outreach team.' },
       ] },
       ck('ces-13-c2', 'What makes a plan fit his life?', ['A phone call he cannot receive', 'A follow-up at a place he already goes, with a warm handoff', 'A letter', 'A pamphlet'], 1, 'Meeting a person where they are improves follow-up.', 'Plans that assume a phone or a mailbox fail.'),
-      ev(['National Health Care for the Homeless Council.', 'The Community Guide, Community Health Workers: outreach and follow-up.', 'California HCAI, CHW/P/R Training Program Best Practices Framework.']),
+      ev(['National Health Care for the Homeless Council.', 'The Community Guide, Community Health Workers: outreach, navigation, and care coordination.', 'California HCAI, CHW/P/R Training Program Best Practices Framework.']),
     ] },
     { title: 'Dignity and escalation', summary: 'Respect, privacy, and when to call.', minutes: 15, blocks: [
       { kind: 'list', title: 'Remember', items: ['Use his name and ask permission before sharing information.', 'Do not photograph him or his belongings.', 'Tell licensed staff if the wound looks worse, he has a fever, or he seems confused.', 'In an emergency, call 911.'] },
@@ -437,7 +437,7 @@ export const CES_DEBRIEF = eventCourse({
     { title: 'A safe space', summary: 'Ground rules for honesty.', minutes: 10, blocks: [
       { kind: 'list', title: 'Ground rules', items: ['What is said here stays here; what we learn leaves with us.', 'Talk about actions, not people.', 'Everyone may pass.', 'Ask questions out of curiosity.'] },
       ck('ces-14-c2', 'Why use ground rules?', ['To save time', 'People speak more honestly when the space feels safe', 'It is required', 'To limit speaking'], 1, 'Psychological safety supports learning.', 'The aim is honest conversation.'),
-      ev(['Edmondson, Administrative Science Quarterly (1999): psychological safety.', 'INACSL Standards: debriefing.', 'Eppich and Cheng (2015).']),
+      ev(['Edmondson, Administrative Science Quarterly (1999): psychological safety.', 'INACSL Healthcare Simulation Standards of Best Practice: The Debriefing Process.', 'Eppich and Cheng (2015).']),
     ] },
     { title: 'Writing your reflection', summary: 'What, so what, now what.', minutes: 10, blocks: [
       { kind: 'steps', title: 'Three questions', items: [
@@ -484,7 +484,7 @@ export const CES_REVIEW = eventCourse({
         { label: 'Sign-off', text: 'Your supervisor decides: yes, not yet, or needs more practice.' },
       ] },
       ck('ces-15-c1', 'What does "not yet" mean?', ['You are removed', 'You need more practice and a second look', 'You failed permanently', 'Nothing'], 1, 'It is a step in learning.', 'It is not an ending.'),
-      ev(['California HCAI, CHW/P/R Training Program Best Practices Framework: supervision.', 'INACSL Healthcare Simulation Standards of Best Practice: Participant Evaluation.', 'AHRQ, TeamSTEPPS.']),
+      ev(['California HCAI, CHW/P/R Training Program Best Practices Framework: supervision.', 'INACSL Healthcare Simulation Standards of Best Practice: The Debriefing Process.', 'AHRQ, TeamSTEPPS.']),
     ] },
     { title: 'The skills checklist', summary: 'What the observer looks for.', minutes: 10, blocks: [
       { kind: 'list', title: 'Checklist', items: ['Introduces self and role as a learner.', 'Observes and asks open, respectful questions.', 'Reports facts to licensed staff promptly.', 'Stays within scope and says so when asked for more.', 'Escalates safety concerns immediately.', 'Protects privacy.'] },

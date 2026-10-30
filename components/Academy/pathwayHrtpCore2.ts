@@ -70,7 +70,7 @@ export const CHW_OUTREACH: Course = {
         {"kind":"myths","items":[{"myth":"If someone says no, outreach has failed.","reality":"A respectful no is the beginning of trust. Many people accept help after several contacts."},{"myth":"People who are unhoused do not want help.","reality":"Most want a way out of their situation but have been let down by systems before. They are careful, not unwilling."}]},
         {"kind":"case","title":"Trust built over six weeks","scenario":false,"text":["Week 1: Dana and a partner stop by a bus stop on Thursdays. They hand out water and cards. One man declines and says nothing more. Week 2: they return at the same time. He takes a card without a word. Week 3: he nods. Week 4: he asks where the closest laundromat is. They give him the address and a card with a quarter roll for the machines, if their program allows it.","Week 5: he asks about getting an ID. They explain the steps and offer to go with him. Week 6: they go together. He says later that he decided to trust them because they did not push, and because they came back each Thursday.","Nothing in those six weeks was dramatic. The work was consistency, and the willingness to hear a no."]},
         ev([
-          'SAMHSA and U.S. Interagency Council on Homelessness, Outreach and Engagement Fact Sheet (2016): engaging some people can take months or years of persistent, proactive effort.',
+          'SAMHSA and USICH, Lessons Learned from SAMHSA\'s Expert Panel on the Role of Outreach and Engagement (2016): engaging some people can take months or years of persistent, proactive effort.',
           'California HCAI, CHW/P/R Training Program Best Practices Framework: outreach is one of the 11 core competencies, with case finding, recruitment, and follow-up.',
           'SAMHSA, Projects for Assistance in Transition from Homelessness (PATH): the program emphasizes active outreach and engagement before services are offered.',
           'Community Preventive Services Task Force, The Community Guide: outreach by community health workers is part of the interventions it recommends.',
@@ -124,7 +124,7 @@ export const CHW_OUTREACH: Course = {
         {"kind":"concept","title":"Settings change the risks","text":["At a shelter or meal site, staff know the space and the people. Ask them what to watch for, and follow their rules. In an encampment, enter slowly, announce yourself, and never walk into a tent. At a clinic or hospital, respect privacy rules and the staff's direction. On a home visit, tell your lead the address and time, and leave if you feel unsafe. On a release day at a facility, follow the facility's rules and your program's plan.","In every setting, you represent your program. Dress simply, carry ID, and be easy to identify."]},
         ev([
           'California HCAI Framework: professional skills and conduct, including personal safety and boundaries, is a core competency.',
-          'SAMHSA and USICH Outreach and Engagement Fact Sheet (2016): outreach is carried out by teams, with training in trauma-informed care and motivational interviewing.',
+          'SAMHSA and USICH, Lessons Learned from SAMHSA\'s Expert Panel on the Role of Outreach and Engagement (2016): recommends formal training on evidence-based practices where resources allow.',
           'National Health Care for the Homeless Council: outreach and engagement resources for workers serving people experiencing homelessness.',
           'Your program\'s field safety protocol and your lead\'s instructions take precedence over this course.',
         ]),
@@ -165,7 +165,7 @@ export const CHW_OUTREACH: Course = {
         ev([
           'California HCAI Framework: outreach skills include case finding, recruitment, follow-up, and field outreach.',
           'California DHCS, CalAIM Justice-Involved Reentry Initiative: pre-release Medi-Cal services and connection to community-based providers, including community health workers and peer support specialists.',
-          'SAMHSA and USICH Outreach and Engagement Fact Sheet (2016): use diverse outreach methods beyond street contact, such as drop-in centers and meal programs.',
+          'SAMHSA and USICH, Lessons Learned from SAMHSA\'s Expert Panel on the Role of Outreach and Engagement (2016): use diverse outreach methods beyond street contact, such as drop-in centers and meal programs.',
         ]),
       ],
     },
@@ -200,7 +200,7 @@ export const CHW_OUTREACH: Course = {
         ev([
           'California HCAI Framework: documentation and follow-up are part of communication and service coordination.',
           'California DHCS CHW Billing FAQ: records must support the services provided and the time spent.',
-          'SAMHSA and USICH Outreach and Engagement Fact Sheet (2016): maintaining contact over time is central to engagement.',
+          'SAMHSA and USICH, Lessons Learned from SAMHSA\'s Expert Panel on the Role of Outreach and Engagement (2016): overcoming barriers to engagement can take months or even years of persistent effort.',
         ]),
       ],
     },
@@ -364,7 +364,7 @@ export const CHW_EVALUATION: Course = {
         {"kind":"concept","title":"Following up later","text":["Programs learn most when they ask people again after some time has passed. California's training framework suggests surveying participants six to twelve months after training. A later question, such as \"Are you still working in this field?\", tells a program more than a smile on the last day of class."]},
         ev([
           'California HCAI Framework: basic evaluation and research methods are part of the core competencies.',
-          'CDC Framework for Program Evaluation in Public Health: credible evidence depends on well-defined measures and accurate data.',
+          'CDC, Program Evaluation Framework, 2024 (MMWR Recomm Rep 2024;73(RR-6)): credible evidence depends on well-defined measures and accurate data.',
           'Kangovi S, et al. Health Affairs 2020;39(2):207-213: the findings depended on carefully counted visits and admissions.',
         ]),
       ],
@@ -414,7 +414,7 @@ export const CHW_EVALUATION: Course = {
         {"kind":"case","title":"Pressure to report more","scenario":true,"text":["It is the end of the month. Your supervisor says the program is two short of its target and asks whether you could count two phone calls as completed referrals. You know neither person was connected. What do you do?","Answer: Say, politely, that you can count only what was completed, and that you would be happy to keep working on those two. Offer to tell the program lead what is getting in the way. If you are asked again, or you are told to change a record, tell the next person up in your program, and write down what was asked. Honest numbers protect the program, the people it serves, and you."]},
         ev([
           'California DHCS CHW Billing FAQ and Medi-Cal community health worker guidance: documentation must support the service and the time billed, and services are tied to a plan of care.',
-          'CDC Framework for Program Evaluation in Public Health: ethics and accuracy are two of the four standards.',
+          'CDC, Program Evaluation Framework, 2024 (MMWR Recomm Rep 2024;73(RR-6)): the federal evaluation standards it applies include ethics and rigor.',
           'California HCAI Framework: professional skills and conduct includes ethics and confidentiality.',
         ]),
       ],
@@ -455,7 +455,7 @@ export const CHW_EVALUATION: Course = {
         {"kind":"tryit","title":"Write a fair sentence","text":["Take any small set of numbers from your own work. Write one sentence that says what it shows, and one that says what it cannot show."]},
         {"kind":"concept","title":"Three ways to say it fairly","text":["Say what you saw: \"Eleven of twelve who finished passed the check.\" Say what you do not know: \"We do not yet know why eight people left.\" Say what you will do next: \"We will call each of them to ask what would have helped.\"","A fair report has all three. A report with only the first can mislead. A report with only the second sounds helpless. A report with all three shows that a program is paying attention and is willing to learn."]},
         ev([
-          'CDC Framework for Program Evaluation in Public Health: draw conclusions that are justified by the evidence gathered.',
+          'CDC, Program Evaluation Framework, 2024 (MMWR Recomm Rep 2024;73(RR-6)): draw conclusions that are justified by the evidence gathered.',
           'Community Preventive Services Task Force: recommendations rest on many studies, not a single small group.',
           'California HCAI Framework: assessment methods include before-and-after testing and self-rated learning, and results should be read with care.',
         ]),
@@ -502,7 +502,7 @@ export const CHW_EVALUATION: Course = {
         {"kind":"concept","title":"How the numbers are used","text":["A program looks at the indicators to see where people are leaving, where they are succeeding, and what to change. If many drop out in week three, the program may change the schedule or add support. If few are placed, it may talk to more employers.","This is why honest, timely records matter to you. They are how the program learns to help the next person better."]},
         ev([
           'California HCAI Framework: programs should assess participants in several ways and follow up 6 to 12 months after training.',
-          'CDC Framework for Program Evaluation in Public Health: engage stakeholders and agree on what will be measured.',
+          'CDC, Program Evaluation Framework, 2024 (MMWR Recomm Rep 2024;73(RR-6)): engage stakeholders and agree on what will be measured.',
           'Kangovi S, et al. Health Affairs 2020;39(2):207-213: an example of measuring outcomes and cost for a community health worker program.',
         ]),
       ],

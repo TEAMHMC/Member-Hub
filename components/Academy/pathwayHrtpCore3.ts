@@ -224,7 +224,7 @@ export const CHW_REENTRY: Course = {
           'Order barriers by what happens in the first 72 hours and who needs to act.',
         ] },
         ev([DHCS_JI, HCAI,
-          'Community Preventive Services Task Force, Community Health Workers: community health worker interventions improve outcomes when they address social needs and connect people to care.']),
+          'Community Preventive Services Task Force, Community Health Workers: interventions that engage community health workers are recommended for several health conditions.']),
       ],
     },
     // ── Lesson 4 ───────────────────────────────────────────────────────────
@@ -289,7 +289,7 @@ export const CHW_REENTRY: Course = {
           'Plan for release day delays and check in on a set schedule for 30 days.',
         ] },
         ev([DHCS_JI, HCAI,
-          'Community Preventive Services Task Force, Community Health Workers: effective programs include care coordination and follow-up with clients.']),
+          'Community Preventive Services Task Force, Community Health Workers: recommended interventions include outreach, navigation, care coordination, and health education.']),
       ],
     },
     // ── Lesson 5 ───────────────────────────────────────────────────────────
@@ -330,7 +330,7 @@ export const CHW_REENTRY: Course = {
         ] },
         ev([HCAI,
           'U.S. HHS, HIPAA Privacy Rule: protected health information must be safeguarded in communications.',
-          'Community Preventive Services Task Force, Community Health Workers: follow-up is a core activity of effective programs.']),
+          'Community Preventive Services Task Force, Community Health Workers: recommended interventions include outreach, navigation, care coordination, and health education.']),
       ],
     },
     // ── Lesson 6 ───────────────────────────────────────────────────────────
@@ -429,7 +429,7 @@ export const CHW_REENTRY: Course = {
         ] },
         ev([HCAI,
           'Community Preventive Services Task Force, Community Health Workers: roles include navigation, advocacy, and health education.',
-          'American Public Health Association, Community Health Workers: advocacy and capacity building as core roles.']),
+          'Community Health Worker Core Consensus (C3) Project, Roles and Skills: advocacy and capacity building are among the core community health worker roles.']),
       ],
     },
     // ── Lesson 8 ───────────────────────────────────────────────────────────
@@ -525,7 +525,7 @@ export const CHW_REENTRY: Course = {
           'What is one boundary you want to practice saying out loud?',
         ] },
         ev([HCAI,
-          'CDC, Framework for Program Evaluation in Public Health: accuracy and ethics as evaluation standards.',
+          'CDC, Program Evaluation Framework, 2024: evaluation standards include ethics and rigor.',
           'California DHCS, Community Health Worker Services benefit guidance: documentation supports the service provided.']),
       ],
     },
