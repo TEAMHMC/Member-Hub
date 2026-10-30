@@ -87,7 +87,7 @@ export const FBCH_DEESCALATION: Course = {
           'Afterward, write a short, factual note. Tell your supervisor what happened, what you did, and how you are. Take a few minutes before you return to work. A hard moment affects the worker too, and a good program expects you to ask for support.',
         ] },
         { kind: 'check', check: { id: 'fbch-11-c3', q: 'A person threatens another at your table. What do you do?', options: ['Try to restrain the person', 'Move people to safety and call your supervisor and 911 as needed', 'Argue with them', 'Ignore it'], answer: 1, rationale: 'Keep people safe, leave the situation, and call for help. Do not restrain anyone.', distractors: 'Restraining or arguing puts you and others at risk.' } },
-        ev(['Richmond et al., Project BETA (2012): debriefing and clear limits.', 'OSHA, Preventing Workplace Violence in Healthcare and Social Service Settings: planning, partners, and reporting.', HCAI]),
+        ev(['Richmond et al., Project BETA (2012): debriefing and clear limits.', 'OSHA, Guidelines for Preventing Workplace Violence for Healthcare and Social Service Workers (OSHA 3148-06R, 2016): planning, partners, and reporting.', HCAI]),
       ],
     },
   ],
@@ -135,7 +135,7 @@ export const FBCH_DATA_DOCS: Course = {
           'Note A could be used by another worker. Note B cannot.',
         ] },
         { kind: 'check', check: { id: 'fbch-12-c1', q: 'Which belongs in a note?', options: ['Your guess about the person\'s diagnosis', 'What was asked, what you did, and what happens next', 'Details of the person\'s family problems that are not needed', 'Your opinion of the person'], answer: 1, rationale: 'Notes record facts and next steps. Leave out opinions, guesses, and details that are not needed.', distractors: 'Opinions and extra detail can harm the person if the record is seen.' } },
-        ev(['CDC, Framework for Program Evaluation in Public Health: accuracy and utility as evaluation standards.', 'U.S. HHS, HIPAA Privacy Rule: the minimum necessary standard.', HCAI]),
+        ev(['CDC, Program Evaluation Framework, 2024: evaluation standards include relevance, utility, and rigor.', 'U.S. HHS, HIPAA Privacy Rule: the minimum necessary standard.', HCAI]),
       ],
     },
     {
@@ -151,7 +151,7 @@ export const FBCH_DATA_DOCS: Course = {
           { label: 'Do not round up', text: 'Inflated numbers can lose a contract and, in billing, may be treated as fraud.' },
         ] },
         { kind: 'check', check: { id: 'fbch-12-c2', q: 'You referred 10 people to enrollment help but know only 4 connected. What do you report?', options: ['10 enrolled', '10 referred and 4 connected', '4 referred', '14 served'], answer: 1, rationale: 'Report what happened. A referral and a connection are different counts.', distractors: 'Combining or rounding the counts overstates the result.' } },
-        ev(['CDC, Framework for Program Evaluation in Public Health: ethical and accurate reporting.', 'California DHCS, CHW Billing FAQ: records must support the service provided.', HCAI]),
+        ev(['CDC, Program Evaluation Framework, 2024: ethical and rigorous reporting.', 'California DHCS, CHW Billing FAQ: records must support the service provided.', HCAI]),
       ],
     },
     {
@@ -176,7 +176,7 @@ export const FBCH_DATA_DOCS: Course = {
   ],
   checks: [],
   furtherLearning: [
-    { name: 'CDC: Framework for Program Evaluation in Public Health', use: 'How programs report honestly.', url: 'https://www.cdc.gov' },
+    { name: 'CDC: Program Evaluation Framework, 2024', use: 'How programs report honestly.', url: 'https://www.cdc.gov' },
     { name: 'U.S. HHS: HIPAA Privacy Rule', use: 'The basics of protecting health information.', url: 'https://www.hhs.gov' },
     { name: 'California HCAI: CHW/P/R Training Program Best Practices Framework', use: 'Professional skills and conduct.', url: 'https://hcai.ca.gov/workforce/initiatives/chwpr/training-program-best-practices-framework/' },
   ],
@@ -220,7 +220,7 @@ export const FBCH_CASE_LAB: Course = {
           'Plan to play the person as well as the worker. Playing the person shows you how it feels to be on the other side.',
         ] },
         { kind: 'check', check: { id: 'fbch-13-c1', q: 'Why play the person as well as the worker?', options: ['To save time', 'It shows how an encounter feels from the other side', 'It is required by law', 'To practice acting'], answer: 1, rationale: 'Playing the person builds empathy and shows how your words land.', distractors: 'The aim is understanding the experience, not performance.' } },
-        ev([HCAI, 'Miller and Rollnick, Motivational Interviewing, third edition (2013): skills are learned through practice with feedback.', 'Community Preventive Services Task Force, Community Health Workers: training and supervision support effective programs.']),
+        ev([HCAI, 'Miller and Rollnick, Motivational Interviewing, third edition (2013): skills are learned through practice with feedback.', 'Community Preventive Services Task Force: the recommended interventions place community health workers in team-based care, working alongside clinicians.']),
       ],
     },
     {
@@ -237,7 +237,7 @@ export const FBCH_CASE_LAB: Course = {
           'Goal: "Get my insulin and stop going to the ER." Barriers in order: no medication for three days; coverage lapsed; no ID. Steps: today, call the clinic for an urgent refill with a warm handoff; Thursday, renewal help with a certified counselor; next week, ID. Escalate if he reports confusion, vomiting, or fainting. Follow up Friday by phone.',
         ] },
         { kind: 'check', check: { id: 'fbch-13-c2', q: 'What should come first in a barrier map?', options: ['The easiest item', 'The item that is time-sensitive for health or safety', 'The item the person mentions last', 'The item that takes longest'], answer: 1, rationale: 'Time-sensitive health and safety needs come first because the cost of waiting is highest.', distractors: 'Ease or length should not outrank urgency.' } },
-        ev([HCAI, 'Community Preventive Services Task Force, Community Health Workers: care coordination and follow-up.', 'SAMHSA, TIP 57: collaboration and choice in planning.']),
+        ev([HCAI, 'Community Preventive Services Task Force, Community Health Workers: recommended interventions include outreach, navigation, care coordination, and health education.', 'SAMHSA, TIP 57: collaboration and choice in planning.']),
       ],
     },
     {
@@ -318,7 +318,7 @@ export const FBCH_READINESS: Course = {
           '"Not yet" is not failure. It means one more practice and a second look. Most people who hear it begin service within a few weeks.',
         ] },
         { kind: 'check', check: { id: 'fbch-14-c1', q: 'What does "not yet" mean at sign-off?', options: ['You are removed from the program', 'You need more practice and a second look', 'You failed permanently', 'Nothing'], answer: 1, rationale: 'Sign-off decides readiness for supervised service. Not yet leads to more practice.', distractors: 'It is a step in learning, not an ending.' } },
-        ev([HCAI, 'Community Preventive Services Task Force, Community Health Workers: supervision and training support effective programs.', 'Miller and Rollnick, Motivational Interviewing (2013): skills develop through observed practice.']),
+        ev([HCAI, 'Community Preventive Services Task Force: the recommended interventions place community health workers in team-based care, working alongside clinicians.', 'Miller and Rollnick, Motivational Interviewing (2013): skills develop through observed practice.']),
       ],
     },
     {
@@ -397,7 +397,7 @@ export const FBCH_PRACTICUM: Course = {
           'You are not expected to know everything. You are expected to ask, to stay within the role, and to tell your supervisor when something is beyond you.',
         ] },
         { kind: 'check', check: { id: 'fbch-15-c1', q: 'What should you do if you are unsure whether something is in your role?', options: ['Do it anyway', 'Ask your supervisor before acting', 'Skip the shift', 'Ask a stranger'], answer: 1, rationale: 'Asking first protects the person and you.', distractors: 'Guessing about the role puts people at risk.' } },
-        ev([HCAI, 'Community Preventive Services Task Force, Community Health Workers: supervision.', 'OSHA, Preventing Workplace Violence in Healthcare and Social Service Settings: planning and escalation.']),
+        ev([HCAI, 'Community Preventive Services Task Force: the recommended interventions place community health workers in team-based care, working alongside clinicians.', 'OSHA, Guidelines for Preventing Workplace Violence for Healthcare and Social Service Workers (OSHA 3148-06R, 2016): planning and escalation.']),
       ],
     },
     {

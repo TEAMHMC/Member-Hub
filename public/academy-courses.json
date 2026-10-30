@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-30T10:57:00.346Z",
+  "generatedAt": "2026-10-30T11:44:14.509Z",
   "courses": [
     {
       "id": "hce-1",
@@ -504,6 +504,41 @@
       "pathwayId": "unstoppable-ce",
       "pathwayTitle": "Unstoppable Continuing Education",
       "delivery": "live"
+    },
+    {
+      "id": "chw_role_field",
+      "title": "The Community Health Worker Role, History, and Field",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_navigation",
+      "title": "Service Coordination and Navigation",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_outreach",
+      "title": "Outreach, Case Finding, and Follow-Up",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_evaluation",
+      "title": "Evaluation and Research Basics",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "hrtp_reentry_chw",
+      "title": "Community Health Work in Reentry",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
     }
   ]
 }

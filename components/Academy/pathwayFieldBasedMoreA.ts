@@ -211,7 +211,7 @@ export const FBCH_MH_SUD: Course = {
       id: 'fbch-8-l1', title: 'What you may see', summary: 'Common conditions in plain terms, and why you do not diagnose.', minutes: 6,
       blocks: [
         { kind: 'prose', text: [
-          'Mental health conditions are common. According to the National Institute of Mental Health, about one in five adults in the United States lives with a mental illness in a given year. Substance use disorders are also common, and the two often occur together.',
+          'Mental health conditions are common. According to the National Institute of Mental Health, 23 percent of adults in the United States, more than one in five, had a mental illness in 2022. Substance use disorders are also common, and the two often occur together.',
           'You do not diagnose. A diagnosis needs a licensed professional. What you can do is notice changes and respond with care.',
         ] },
         { kind: 'steps', title: 'Common patterns, in plain terms', items: [
@@ -222,7 +222,7 @@ export const FBCH_MH_SUD: Course = {
           { label: 'Substance use disorder', text: 'Continued use despite harm, with cravings, loss of control, and effects on health, relationships, and work.' },
         ] },
         { kind: 'check', check: { id: 'fbch-8-c1', q: 'What is your role when you notice signs of depression in a member?', options: ['Diagnose and treat it', 'Respond with care and connect the person to qualified help', 'Ignore it unless asked', 'Tell them to cheer up'], answer: 1, rationale: 'You notice, respond kindly, and connect. Diagnosis and treatment belong to licensed professionals.', distractors: 'Diagnosing exceeds your role, and ignoring or dismissing the signs leaves the person alone.' } },
-        ev(['National Institute of Mental Health, Mental Illness statistics: about one in five U.S. adults lives with a mental illness.', 'NIDA, Drugs, Brains, and Behavior: The Science of Addiction: addiction is a treatable medical condition.', HCAI]),
+        ev(['National Institute of Mental Health, Mental Illness statistics: 23.1 percent of U.S. adults, about 59 million people, had a mental illness in 2022.', 'NIDA, Drugs, Brains, and Behavior: The Science of Addiction: addiction is a treatable medical condition.', HCAI]),
       ],
     },
     {
@@ -238,7 +238,7 @@ export const FBCH_MH_SUD: Course = {
           { label: 'In recovery', text: 'Not "clean" or "dirty." Say a test result was positive or negative.' },
         ] },
         { kind: 'check', check: { id: 'fbch-8-c2', q: 'Which phrase is best?', options: ['"An addict came by"', '"A person with a substance use disorder came by"', '"A junkie came by"', '"A druggie came by"'], answer: 1, rationale: 'Person-first language names the person first and treats the condition as one part of them.', distractors: 'The other terms label the person and add stigma.' } },
-        ev(['NIDA, Words Matter: Terms to Use and Avoid When Talking About Addiction: person-first language reduces stigma.', 'SAMHSA, Preferred Terminology and Language Guidelines for substance use and mental health.', HCAI]),
+        ev(['NIDA, Words Matter: Terms to Use and Avoid When Talking About Addiction: person-first language reduces stigma.', 'Office of National Drug Control Policy, Changing Federal Terminology Regarding Substance Use and Substance Use Disorders (2017): person-first language.', HCAI]),
       ],
     },
     {

@@ -76,7 +76,7 @@ export const YS_BODY = yc({
       { kind: 'prose', text: ['Your lungs take in oxygen from the air. Your heart pumps blood that carries oxygen to every part of your body. When you run, your heart beats faster and you breathe faster because your muscles need more oxygen.'] },
       { kind: 'tryit', title: 'Try it with your mentor', text: ['Sit quietly and find your pulse at your wrist for 15 seconds. Then do 30 jumping jacks and find it again. What changed? Why?'] },
       ck('ys-2-c1', 'What does the heart do?', ['Digests food', 'Pumps blood to carry oxygen', 'Thinks', 'Makes bone'], 1, 'The heart pumps blood that carries oxygen around the body.', 'Other organs do the other jobs.'),
-      ev(['NIH, National Heart, Lung, and Blood Institute: How the heart works.', 'NIH, National Institute of General Medical Sciences: The Inside Story.', 'American Heart Association, Kids Heart Challenge resources.']),
+      ev(['NIH, National Heart, Lung, and Blood Institute: How the heart works.', 'NIH, National Institute of General Medical Sciences: The Inside Story.', 'National Library of Medicine, MedlinePlus: Heart and Circulatory System.']),
     ] },
     { title: 'The nervous system', summary: 'How your body sends messages.', minutes: 2, blocks: [
       { kind: 'prose', text: ['Your brain, spinal cord, and nerves make up your nervous system. Nerves carry messages like "this is hot" to your brain and back to your hand in a split second. That is why you pull your hand away fast.'] },
@@ -148,7 +148,7 @@ export const YS_DATA = yc({
       { kind: 'prose', text: ['A good data question can be answered with numbers. "How many students walk to school?" works. "Is school good?" is too big. Pick a question, decide who you will ask, and decide how you will count.'] },
       { kind: 'tryit', title: 'Try it', text: ['Write a question about your class that you can count, such as how many hours of sleep students got. Decide how you will ask without asking for names.'] },
       ck('ys-4-c1', 'Which is a good data question?', ['Is school fun?', 'How many students in our class walk to school?', 'Why is everything hard?', 'What is best?'], 1, 'It can be answered by counting, which is what makes it a data question.', 'The others are too big or too vague.'),
-      ev(['Next Generation Science Standards, Science and Engineering Practices: Analyzing and Interpreting Data.', 'CDC, Data and Statistics: how health data is used.', 'American Statistical Association, GAISE College Report: statistical thinking.']),
+      ev(['Next Generation Science Standards, Science and Engineering Practices: Analyzing and Interpreting Data.', 'CDC, Data and Statistics: how health data is used.', 'American Statistical Association and NCTM, GAISE II: Pre-K-12 Guidelines for Assessment and Instruction in Statistics Education (2020): statistical problem solving.']),
     ] },
     { title: 'Charts that tell the truth', summary: 'Bar charts and honest labels.', minutes: 2, blocks: [
       { kind: 'steps', title: 'A good chart has', items: [
@@ -158,7 +158,7 @@ export const YS_DATA = yc({
         { label: 'A short sentence', text: 'Say what you learned.' },
       ] },
       ck('ys-4-c2', 'Why start a bar chart at zero?', ['It looks nicer', 'So differences are not made to look bigger than they are', 'It is a rule for art', 'It does not matter'], 1, 'A cut-off axis can mislead.', 'Honest charts matter.'),
-      ev(['Next Generation Science Standards: Analyzing and Interpreting Data.', 'CDC, Visualizing Data.', 'American Statistical Association, GAISE report.']),
+      ev(['Next Generation Science Standards: Analyzing and Interpreting Data.', 'CDC, Visualizing Data.', 'American Statistical Association and NCTM, GAISE II: Pre-K-12 Guidelines for Assessment and Instruction in Statistics Education (2020).']),
     ] },
     { title: 'What data can and cannot tell you', summary: 'Be careful and be kind.', minutes: 2, blocks: [
       { kind: 'list', title: 'Careful thinking', items: ['A small group may not represent everyone.', 'Two things happening together do not always mean one causes the other.', 'Never share names or private details. Report counts only.', 'Ask permission before you collect anything.'] },
@@ -188,12 +188,12 @@ export const YS_TECH = yc({
         { label: 'Health apps', text: 'Remind people to take medicine or track sleep.' },
       ] },
       ck('ys-5-c1', 'What does a thermometer do?', ['Turns body heat into a number', 'Cures fever', 'Measures height', 'Counts steps'], 0, 'It senses temperature and shows it.', 'It measures, it does not treat.'),
-      ev(['NIH, National Institute of Biomedical Imaging and Bioengineering: Telehealth and wearable devices.', 'CDC, Telehealth.', 'American Academy of Pediatrics, HealthyChildren.org.']),
+      ev(['HealthIT.gov, What is telehealth?', 'CDC, Telehealth.', 'American Academy of Pediatrics, HealthyChildren.org.']),
     ] },
     { title: 'Staying safe online', summary: 'Keep your private information private.', minutes: 2, blocks: [
       { kind: 'list', title: 'Habits', items: ['Do not share your full name, address, school, or photos with people you do not know.', 'Use strong passwords and keep them to yourself.', 'Ask a parent or guardian before you use an app.', 'Tell a trusted adult if someone makes you uncomfortable online.'] },
       ck('ys-5-c2', 'Someone you do not know asks for your address online. What do you do?', ['Send it', 'Do not share it and tell a trusted adult', 'Send half of it', 'Ignore your parents'], 1, 'Private information stays private, and an adult can help.', 'Sharing puts you at risk.'),
-      ev(['Federal Trade Commission, Protecting Kids Online and COPPA.', 'Common Sense Media, Digital Citizenship curriculum.', 'CISA, Stay Safe Online guidance for families.']),
+      ev(['Federal Trade Commission, Protecting Kids Online and COPPA.', 'Common Sense Media, Digital Citizenship curriculum.', 'CISA, Secure Our World: simple steps for families, including strong passwords, multifactor authentication, recognizing phishing, and updating software.']),
     ] },
     { title: 'Screens and sleep', summary: 'Why bedtime matters.', minutes: 2, blocks: [
       { kind: 'prose', text: ['Bright screens close to bedtime can make it harder to fall asleep. The American Academy of Pediatrics suggests keeping screens out of bedrooms at night and turning them off before bed.'] },
@@ -261,7 +261,7 @@ export const YS_CAREERS = yc({
         { label: 'Data analyst', text: 'Finds patterns in health information.' },
       ] },
       ck('ys-7-c1', 'Who helps neighbors find care and services?', ['A lab technician', 'A community health worker', 'A pharmacist', 'An engineer'], 1, 'Community health workers connect people to care.', 'The others do different jobs.'),
-      ev(['U.S. Bureau of Labor Statistics, Occupational Outlook Handbook: healthcare occupations.', 'California HCAI, Health Workforce Initiatives: careers in health.', 'HMC Health Careers Exploration pathway.']),
+      ev(['U.S. Bureau of Labor Statistics, Occupational Outlook Handbook: healthcare occupations.', 'California HCAI, Health Workforce Initiatives: careers in health.', 'U.S. Bureau of Labor Statistics, Occupational Outlook Handbook: community and social service occupations.']),
     ] },
     { title: 'Ask a question', summary: 'How to interview someone.', minutes: 3, blocks: [
       { kind: 'list', title: 'Good questions', items: ['What does a normal day look like?', 'What do you like most? What is hard?', 'What did you study, and what helped you most?', 'What would you tell someone my age?'] },
