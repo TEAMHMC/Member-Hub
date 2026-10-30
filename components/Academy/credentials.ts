@@ -84,7 +84,7 @@ export const PERSONAS: Persona[] = [
 export const CREDENTIALS: CredentialSpec[] = [
   {
     pathwayId: 'health-careers-exploration',
-    title: 'HMC Health Careers Exploration — Pathway Completion',
+    title: 'HMC Health Careers Exploration: Pathway Completion',
     type: 'Course Completion',
     level: 'Discover',
     proves:
@@ -109,7 +109,7 @@ export const CREDENTIALS: CredentialSpec[] = [
   },
   {
     pathwayId: 'youth-steam',
-    title: 'HMC Youth Mentorship + STEAM — Pathway Completion',
+    title: 'HMC Youth Mentorship + STEAM: Pathway Completion',
     type: 'Course Completion',
     level: 'Discover',
     proves:
@@ -133,7 +133,7 @@ export const CREDENTIALS: CredentialSpec[] = [
   },
   {
     pathwayId: 'field-based-community-health',
-    title: 'HMC Field-Based Community Health — Applied Pathway Completion',
+    title: 'HMC Field-Based Community Health: Applied Pathway Completion',
     type: 'Applied Pathway Completion',
     level: 'Foundations',
     proves:
@@ -161,7 +161,7 @@ export const CREDENTIALS: CredentialSpec[] = [
   },
   {
     pathwayId: 'clinical-exposure-simulation',
-    title: 'HMC Clinical + Community Health Experience — Pathway Completion',
+    title: 'HMC Clinical + Community Health Experience: Pathway Completion',
     type: 'Applied Pathway Completion',
     level: 'Applied',
     proves:
@@ -188,7 +188,7 @@ export const CREDENTIALS: CredentialSpec[] = [
   },
   {
     pathwayId: 'internships-fellowships',
-    title: 'HMC [Concentration] Internship or Fellowship — Completion',
+    title: 'HMC [Concentration] Internship or Fellowship: Completion',
     type: 'Fellowship / Internship Completion',
     level: 'Advanced',
     proves:
@@ -215,7 +215,7 @@ export const CREDENTIALS: CredentialSpec[] = [
   },
   {
     pathwayId: 'mentor-leader',
-    title: 'HMC Mentor + Peer Leader — Pathway Completion',
+    title: 'HMC Mentor + Peer Leader: Pathway Completion',
     type: 'Course Completion',
     level: 'Leadership',
     proves:
@@ -281,9 +281,5 @@ export const CREDENTIAL_FAQ: Faq[] = [
   {
     q: 'Are Academy hours the same as volunteer service hours?',
     a: 'No. The hours ledger keeps categories distinct: training, practicum, field service, project, internship or fellowship, mentoring, research, and meeting. A certificate never implies that time spent in a course equals approved continuing education or volunteer service.',
-  },
-  {
-    q: 'What does it cost?',
-    a: 'Nothing. Academy pathways, assessments, and completion records are free to learners.',
   },
 ];
