@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-30T07:07:13.138Z",
+  "generatedAt": "2026-10-30T08:45:55.213Z",
   "courses": [
     {
       "id": "hce-1",
@@ -221,6 +221,13 @@
     {
       "id": "chw_evaluation",
       "title": "Evaluation and Research Basics",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "hrtp_reentry_chw",
+      "title": "Community Health Work in Reentry",
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "self-paced"
