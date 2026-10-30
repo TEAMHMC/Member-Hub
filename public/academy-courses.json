@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-08T21:08:09.468Z",
+  "generatedAt": "2026-10-30T10:57:00.346Z",
   "courses": [
     {
       "id": "hce-1",
@@ -65,6 +65,62 @@
       "delivery": "practical"
     },
     {
+      "id": "ys-1",
+      "title": "Health Starts Here",
+      "pathwayId": "youth-steam",
+      "pathwayTitle": "Youth Mentorship + STEAM",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ys-2",
+      "title": "Inside the Human Body",
+      "pathwayId": "youth-steam",
+      "pathwayTitle": "Youth Mentorship + STEAM",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ys-3",
+      "title": "Mind + Brain",
+      "pathwayId": "youth-steam",
+      "pathwayTitle": "Youth Mentorship + STEAM",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ys-4",
+      "title": "Data Can Tell a Story",
+      "pathwayId": "youth-steam",
+      "pathwayTitle": "Youth Mentorship + STEAM",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ys-5",
+      "title": "Technology + Health",
+      "pathwayId": "youth-steam",
+      "pathwayTitle": "Youth Mentorship + STEAM",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ys-6",
+      "title": "Designing for People",
+      "pathwayId": "youth-steam",
+      "pathwayTitle": "Youth Mentorship + STEAM",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ys-7",
+      "title": "Meet the People Behind Healthcare",
+      "pathwayId": "youth-steam",
+      "pathwayTitle": "Youth Mentorship + STEAM",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ys-8",
+      "title": "Build Something That Matters: Capstone",
+      "pathwayId": "youth-steam",
+      "pathwayTitle": "Youth Mentorship + STEAM",
+      "delivery": "practical"
+    },
+    {
       "id": "fbch-coverage",
       "title": "Care Navigation and Coverage",
       "pathwayId": "field-based-community-health",
@@ -100,6 +156,76 @@
       "delivery": "self-paced"
     },
     {
+      "id": "fbch-6",
+      "title": "Communication + Active Listening",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-7",
+      "title": "Cultural Humility + Trauma-Informed Engagement",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-8",
+      "title": "Mental Health + Substance Use Awareness",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-9",
+      "title": "Harm Reduction Foundations",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-10",
+      "title": "Motivational Interviewing Foundations",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-11",
+      "title": "De-escalation + Conflict Response",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-12",
+      "title": "Data Collection + Documentation",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "fbch-13",
+      "title": "Applied Community Health Case Lab",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "practical"
+    },
+    {
+      "id": "fbch-14",
+      "title": "Field Readiness Assessment",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "practical"
+    },
+    {
+      "id": "fbch-15",
+      "title": "Practicum / Supervised Service",
+      "pathwayId": "field-based-community-health",
+      "pathwayTitle": "Field-Based Community Health",
+      "delivery": "practicum"
+    },
+    {
       "id": "ces-1",
       "title": "Healthcare Team Roles + Scope",
       "pathwayId": "clinical-exposure-simulation",
@@ -119,6 +245,90 @@
       "pathwayId": "clinical-exposure-simulation",
       "pathwayTitle": "Clinical Exposure + Simulation",
       "delivery": "self-paced"
+    },
+    {
+      "id": "ces-4",
+      "title": "Community-Centered Clinical Care",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ces-5",
+      "title": "Vitals + Screening Concepts",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ces-6",
+      "title": "Infection Prevention + PPE",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ces-7",
+      "title": "Clinical Documentation + Scribing Concepts",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ces-8",
+      "title": "Social Needs in Clinical Care",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ces-9",
+      "title": "Trauma-Informed Clinical Encounters",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ces-10",
+      "title": "Referral + Follow-Up Planning",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ces-11",
+      "title": "Simulation Case 1: Chronic Disease + Access Barriers",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "practical"
+    },
+    {
+      "id": "ces-12",
+      "title": "Simulation Case 2: Mental Health / Substance Use + Safety",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "practical"
+    },
+    {
+      "id": "ces-13",
+      "title": "Simulation Case 3: Unhoused Patient + Continuity of Care",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "practical"
+    },
+    {
+      "id": "ces-14",
+      "title": "Debrief + Reflection",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "practical"
+    },
+    {
+      "id": "ces-15",
+      "title": "Practical / Simulation Competency Review",
+      "pathwayId": "clinical-exposure-simulation",
+      "pathwayTitle": "Clinical Exposure + Simulation",
+      "delivery": "practical"
     },
     {
       "id": "if-1",
@@ -147,6 +357,55 @@
       "pathwayId": "internships-fellowships",
       "pathwayTitle": "Internships + Fellowships",
       "delivery": "self-paced"
+    },
+    {
+      "id": "if-5",
+      "title": "Research + Evidence Use",
+      "pathwayId": "internships-fellowships",
+      "pathwayTitle": "Internships + Fellowships",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "if-6",
+      "title": "Communication + Documentation",
+      "pathwayId": "internships-fellowships",
+      "pathwayTitle": "Internships + Fellowships",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "if-7",
+      "title": "Team Collaboration",
+      "pathwayId": "internships-fellowships",
+      "pathwayTitle": "Internships + Fellowships",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "if-8",
+      "title": "Professional Feedback + Growth",
+      "pathwayId": "internships-fellowships",
+      "pathwayTitle": "Internships + Fellowships",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "if-9",
+      "title": "Midpoint Review",
+      "pathwayId": "internships-fellowships",
+      "pathwayTitle": "Internships + Fellowships",
+      "delivery": "practical"
+    },
+    {
+      "id": "if-10",
+      "title": "Capstone Presentation",
+      "pathwayId": "internships-fellowships",
+      "pathwayTitle": "Internships + Fellowships",
+      "delivery": "practical"
+    },
+    {
+      "id": "if-11",
+      "title": "Final Evaluation + Career Reflection",
+      "pathwayId": "internships-fellowships",
+      "pathwayTitle": "Internships + Fellowships",
+      "delivery": "practical"
     },
     {
       "id": "ml-1",
@@ -182,6 +441,55 @@
       "pathwayId": "mentor-leader",
       "pathwayTitle": "Mentor + Leader",
       "delivery": "self-paced"
+    },
+    {
+      "id": "ml-6",
+      "title": "Goal Setting + Development Planning",
+      "pathwayId": "mentor-leader",
+      "pathwayTitle": "Mentor + Leader",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ml-7",
+      "title": "Inclusive Mentorship",
+      "pathwayId": "mentor-leader",
+      "pathwayTitle": "Mentor + Leader",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ml-8",
+      "title": "Facilitating Groups + Learning",
+      "pathwayId": "mentor-leader",
+      "pathwayTitle": "Mentor + Leader",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ml-9",
+      "title": "Supporting Reflection + Portfolio Development",
+      "pathwayId": "mentor-leader",
+      "pathwayTitle": "Mentor + Leader",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ml-10",
+      "title": "Peer Leadership + Team Coordination",
+      "pathwayId": "mentor-leader",
+      "pathwayTitle": "Mentor + Leader",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "ml-11",
+      "title": "Mentor Practice Case",
+      "pathwayId": "mentor-leader",
+      "pathwayTitle": "Mentor + Leader",
+      "delivery": "practical"
+    },
+    {
+      "id": "ml-12",
+      "title": "Mentor / Leader Readiness Review",
+      "pathwayId": "mentor-leader",
+      "pathwayTitle": "Mentor + Leader",
+      "delivery": "practical"
     },
     {
       "id": "cmhw-facilitator",
