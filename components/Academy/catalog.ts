@@ -401,6 +401,7 @@ import { FBCH_COMMUNICATION, FBCH_CULTURAL_TRAUMA, FBCH_MH_SUD, FBCH_HARM_REDUCT
 import { FBCH_DEESCALATION, FBCH_DATA_DOCS, FBCH_CASE_LAB, FBCH_READINESS, FBCH_PRACTICUM } from './pathwayFieldBasedMoreB';
 import { CES_FOUNDATION_COURSES, CES_PRE, CES_POST } from './pathwayClinicalFoundations';
 import { MENTOR_LEADER_COURSES, MENTOR_PRE, MENTOR_POST } from './pathwayMentorLeader';
+import { ML_MORE_COURSES } from './pathwayMentorLeaderMore';
 import { INTERNSHIP_COURSES } from './pathwayInternships';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
 import { CMHW_FACILITATOR, UNSTOPPABLE_CE } from './pathwayMentalHealth';
@@ -751,7 +752,7 @@ export const PATHWAYS: Pathway[] = [
     id: 'mentor-leader',
     title: 'Mentor + Leader',
     level: 'Leadership',
-    status: 'in-development',
+    status: 'published',
     purpose:
       'Learn to mentor one person, lead a group, and help others grow.',
     format: 'Self-paced core plus mentor practice case | 12 courses',
@@ -764,24 +765,13 @@ export const PATHWAYS: Pathway[] = [
       'Readiness acknowledgement',
       'Extra checks if you will work with young people or sensitive information',
     ],
-    // Five of the twelve are written. The seven below are the ones still to write, so this
-    // list reads as a plan rather than as a promise: a planned title next to a written
-    // course is how a catalogue starts advertising work nobody has done.
-    plannedCourses: [
-      'Goal Setting + Development Planning',
-      'Inclusive Mentorship',
-      'Facilitating Groups + Learning',
-      'Supporting Reflection + Portfolio Development',
-      'Peer Leadership + Team Coordination',
-      'Mentor Practice Case',
-      'Mentor / Leader Readiness Review',
-    ],
-    courses: MENTOR_LEADER_COURSES,
+    plannedCourses: [],
+    courses: [...MENTOR_LEADER_COURSES, ...ML_MORE_COURSES],
     preTest: MENTOR_PRE,
     postTest: MENTOR_POST,
-    version: '1.0 partial',
-    effectiveDate: 'Five of twelve courses written, August 28, 2026',
-    nextReview: 'When the remaining seven are written, and before the mentor practice case is used to gate a credential',
+    version: '1.0',
+    effectiveDate: 'October 2026',
+    nextReview: 'October 2027, and before the mentor practice case is used to gate a credential',
   },
 ];
 
