@@ -381,7 +381,7 @@ export const CHW_REENTRY: Course = {
           'When in doubt about safety, stay, call 988 or 911, and tell your supervisor.',
         ] },
         ev([DHCS_JI,
-          'SAMHSA, Opioid Overdose Prevention Toolkit: naloxone reverses opioid overdose, and people should call 911.',
+          'SAMHSA, Overdose Prevention and Response Toolkit: naloxone reverses opioid overdose, and people should call 911.',
           '988 Suicide and Crisis Lifeline: call or text 988 for support in a mental health crisis.',
           'Binswanger et al., New England Journal of Medicine, 2007: risk of death after release, highest in the first two weeks.']),
       ],

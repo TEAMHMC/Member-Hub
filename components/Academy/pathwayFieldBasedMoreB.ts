@@ -416,7 +416,7 @@ export const FBCH_PRACTICUM: Course = {
           'You feel unsafe.',
         ] },
         { kind: 'check', check: { id: 'fbch-15-c2', q: 'You suspect an overdose. What do you do?', options: ['Wait', 'Call 911, give naloxone, and tell your supervisor', 'Leave', 'Record it later'], answer: 1, rationale: 'Call 911 and give naloxone without delay, then tell your supervisor.', distractors: 'Delay costs time the person does not have.' } },
-        ev([HCAI, 'SAMHSA, Opioid Overdose Prevention Toolkit.', 'SAMHSA, TIP 57: safety and trustworthiness.']),
+        ev([HCAI, 'SAMHSA, Overdose Prevention and Response Toolkit.', 'SAMHSA, TIP 57: safety and trustworthiness.']),
       ],
     },
     {
