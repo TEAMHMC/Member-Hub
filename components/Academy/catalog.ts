@@ -694,7 +694,7 @@ export const PATHWAYS: Pathway[] = [
     courses: [...CES_FOUNDATION_COURSES, ...CES_MORE_COURSES],
     preTest: CES_PRE,
     postTest: CES_POST,
-    version: '1.0',
+    version: '1.0 draft',
     effectiveDate: 'Written October 2026',
     nextReview: 'Clinical governance review by HMC\'s PMHNP, before the pathway is opened',
   },
