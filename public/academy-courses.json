@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-30T11:44:14.509Z",
+  "generatedAt": "2026-10-30T23:41:23.446Z",
   "courses": [
     {
       "id": "hce-1",
@@ -536,6 +536,27 @@
     {
       "id": "hrtp_reentry_chw",
       "title": "Community Health Work in Reentry",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "hrtp_mh_education",
+      "title": "Mental Health Education: Sharing What You Know",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "hrtp_mh_prevention",
+      "title": "Prevention: Protecting Mental Health Before a Crisis",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "hrtp_mh_intervention",
+      "title": "Intervention: Early Support, Crisis Response, and Recovery",
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "self-paced"
