@@ -1073,7 +1073,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
         <h1 className="text-5xl font-semibold tracking-tight text-zinc-900">Welcome, {user.firstName}.</h1>
         <p className="text-zinc-500 max-w-lg mx-auto leading-relaxed text-lg">
           You are registered for the HMC Health and Education Pathways Academy. Everything is
-          self-paced, text-first, and free.
+          self-paced and text-first.
         </p>
         <div className="flex flex-wrap gap-4 pt-6 justify-center">
           <ButtonPrimary onClick={() => setActiveTab('academy')}>Go to my pathway</ButtonPrimary>

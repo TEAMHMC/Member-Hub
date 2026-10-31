@@ -504,7 +504,7 @@ export const CHW_NAVIGATION: Course = {
         {"kind":"case","title":"When you cannot reach the person","scenario":true,"text":["You referred a man to a clinic on Monday. By Friday you have called twice with no answer. What do you do?","Answer: Try the other contact he gave you, if he agreed to one. Check with the clinic whether he came. Try one more call at a different time of day. If you still cannot reach him, record each try, tell your supervisor, and keep the case open for a defined time. Do not assume he is no longer interested. Many people lose a phone or change numbers. If you see him in the field, tell him you are glad to see him, and ask how best to reach him."]},
         ev(["AHRQ Care Coordination Measures Atlas: coordination depends on sharing information and linking people to community resources.",
           "California HCAI Framework: communication, documentation, and follow-up sit within the service coordination competency.",
-          "California DHCS CHW Billing FAQ: records must support the services provided."]),
+          "U.S. HHS Office for Civil Rights, Summary of the HIPAA Privacy Rule: health information is kept private and shared only as the rule allows."]),
       ],
     },
     {

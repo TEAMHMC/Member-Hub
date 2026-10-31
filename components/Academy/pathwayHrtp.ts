@@ -12,6 +12,7 @@ import { CHW_REENTRY } from './pathwayHrtpCore3';
 import { MH_EDUCATION } from './pathwayHrtpEducation';
 import { MH_PREVENTION } from './pathwayHrtpPrevention';
 import { MH_INTERVENTION } from './pathwayHrtpIntervention';
+import { CHWP_PRE, CHWP_POST } from './pathwayHrtpAssessment';
 
 export const COMMUNITY_MENTAL_HEALTH_WORKER: Pathway = {
   family: 'Mental Health + Community Education',
@@ -26,11 +27,13 @@ export const COMMUNITY_MENTAL_HEALTH_WORKER: Pathway = {
   credentialType: 'Course Completion',
   gates: [
     'Finish the eight courses and the facilitated practice',
-    'Pass the knowledge checks',
+    'Pass the final quiz with 80% or more',
     'Complete the practice file in each course',
   ],
   guidedStart: 'Start with The Community Health Worker Role, then Service Coordination and Navigation. The Mental Health Education, Prevention, and Intervention courses follow.',
   courses: [CHW_ROLE_FIELD, CHW_NAVIGATION, CHW_OUTREACH, CHW_EVALUATION, CHW_REENTRY, MH_EDUCATION, MH_PREVENTION, MH_INTERVENTION],
+  preTest: CHWP_PRE,
+  postTest: CHWP_POST,
   plannedCourses: [],
   version: '1.0',
   effectiveDate: 'October 2026',
