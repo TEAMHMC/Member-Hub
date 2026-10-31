@@ -199,7 +199,7 @@ export const CHW_OUTREACH: Course = {
         {"kind":"concept","title":"What people tell you","text":["People may tell you things that are private, painful, or serious. Keep what you hear private, except where your supervisor has told you that something must be shared. Ask your supervisor, before you start, which situations you are required to report, and how. If someone tells you about a risk to a child, an older adult, a dependent adult, or themselves, tell your supervisor right away.","You do not have to decide what is reportable by yourself. That is the point of a supervisor."]},
         ev([
           'California HCAI Framework: documentation and follow-up are part of communication and service coordination.',
-          'California DHCS CHW Billing FAQ: records must support the services provided and the time spent.',
+          'U.S. HHS Office for Civil Rights, Summary of the HIPAA Privacy Rule: health information is kept private and shared only as the rule allows.',
           'SAMHSA and USICH, Lessons Learned from SAMHSA\'s Expert Panel on the Role of Outreach and Engagement (2016): overcoming barriers to engagement can take months or even years of persistent effort.',
         ]),
       ],
@@ -289,8 +289,8 @@ export const CHW_EVALUATION: Course = {
   promise:
     'Tell outputs from outcomes, count accurately, keep honest records that protect people and your job, and read a small table without overclaiming.',
   about: [
-    'Programs are funded, and workers are hired, because someone can show that the work helps. This course teaches how a worker contributes to that honestly.',
-    'It also explains the numbers a County-funded program reports.',
+    'Employers and supervising providers trust workers whose records are accurate and who can show what they did. This course teaches how to keep those records honestly.',
+    'It also shows how to turn your practice file and field log into a record of the skills you have.',
   ],
   objectives: [
     'Tell outputs from outcomes.',
@@ -413,7 +413,7 @@ export const CHW_EVALUATION: Course = {
         {"kind":"list","title":"What a plan of care usually shows","items":["The person's goals in their own words.","The services needed to reach them.","How often and for how long each will happen.","Who is responsible for each step.","When the plan will be reviewed."]},
         {"kind":"case","title":"Pressure to report more","scenario":true,"text":["It is the end of the month. Your supervisor says the program is two short of its target and asks whether you could count two phone calls as completed referrals. You know neither person was connected. What do you do?","Answer: Say, politely, that you can count only what was completed, and that you would be happy to keep working on those two. Offer to tell the program lead what is getting in the way. If you are asked again, or you are told to change a record, tell the next person up in your program, and write down what was asked. Honest numbers protect the program, the people it serves, and you."]},
         ev([
-          'California DHCS CHW Billing FAQ and Medi-Cal community health worker guidance: documentation must support the service and the time billed, and services are tied to a plan of care.',
+          'U.S. HHS Office for Civil Rights, Summary of the HIPAA Privacy Rule: health information is kept private and shared only as the rule allows.',
           'CDC, Program Evaluation Framework, 2024 (MMWR Recomm Rep 2024;73(RR-6)): the federal evaluation standards it applies include ethics and rigor.',
           'California HCAI Framework: professional skills and conduct includes ethics and confidentiality.',
         ]),
@@ -463,47 +463,63 @@ export const CHW_EVALUATION: Course = {
     },
     {
       id: 'chw-eval-l5',
-      title: 'This program\'s measures',
-      summary: 'The indicators a County-funded program reports.',
+      title: 'Your records show what you can do',
+      summary: 'Turn your practice file and field log into a record a supervisor can sign.',
       minutes: 10,
       blocks: [
         { kind: 'why', text: [
-          'A County-funded training program reports the same indicators for every participant. Knowing them shows you how your own work counts.',
+          'A supervising provider or an employer will ask what you can do and who has seen you do it. Your own records are how you answer.',
         ] },
-        { kind: 'list', title: 'The core indicators', items: [
-          'Enrolled: a participant counts after the first week of training.',
-          'Graduated: the participant completed the program.',
-          'Placed: the participant is in full-time, unsubsidized employment.',
-          'Retained: the participant is still working at 30, 60, and 90 days.',
-          'Skill gain: the participant reports more competence at the end than at the start.',
+        { kind: 'concept', title: 'What the State checklist asks for', text: [
+          'California\'s Medi-Cal Community Health Worker Minimum Qualification Checklist tracks each of the 11 core competencies on its own line. For each one, the supervising provider records a description of your experience or training, the date you completed it, and their initials.',
+          'The checklist is a tool for supervising providers, so ask yours what they use. If you keep your own record in the same shape, it is easy for them to check.',
         ] },
-        { kind: 'concept', title: 'Where you fit', text: [
-          'Your attendance, your practice file, your field log, and your own reports of what changed are the data behind these numbers. They are also yours: a documented record you can use in an interview.',
+        { kind: 'list', title: 'The 11 competencies, as the checklist names them', items: [
+          'Communication',
+          'Interpersonal Skills and Relationship Building',
+          'Service Coordination and Navigation',
+          'Capacity Building',
+          'Advocacy',
+          'Education and Facilitation',
+          'Individual and Community Assessment',
+          'Professional Skills and Conduct',
+          'Outreach',
+          'Evaluation and Research',
+          'Basic Knowledge in Public Health Principles and Social Determinants of Health',
+        ] },
+        { kind: 'example', title: 'A weak line and a strong line', text: [
+          'Weak: "Did outreach."',
+          'Strong: "Oct 14. Approached six people at the Thursday site. Four took the resource list and two agreed to a check-in. My supervisor observed the first contact."',
+          'The strong line says what you did, when, and who saw it. A supervisor can read it and sign.',
         ] },
         { kind: 'check', check: {
           id: 'hrtp-c15-q3',
-          q: 'Which is an outcome?',
+          q: 'Which line would a supervising provider find easiest to sign for the Outreach competency?',
           options: [
-            'We handed out 200 flyers',
-            'We held four tabling events',
-            'We trained 12 volunteers',
-            'Eight of ten people referred are now enrolled in coverage',
+            'Did lots of outreach.',
+            'Good at talking to people.',
+            'Oct 14: approached six people at the Thursday site, four took the resource list, supervisor observed the first contact.',
+            'Very motivated to do outreach.',
           ],
-          answer: 3,
-          rationale: 'An outcome is a change in people\'s circumstances. The others count activity.',
-          distractors: 'Flyers, events, and trainings are outputs.',
+          answer: 2,
+          rationale: 'It says what you did, when, and who saw it. The others claim a skill without showing it.',
+          distractors: 'Lots of outreach, good at talking, and motivated are claims. A supervisor cannot check them.',
         } },
         { kind: 'takeaways', items: [
-          'Enrolled, graduated, placed, retained, and skill gain.',
-          'Your records are the data behind them.',
+          'Keep one line for each competency: what you did, when, and who saw it.',
+          'A record of what you did counts for more than a claim that you can.',
         ] },
-        {"kind":"list","title":"How your work connects to each indicator","items":["Enrolled: you attend the first week and complete the intake.","Graduated: you attend, practice, pass the checks, and complete your field hours.","Placed: you document your experience and prepare for interviews.","Retained: you use your support network in the first 90 days.","Skill gain: you complete the self-assessment honestly at the start, middle, and end."]},
+        { kind: 'concept', title: 'Rating your own skills', text: [
+          'In this program you rate your skills from 1 to 5 at the start, the middle, and the end. Your instructor rates the same skills. Rate the skills as you use them today, so that the later ratings show real change. Putting the two sets of ratings side by side shows you where practice is paying off.',
+        ] },
+        { kind: 'concept', title: 'Where your hours count', text: [
+          'The Work Experience Pathway in the State checklist counts 2,000 hours of paid or volunteer community health work within the previous three years, together with demonstrated skills in the 11 areas. The records you start in this course are the beginning of that file.',
+        ] },
         {"kind":"reflect","title":"Your measure","prompts":["What is one thing you want to be able to show an employer about your work in six months?","What record would you need to keep to show it?"]},
-        {"kind":"concept","title":"How the numbers are used","text":["A program looks at the indicators to see where people are leaving, where they are succeeding, and what to change. If many drop out in week three, the program may change the schedule or add support. If few are placed, it may talk to more employers.","This is why honest, timely records matter to you. They are how the program learns to help the next person better."]},
         ev([
-          'California HCAI Framework: programs should assess participants in several ways and follow up 6 to 12 months after training.',
-          'CDC, Program Evaluation Framework, 2024 (MMWR Recomm Rep 2024;73(RR-6)): engage stakeholders and agree on what will be measured.',
-          'Kangovi S, et al. Health Affairs 2020;39(2):207-213: an example of measuring outcomes and cost for a community health worker program.',
+          'California DHCS, Medi-Cal Community Health Worker Minimum Qualification Checklist: Section C tracks each of the 11 core competencies with a description of experience or training, the date completed, and the supervising provider\'s initials; the Work Experience Pathway counts 2,000 hours within three years.',
+          'Miller GE. The assessment of clinical skills/competence/performance. Academic Medicine 1990;65(9 Suppl):S63-S67: competence is built in levels from knowing to doing, and the top level is what a person does in practice.',
+          'California HCAI Framework: programs should assess participants in several ways.',
         ]),
       ],
     },
