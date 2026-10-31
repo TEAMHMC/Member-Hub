@@ -1183,9 +1183,6 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             </tbody>
           </table>
         </div>
-        <p className="text-[11px] text-zinc-400">
-          Every credential is free. HMC does not charge learners for pathways, assessments, or completion records.
-        </p>
       </section>
 
       {/* Per-credential detail */}
@@ -1304,8 +1301,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
       <section className="text-center space-y-5 py-6">
         <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">Start with the pathway that is open now</h2>
         <p className="text-zinc-500 max-w-lg mx-auto leading-relaxed">
-          Health Careers Exploration is self-paced, free, and takes eight to twelve hours. The next guided
-          start is September 1.
+          Health Careers Exploration is self-paced and takes eight to twelve hours.
         </p>
         <Btn onClick={() => setView({ name: 'pathway', pathwayId: 'health-careers-exploration' })}>
           Open Health Careers Exploration
@@ -1695,7 +1691,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
         <header className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           <div className="lg:col-span-7 space-y-5">
             <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-              Course {c.num} of {p.courses.length} in {p.title}
+              Course {p.courses.findIndex((x) => x.id === c.id) + 1} of {p.courses.length} in {p.title}
             </p>
             <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 leading-[1.12]">{c.title}</h1>
             <p className="text-lg text-zinc-600 leading-relaxed">{c.promise}</p>

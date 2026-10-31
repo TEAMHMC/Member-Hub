@@ -151,7 +151,7 @@ export const FBCH_DATA_DOCS: Course = {
           { label: 'Do not round up', text: 'Inflated numbers can lose a contract and, in billing, may be treated as fraud.' },
         ] },
         { kind: 'check', check: { id: 'fbch-12-c2', q: 'You referred 10 people to enrollment help but know only 4 connected. What do you report?', options: ['10 enrolled', '10 referred and 4 connected', '4 referred', '14 served'], answer: 1, rationale: 'Report what happened. A referral and a connection are different counts.', distractors: 'Combining or rounding the counts overstates the result.' } },
-        ev(['CDC, Program Evaluation Framework, 2024: ethical and rigorous reporting.', 'California DHCS, CHW Billing FAQ: records must support the service provided.', HCAI]),
+        ev(['CDC, Program Evaluation Framework, 2024: ethical and rigorous reporting.', 'U.S. HHS Office for Civil Rights, Summary of the HIPAA Privacy Rule: health information is kept private and shared only as the rule allows.', HCAI]),
       ],
     },
     {

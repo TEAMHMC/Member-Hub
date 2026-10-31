@@ -65,7 +65,7 @@ const TEAM_ROLES_AND_SCOPE: Course = {
         { kind: 'steps', title: 'Commonly present', items: [
           { label: 'Physician, nurse practitioner, physician assistant', text: 'Diagnose, treat, prescribe within their own authority. A nurse practitioner and a physician assistant are independent roles with their own scope, not assistants to a physician.' },
           { label: 'Registered nurse, licensed vocational nurse', text: 'Assessment, care delivery, medication administration and patient teaching, at different levels of authority. The RN is frequently the person who actually knows what is happening with everybody in the room.' },
-          { label: 'Medical assistant, community health worker, promotora', text: 'Support, navigation, outreach, and the tasks their training and the setting authorize. A CHW role is defined by the program and the payer rather than by a state license.' },
+          { label: 'Medical assistant, community health worker, promotora', text: 'Support, navigation, outreach, and the tasks their training and the setting authorize. A CHW role is defined by the program and the setting rather than by a state license.' },
           { label: 'Pharmacist, behavioral health clinician, social worker, care coordinator', text: 'Each holds a distinct scope and each is the correct destination for a specific kind of question. Sending a housing question to a pharmacist wastes everybody\'s time.' },
           { label: 'Front desk, scheduler, interpreter, records staff', text: 'Non-clinical and central. An interpreter in particular is a professional role and not a bilingual bystander, and a learner should never substitute for one.' },
         ] },
@@ -91,13 +91,13 @@ const TEAM_ROLES_AND_SCOPE: Course = {
       blocks: [
         { kind: 'vocab', items: [
           { term: 'Licensure', plain: 'Legal permission from a government body to practice a profession in a place. Without it the activity is unlawful, not merely unendorsed.' },
-          { term: 'Certification', plain: 'A body attests that you met its standard. It may be required by an employer or a payer, and it is not a government grant of authority.' },
+          { term: 'Certification', plain: 'A body attests that you met its standard. It may be required by an employer or a program, and it is not a government grant of authority.' },
           { term: 'Registration', plain: 'Being on an official list, sometimes with a competency requirement and sometimes without.' },
           { term: 'Educational completion', plain: 'A record that you completed a course of study. What HMC issues. It is evidence of learning and it grants no authority.' },
         ] },
         { kind: 'concept', title: 'Why the distinction has teeth', text: [
           'Describing an educational completion as a certification, or a certification as a license, is not a matter of emphasis. It is a claim about legal authority, and a learner who makes it in front of a patient has told that patient something false about who is helping them.',
-          'The community health worker role is the case where this comes up most in California, because there is no state CHW certification to hold. What exists is training, program requirements and payer requirements, which are real and are a different thing.',
+          'The community health worker role is the case where this comes up most in California, because there is no state CHW certification to hold. What exists is training and the requirements of each program or employer, which are real and are a different thing.',
         ] },
         { kind: 'myths', items: [
           { myth: 'Certified and licensed mean roughly the same thing in practice.', reality: 'A license is legal authority granted by a government body. A certification is an attestation by an organization. Only one of them makes an act lawful.' },
