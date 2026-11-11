@@ -44,6 +44,7 @@ export const COMMUNITY_MENTAL_HEALTH_WORKER: Pathway = {
   title: 'Community Mental Health Worker Pathway',
   level: 'Foundations',
   status: 'published',
+  chooseOneOf: ['chw_spec_street_medicine', 'chw_spec_behavioral_health', 'chw_spec_navigation'],
   purpose:
     'Learn the foundations of community mental health and community health work: the role, how to connect people to services, how to reach them, how to keep honest records, how to do community health work with people preparing to leave jail or prison, and the three jobs of a community mental health worker: educate, prevent, and intervene. It adds mental health core courses, 24 hours of supervised fieldwork, and one specialty track, for 120 hours in all.',
   format:
