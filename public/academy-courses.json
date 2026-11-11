@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T03:30:37.256Z",
+  "generatedAt": "2026-11-11T03:37:44.044Z",
   "courses": [
     {
       "id": "hce-1",
@@ -658,6 +658,13 @@
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "self-paced"
+    },
+    {
+      "id": "chw_mh_suicide_prevention",
+      "title": "Suicide Prevention, Safety, and Crisis Planning",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
     }
   ]
 }
