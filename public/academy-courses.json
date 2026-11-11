@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T03:15:08.500Z",
+  "generatedAt": "2026-11-11T03:21:49.122Z",
   "courses": [
     {
       "id": "hce-1",
@@ -641,6 +641,13 @@
     {
       "id": "chw_mh_recovery_wellness",
       "title": "Hope, Recovery, and Wellness",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_mh_conditions",
+      "title": "Understanding Mental Health Conditions",
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "self-paced"
