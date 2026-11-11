@@ -196,7 +196,7 @@ export interface ClientMe {
 }
 
 // ── Staff (people who maintain the Hub) ──────────────────────────────────
-export type HubCapability = 'academy' | 'content' | 'support' | 'staffAdmin' | 'review' | 'curriculum';
+export type HubCapability = 'academy' | 'content' | 'support' | 'staffAdmin' | 'review' | 'curriculum' | 'author' | 'approve';
 
 export interface HubStaff {
   role: string;
@@ -314,8 +314,92 @@ export interface HubCurriculumDetail {
   history: Array<{ version: number; note: string | null; archivedAt: string | null; archivedBy: string | null }>;
 }
 
+// ── Course drafts: authors write, reviewers release ──────────────────────
+export type HubDraftStatus = 'draft' | 'submitted' | 'returned' | 'approved';
+
+export interface HubAuthorCourse {
+  id: string;
+  title: string;
+  /** This author's draft of the course, or null when they have not started one. */
+  status: HubDraftStatus | null;
+  updatedAt: string | null;
+}
+
+export interface HubDraft {
+  id: string;
+  moduleId: string;
+  moduleTitle: string;
+  authorName: string;
+  authorEmail: string;
+  status: HubDraftStatus;
+  content: string;
+  sections: { heading: string; body: string }[];
+  page: CoursePageOverride | null;
+  authorNote: string;
+  /** What a reviewer wrote when they sent the draft back. */
+  decisionNote: string;
+  /** The live version the author started from. */
+  baseVersion: number;
+  updatedAt: string | null;
+  submittedAt: string | null;
+  decidedAt: string | null;
+  decidedBy: string | null;
+  publishedAsVersion: number | null;
+}
+
+export interface HubDraftLive {
+  content: string;
+  sections: { heading: string; body: string }[];
+  page: CoursePageOverride | null;
+  version: number;
+  hasCorrection: boolean;
+}
+
+/** A draft as the review queue lists it: no lesson text until it is opened. */
+export type HubDraftListItem = Omit<HubDraft, 'content' | 'sections'> & { sectionCount: number };
+
 export const staffApi = {
   overview: () => req<HubStaffOverview>('/api/hub/staff/overview'),
+
+  // ── Authors ────────────────────────────────────────────────────────────
+  authorCourses: () => req<{ courses: HubAuthorCourse[] }>('/api/hub/staff/author/courses'),
+  authorDraft: (id: string) =>
+    req<{ moduleId: string; title: string; draft: HubDraft | null; live: HubDraftLive }>(
+      `/api/hub/staff/author/drafts/${encodeURIComponent(id)}`,
+    ),
+  saveDraft: (id: string, body: Record<string, unknown>) =>
+    req<{ success: boolean; status: HubDraftStatus; updatedAt: string }>(
+      `/api/hub/staff/author/drafts/${encodeURIComponent(id)}`,
+      { method: 'PUT', body: JSON.stringify(body) },
+    ),
+  submitDraft: (id: string) =>
+    req<{ success: boolean; status: HubDraftStatus }>(
+      `/api/hub/staff/author/drafts/${encodeURIComponent(id)}/submit`,
+      { method: 'POST', body: JSON.stringify({}) },
+    ),
+  withdrawDraft: (id: string) =>
+    req<{ success: boolean; status: HubDraftStatus }>(
+      `/api/hub/staff/author/drafts/${encodeURIComponent(id)}/withdraw`,
+      { method: 'POST', body: JSON.stringify({}) },
+    ),
+
+  // ── Reviewers ──────────────────────────────────────────────────────────
+  reviewQueue: (status: 'submitted' | 'returned' | 'approved' = 'submitted') =>
+    req<{ drafts: HubDraftListItem[]; canDecide: boolean }>(`/api/hub/staff/drafts?status=${status}`),
+  reviewDraft: (draftId: string) =>
+    req<{ draft: HubDraft; live: HubDraftLive; liveChangedSinceDraft: boolean; canDecide: boolean }>(
+      `/api/hub/staff/drafts/${encodeURIComponent(draftId)}`,
+    ),
+  approveDraft: (draftId: string, body: Record<string, unknown>) =>
+    req<{ success: boolean; status: HubDraftStatus; moduleId: string; version: number }>(
+      `/api/hub/staff/drafts/${encodeURIComponent(draftId)}/approve`,
+      { method: 'POST', body: JSON.stringify(body) },
+    ),
+  returnDraft: (draftId: string, note: string) =>
+    req<{ success: boolean; status: HubDraftStatus }>(
+      `/api/hub/staff/drafts/${encodeURIComponent(draftId)}/return`,
+      { method: 'POST', body: JSON.stringify({ note }) },
+    ),
 
   // ── Who maintains the Hub ──────────────────────────────────────────────
   people: () => req<{ tiers: HubTier[]; people: HubPerson[] }>('/api/hub/staff/people'),

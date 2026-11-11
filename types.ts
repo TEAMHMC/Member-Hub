@@ -52,7 +52,9 @@ export interface StaffStanding {
   isAdmin: boolean;
   // 'review' is read-only access to the curriculum, held by a clinical reviewer or an
   // external auditor who is not on the volunteers roster. It grants nothing else.
-  capabilities: Array<'academy' | 'content' | 'support' | 'staffAdmin' | 'review' | 'curriculum'>;
+  // 'author' writes course drafts and cannot release them. 'approve' decides on a submitted
+  // draft and is held by clinical reviewers and administrators only.
+  capabilities: Array<'academy' | 'content' | 'support' | 'staffAdmin' | 'review' | 'curriculum' | 'author' | 'approve'>;
 }
 
 export interface User {

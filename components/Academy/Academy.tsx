@@ -626,6 +626,8 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     const set = visibility[id];
     if (set) return set;
     const p = pathwayById(id);
+    // A course still being written is hidden until staff choose a state for it.
+    if (p?.hiddenUntilReleased) return { state: 'hidden' };
     return { state: p?.status === 'published' ? 'open' : 'upcoming' };
   };
 

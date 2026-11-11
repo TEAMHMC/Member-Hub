@@ -1,15 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   SlidersHorizontal, LifeBuoy, Megaphone, Users, ShieldCheck,
-  Check, X, Search, Trash2, AlertTriangle, ExternalLink, FileText, Plus,
+  Check, X, Search, Trash2, AlertTriangle, ExternalLink, FileText, Plus, Pencil,
 } from 'lucide-react';
 import type { StaffStanding } from '../../types';
 import {
-  staffApi,
+  staffApi, ApiError,
   type HubStaffOverview, type MemberLookup,
   type HubPerson, type HubTier,
   type HubCurriculumCourse, type HubCurriculumDetail,
+  type HubAuthorCourse, type HubDraftStatus,
 } from '../../services/api';
+import CurriculumReview from './CurriculumReview';
 import {
   findCourse, editableSections, coursePageDraft, changedSections, releaseSections,
   pageDraftChanged, type EditableSection, type CoursePageDraft,
@@ -37,7 +39,7 @@ import { PATHWAYS } from '../Academy/catalog';
  * admin additionally sees who holds Hub access.
  */
 
-type Tab = 'academy' | 'curriculum' | 'content' | 'support' | 'staffAdmin';
+type Tab = 'author' | 'academy' | 'curriculum' | 'content' | 'support' | 'staffAdmin';
 
 const ACADEMY_STATES: { value: string; label: string; help: string }[] = [
   { value: 'open', label: 'Open', help: 'Members can see it and enroll now.' },
@@ -47,12 +49,20 @@ const ACADEMY_STATES: { value: string; label: string; help: string }[] = [
 ];
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
+  { id: 'author', label: 'My drafts', icon: <Pencil size={16} /> },
   { id: 'academy', label: 'Courses', icon: <SlidersHorizontal size={16} /> },
   { id: 'curriculum', label: 'Curriculum', icon: <FileText size={16} /> },
   { id: 'content', label: 'Announcements', icon: <Megaphone size={16} /> },
   { id: 'support', label: 'Member support', icon: <LifeBuoy size={16} /> },
   { id: 'staffAdmin', label: 'Hub access', icon: <Users size={16} /> },
 ];
+
+const DRAFT_STATUS_LABEL: Record<HubDraftStatus, string> = {
+  draft: 'Your draft, not submitted',
+  submitted: 'With a reviewer',
+  returned: 'Sent back to you',
+  approved: 'Released',
+};
 
 const card = 'bg-white rounded-3xl border border-zinc-200/70 p-6';
 const label = 'text-[10px] font-black uppercase tracking-widest text-zinc-400';
@@ -122,8 +132,35 @@ const StaffDashboard: React.FC<Props> = ({ staff, selfEmail, onExit }) => {
       {tab === 'academy' && <AcademyPanel overview={overview} onChanged={load} />}
       {tab === 'content' && <AnnouncementsPanel overview={overview} onChanged={load} />}
       {tab === 'support' && <SupportPanel />}
-      {tab === 'curriculum' && <CurriculumPanel />}
+      {tab === 'author' && <CurriculumPanel mode="author" />}
+      {tab === 'curriculum' && <CurriculumHome />}
       {tab === 'staffAdmin' && <AccessPanel selfEmail={selfEmail} />}
+    </div>
+  );
+};
+
+/**
+ * Curriculum for people who release content: the drafts waiting on them, and every course.
+ *
+ * Opens on the queue, because a draft somebody handed over is the thing waiting on a person,
+ * and a count on the button means nobody has to open it to find out.
+ */
+const CurriculumHome: React.FC = () => {
+  const [view, setView] = useState<'review' | 'courses'>('review');
+  const [waiting, setWaiting] = useState<number | null>(null);
+  const pill = (active: boolean) =>
+    `px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-wider border ${
+      active ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-white text-zinc-500 border-zinc-200 hover:text-zinc-900'
+    }`;
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-2">
+        <button onClick={() => setView('review')} className={pill(view === 'review')}>
+          Drafts to review{waiting ? ` (${waiting})` : ''}
+        </button>
+        <button onClick={() => setView('courses')} className={pill(view === 'courses')}>All courses</button>
+      </div>
+      {view === 'review' ? <CurriculumReview onCount={setWaiting} /> : <CurriculumPanel />}
     </div>
   );
 };
@@ -167,7 +204,9 @@ const AcademyPanel: React.FC<{ overview: HubStaffOverview | null; onChanged: () 
       </div>
 
       {PATHWAYS.map((p) => {
-        const state = overrides[p.id]?.state || 'open';
+        // A course held back until released reads as hidden here too, so the panel does not
+        // show Open for something members cannot see.
+        const state = overrides[p.id]?.state || (p.hiddenUntilReleased ? 'hidden' : 'open');
         return (
           <div key={p.id} className={card}>
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -432,8 +471,14 @@ const REQUIREMENT_KINDS = ['attend', 'assignment', 'practicum', 'evaluation'] as
  * What it still will not touch: knowledge checks, the exam and the CE approval. Those are
  * the assessment record and the approved title, and neither belongs in a prose editor.
  */
-const CurriculumPanel: React.FC = () => {
+const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 'release' }) => {
+  // In author mode this is the same editor with a different ending. Nothing an author does
+  // reaches a learner: it saves a draft and submits it to a reviewer, who decides.
+  const author = mode === 'author';
   const [courses, setCourses] = useState<HubCurriculumCourse[] | null>(null);
+  const [authorCourses, setAuthorCourses] = useState<HubAuthorCourse[] | null>(null);
+  const [draftState, setDraftState] = useState<{ status: HubDraftStatus; decisionNote: string } | null>(null);
+  const locked = author && draftState?.status === 'submitted';
   const [openId, setOpenId] = useState<string | null>(null);
   const [detail, setDetail] = useState<HubCurriculumDetail | null>(null);
   const [sections, setSections] = useState<EditableSection[]>([]);
@@ -449,13 +494,73 @@ const CurriculumPanel: React.FC = () => {
   const [preview, setPreview] = useState(false);
 
   const load = () => {
+    if (author) {
+      staffApi.authorCourses()
+        .then((r) => setAuthorCourses(r.courses))
+        .catch(() => setErr('The course list could not load.'));
+      return;
+    }
     staffApi.curriculum()
       .then((r) => setCourses(r.courses))
       .catch(() => setErr('The course list could not load.'));
   };
   useEffect(load, []);
 
+  /**
+   * Opens a course for an author, on their own draft when they have one and on what a
+   * learner reads now when they do not. Changes are measured against what is live, so a
+   * draft only ever carries the lessons the author actually changed.
+   */
+  const openAuthor = (id: string) => {
+    setOpenId(id); setDetail(null); setErr(null); setDone(null); setNote(''); setPreview(false); setDraftState(null);
+    staffApi.authorDraft(id)
+      .then(({ title, draft: saved, live }) => {
+        const d: HubCurriculumDetail = {
+          id, title, content: live.content || '', sections: live.sections || [],
+          page: live.page || undefined, version: live.version || 0, hasCorrection: live.hasCorrection, history: [],
+        };
+        setDetail(d);
+        // A draft that was released is finished. Opening the course again starts a new one.
+        const mine = saved && saved.status !== 'approved' ? saved : null;
+        setDraftState({ status: mine ? mine.status : 'draft', decisionNote: mine?.decisionNote || '' });
+        setNote(mine?.authorNote || '');
+
+        const liveOv = { content: live.content || '', sections: live.sections || [], page: live.page || undefined, version: live.version || 0 };
+        const draftOv = mine
+          ? {
+              content: mine.content || live.content || '',
+              sections: mine.sections.length ? mine.sections : (live.sections || []),
+              page: mine.page || live.page || undefined,
+              version: live.version || 0,
+            }
+          : liveOv;
+        const norm = (s: string) => s.replace(/\s+/g, ' ').trim().toLowerCase();
+        // Modules an author added are not catalogue lessons, so they are appended by heading.
+        const withExtras = (base: EditableSection[], released: { heading: string; body: string }[]) => {
+          const have = new Set(base.map((s) => norm(s.heading)));
+          return [...base, ...released.filter((s) => s.heading.trim() && !have.has(norm(s.heading))).map((s) => ({ ...s, corrected: true }))];
+        };
+
+        const found = findCourse(id);
+        setInCatalogue(Boolean(found));
+        if (found) {
+          setOpenedSections(withExtras(editableSections(found.course, liveOv), liveOv.sections));
+          setSections(withExtras(editableSections(found.course, draftOv), draftOv.sections));
+          const opened = coursePageDraft(found.course, liveOv);
+          setOpenedPage({ ...opened, requirements: opened.requirements.map((r) => ({ ...r })) });
+          setPage(coursePageDraft(found.course, draftOv));
+        } else {
+          const secs = (draftOv.sections || []).map((s) => ({ ...s, corrected: true }));
+          setSections(secs);
+          setOpenedSections((liveOv.sections || []).map((s) => ({ ...s, corrected: true })));
+          setPage(null); setOpenedPage(null);
+        }
+      })
+      .catch(() => setErr('That course could not be opened.'));
+  };
+
   const open = (id: string) => {
+    if (author) { openAuthor(id); return; }
     setOpenId(id); setDetail(null); setErr(null); setDone(null); setNote(''); setPreview(false);
     staffApi.course(id)
       .then((d) => {
@@ -492,6 +597,88 @@ const CurriculumPanel: React.FC = () => {
   const setRequirement = (i: number, patch: Partial<CoursePageDraft['requirements'][number]>) =>
     setPage((p) => (p ? { ...p, requirements: p.requirements.map((r, n) => (n === i ? { ...r, ...patch } : r)) } : p));
 
+  /** The page fields in the shape the server takes, for a release and for a draft alike. */
+  const pagePayload = () => (page ? {
+    promise: page.promise,
+    about: page.about,
+    objectives: page.objectives,
+    prerequisites: page.prerequisites,
+    whoFor: page.whoFor,
+    requirements: page.requirements
+      .filter((r) => r.label.trim())
+      .map((r) => ({ id: r.id, label: r.label, detail: r.detail, kind: r.kind })),
+  } : undefined);
+
+  const DRAFT_ERRORS: Record<string, string> = {
+    draft_locked: 'This draft is with a reviewer, so it cannot be changed. Withdraw it first if you need to change something.',
+    nothing_to_submit: 'There is nothing in this draft to submit yet.',
+    no_draft: 'Save the draft first, then submit it.',
+  };
+
+  /**
+   * Saves the author's work as a draft, and optionally hands it to a reviewer.
+   *
+   * What is sent is exactly what a release would send: the lessons that changed, merged over
+   * what is already live, and the whole course page. So a reviewer who approves releases
+   * the same thing the author was looking at, and lessons nobody touched keep their built-in
+   * lists, callouts and knowledge checks.
+   */
+  const saveDraft = async (submit: boolean) => {
+    if (!detail || !author) return;
+    const changed = changedSections(sections, openedSections);
+    const pageChanged = page && openedPage ? pageDraftChanged(page, openedPage) : false;
+    const incomplete = sections.find((s) => (s.heading.trim() && !s.body.trim()) || (!s.heading.trim() && s.body.trim()));
+    if (submit && !changed.length && !pageChanged) {
+      setErr('Nothing has changed yet, so there is nothing to submit.');
+      return;
+    }
+    if (submit && incomplete) { setErr('Every module needs both a heading and a body before you submit.'); return; }
+
+    setBusy(true); setErr(null); setDone(null);
+    try {
+      const body: Record<string, unknown> = { authorNote: note.trim() };
+      // changedSections leaves out a module that has a heading and no body, or the reverse.
+      // Such a module is not saved until it has both, so the author is told below.
+      if (changed.length) {
+        body.content = detail.content || '';
+        body.sections = releaseSections(detail.sections || [], changed);
+      }
+      if (page) body.page = pagePayload();
+      await staffApi.saveDraft(detail.id, body);
+      if (!submit && incomplete) {
+        setDraftState((s) => ({ status: 'draft', decisionNote: s?.decisionNote || '' }));
+        setDone('Draft saved, except one module that has a heading or text but not both. Finish it and save again.');
+        load();
+        return;
+      }
+      if (submit) {
+        await staffApi.submitDraft(detail.id);
+        setDraftState({ status: 'submitted', decisionNote: '' });
+        setDone('Submitted. A reviewer reads it before anything reaches members.');
+      } else {
+        setDraftState((s) => ({ status: 'draft', decisionNote: s?.decisionNote || '' }));
+        setDone('Draft saved. Nothing has reached members.');
+      }
+      load();
+    } catch (e) {
+      const code = e instanceof ApiError ? e.code : null;
+      setErr((code && DRAFT_ERRORS[code]) || 'That could not be saved. Nothing was changed.');
+    } finally { setBusy(false); }
+  };
+
+  const withdraw = async () => {
+    if (!detail) return;
+    setBusy(true); setErr(null); setDone(null);
+    try {
+      await staffApi.withdrawDraft(detail.id);
+      setDraftState({ status: 'draft', decisionNote: '' });
+      setDone('Withdrawn. It is a draft again and you can change it.');
+      load();
+    } catch {
+      setErr('That could not be withdrawn. It may already have been decided.');
+    } finally { setBusy(false); }
+  };
+
   const release = async () => {
     if (!detail) return;
     const changed = changedSections(sections, openedSections);
@@ -511,18 +698,7 @@ const CurriculumPanel: React.FC = () => {
         // Corrections released earlier are kept, so releasing one lesson does not drop them.
         body.sections = releaseSections(detail.sections || [], changed);
       }
-      if (page) {
-        body.page = {
-          promise: page.promise,
-          about: page.about,
-          objectives: page.objectives,
-          prerequisites: page.prerequisites,
-          whoFor: page.whoFor,
-          requirements: page.requirements
-            .filter((r) => r.label.trim())
-            .map((r) => ({ id: r.id, label: r.label, detail: r.detail, kind: r.kind })),
-        };
-      }
+      if (page) body.page = pagePayload();
       const r = await staffApi.releaseCourseFull(detail.id, body);
       setDone(`Released as version ${r.version}. Members reading this course see it now.`);
       load();
@@ -556,15 +732,33 @@ const CurriculumPanel: React.FC = () => {
         </div>
 
         <div className={card}>
-          <p className={label}>{detail.hasCorrection ? `Released version ${detail.version}` : 'No correction released'}</p>
+          <p className={label}>
+            {author && draftState
+              ? DRAFT_STATUS_LABEL[draftState.status]
+              : (detail.hasCorrection ? `Released version ${detail.version}` : 'No correction released')}
+          </p>
           <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 mt-1">{detail.title}</h2>
           <p className="text-sm text-zinc-600 mt-3 leading-relaxed">
-            {inCatalogue
-              ? 'Everything below is what a learner reads right now. Change what needs changing and release it. Knowledge checks, the exam and the CE approval are not edited here.'
-              : 'This build does not carry the course, so only what has already been released is shown.'}
+            {!inCatalogue
+              ? 'This build does not carry the course, so only what has already been released is shown.'
+              : author
+                ? 'Everything below starts as what a learner reads right now. Write or change what needs changing, save as you go, and submit it when it is ready. Only you and the reviewers can see a draft. Nothing reaches members until a Clinical Reviewer releases it.'
+                : 'Everything below is what a learner reads right now. Change what needs changing and release it. Knowledge checks, the exam and the CE approval are not edited here.'}
           </p>
+          {author && draftState?.status === 'submitted' && (
+            <p className="text-sm text-zinc-700 mt-4 rounded-2xl bg-zinc-50 p-4 leading-relaxed">
+              This draft is with a reviewer. You can read it but not change it until they decide. If you need to change something, withdraw it first.
+            </p>
+          )}
+          {author && draftState?.status === 'returned' && draftState.decisionNote && (
+            <p className="text-sm text-amber-900 mt-4 rounded-2xl bg-amber-50 border border-amber-200 p-4 leading-relaxed">
+              <span className="block text-[10px] font-black uppercase tracking-widest text-amber-700 mb-1">A reviewer sent this back with a note</span>
+              {draftState.decisionNote}
+            </p>
+          )}
         </div>
 
+        <fieldset disabled={locked} className="min-w-0 border-0 p-0 m-0 space-y-3">
         {preview ? (
           <div className={card}>
             <p className={label}>Preview, in the order a learner sees it</p>
@@ -786,24 +980,58 @@ const CurriculumPanel: React.FC = () => {
         )}
 
         <div className={card}>
-          <label className={label} htmlFor="curr-note">What changed, and why</label>
+          <label className={label} htmlFor="curr-note">
+            {author ? 'A note for the reviewer' : 'What changed, and why'}
+          </label>
           <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
-            Kept with the version. A CE audit asks what was corrected and on whose authority,
-            and a blank note a year from now cannot answer it.
+            {author
+              ? 'Optional. Say what you changed and where you found your sources, so the review goes faster.'
+              : 'Kept with the version. A CE audit asks what was corrected and on whose authority, and a blank note a year from now cannot answer it.'}
           </p>
           <input
             id="curr-note"
             className={`${input} mt-3`}
             value={note}
-            placeholder="Corrected the GAD-7 severity bands to match the validated source."
+            placeholder={author
+              ? 'Rewrote lessons 2 and 3 and added the sources I used.'
+              : 'Corrected the GAD-7 severity bands to match the validated source.'}
             onChange={(e) => setNote(e.target.value)}
           />
-          {err && <p className="text-sm font-semibold text-[#FF6F91] mt-4">{err}</p>}
-          {done && <p className="text-sm font-semibold text-emerald-700 mt-4">{done}</p>}
-          <button onClick={release} className={`${primary} mt-5`} disabled={busy}>
-            {busy ? 'Releasing' : 'Release to members'}
-          </button>
+          {err && <p className="text-sm font-semibold text-[#FF6F91] mt-4" role="alert">{err}</p>}
+          {done && <p className="text-sm font-semibold text-emerald-700 mt-4" role="status">{done}</p>}
+          {!author && (
+            <button onClick={release} className={`${primary} mt-5`} disabled={busy}>
+              {busy ? 'Releasing' : 'Release to members'}
+            </button>
+          )}
+          {author && !locked && (
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button onClick={() => saveDraft(false)} className={primary} disabled={busy}>
+                {busy ? 'Saving' : 'Save draft'}
+              </button>
+              <button
+                onClick={() => saveDraft(true)}
+                className="px-5 py-3 rounded-full border border-zinc-300 text-[11px] font-black uppercase tracking-wider text-zinc-600 hover:border-zinc-900 hover:text-zinc-900 disabled:opacity-50"
+                disabled={busy}
+              >
+                Submit for review
+              </button>
+            </div>
+          )}
         </div>
+        </fieldset>
+
+        {author && locked && (
+          <div className={card}>
+            <button
+              onClick={withdraw}
+              disabled={busy}
+              className="px-5 py-3 rounded-full border border-zinc-300 text-[11px] font-black uppercase tracking-wider text-zinc-600 hover:border-zinc-900 hover:text-zinc-900 disabled:opacity-50"
+            >
+              {busy ? 'Working' : 'Withdraw from review'}
+            </button>
+          </div>
+        )}
 
         {detail.history.length > 0 && (
           <div className={card}>
@@ -829,11 +1057,11 @@ const CurriculumPanel: React.FC = () => {
   return (
     <div className="space-y-3">
       <div className={card}>
-        <p className={label}>Course content</p>
+        <p className={label}>{author ? 'Your drafts' : 'Course content'}</p>
         <p className="text-sm text-zinc-600 mt-2 leading-relaxed">
-          Open a course to read what a learner reads, correct any of it, and release the
-          correction. Every release keeps the version before it, so nothing is lost and the
-          history says who changed what.
+          {author
+            ? 'Open a course to write or change it. Your work is saved as a draft that only you and the reviewers can see. When it is ready, submit it for review. Nothing reaches members until a Clinical Reviewer releases it.'
+            : 'Open a course to read what a learner reads, correct any of it, and release the correction. Every release keeps the version before it, so nothing is lost and the history says who changed what.'}
         </p>
         <div className="relative mt-4">
           <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" />
@@ -849,7 +1077,46 @@ const CurriculumPanel: React.FC = () => {
 
       {err && <div className={card}><p className="text-sm text-zinc-500">{err}</p></div>}
 
-      {courses && (
+      {author && authorCourses && (() => {
+        const shown = authorCourses.filter((c) => !query.trim() || c.title.toLowerCase().includes(query.trim().toLowerCase()));
+        return (
+        <div className={card}>
+          <p className={label}>{shown.length} {shown.length === 1 ? 'course' : 'courses'}</p>
+          <div className="mt-3 divide-y divide-zinc-100">
+            {shown
+              .map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => open(c.id)}
+                  className="w-full flex flex-wrap items-center justify-between gap-3 py-3.5 text-left group"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-zinc-900 group-hover:text-[#233DFF] truncate">{c.title}</p>
+                    <p className="text-[11px] text-zinc-400 mt-0.5">
+                      {c.status === 'approved'
+                        ? 'Your last draft was released'
+                        : c.status
+                          ? `Last saved ${c.updatedAt ? c.updatedAt.slice(0, 10) : ''}`
+                          : 'You have not started a draft'}
+                    </p>
+                  </div>
+                  {c.status && c.status !== 'approved' && (
+                    <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider shrink-0 ${
+                      c.status === 'submitted' ? 'bg-blue-50 text-[#233DFF]'
+                        : c.status === 'returned' ? 'bg-amber-50 text-amber-800'
+                          : 'bg-zinc-100 text-zinc-500'
+                    }`}>
+                      {DRAFT_STATUS_LABEL[c.status]}
+                    </span>
+                  )}
+                </button>
+              ))}
+          </div>
+        </div>
+        );
+      })()}
+
+      {!author && courses && (
         <div className={card}>
           <p className={label}>{filtered.length} {filtered.length === 1 ? 'course' : 'courses'}</p>
           <div className="mt-3 divide-y divide-zinc-100">
