@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T02:57:48.357Z",
+  "generatedAt": "2026-11-11T03:01:56.730Z",
   "courses": [
     {
       "id": "hce-1",
@@ -571,6 +571,13 @@
     {
       "id": "chw_education_facilitation",
       "title": "Health Education and Facilitation",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
+      "id": "chw_advocacy",
+      "title": "Advocacy, Individual and Policy",
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "live"
