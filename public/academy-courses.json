@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T03:01:56.730Z",
+  "generatedAt": "2026-11-11T03:06:22.710Z",
   "courses": [
     {
       "id": "hce-1",
@@ -578,6 +578,13 @@
     {
       "id": "chw_advocacy",
       "title": "Advocacy, Individual and Policy",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
+      "id": "chw_capacity_building",
+      "title": "Capacity Building and Community Organizing",
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "live"
