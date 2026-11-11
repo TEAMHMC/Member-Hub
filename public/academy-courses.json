@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T07:32:03.128Z",
+  "generatedAt": "2026-11-11T07:38:59.910Z",
   "courses": [
     {
       "id": "hce-1",
@@ -700,6 +700,27 @@
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "self-paced"
+    },
+    {
+      "id": "chw_fieldwork_observed",
+      "title": "Observed Field Practice",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "practicum"
+    },
+    {
+      "id": "chw_fieldwork_supervised",
+      "title": "Supervised Service Delivery",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "practicum"
+    },
+    {
+      "id": "chw_case_conference",
+      "title": "Case Conference and Reflection",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
     },
     {
       "id": "chw_spec_street_medicine",
