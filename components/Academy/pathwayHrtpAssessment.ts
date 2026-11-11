@@ -1,6 +1,8 @@
 // Community Mental Health Worker Pathway: baseline and final quiz.
 //
-// Ten constructs across the eight courses, in parallel forms. The baseline is reviewed with
+// Twenty constructs across the pathway's courses, in parallel forms. The first ten cover the original
+// eight courses. The second ten cover the motivational interviewing, humility, equity, coverage,
+// advocacy, facilitation, recovery, overdose, peer practice, and crisis safety work added later. The baseline is reviewed with
 // rationales right after it is taken, which is good teaching and means those exact items cannot
 // carry the credential. The final quiz asks about the same ten things with different items and
 // a different spread of correct positions.
@@ -136,6 +138,126 @@ export const CHWP_PRE: Check[] = [
     answer: 2,
     why: 'You acknowledge the feeling without arguing or agreeing, and you focus on safety and clinical help. Arguing adds fear and leaving abandons them.',
   },
+  {
+    id: 'chwp-t11',
+    q: "A person says they want to cut down on drinking but are not sure they can. Which response fits motivational interviewing?",
+    options: [
+      "Ask what makes them want to cut down, and listen for their own reasons",
+      "Tell them they have to quit completely",
+      "Warn them what will happen if they do not stop",
+      "Tell them most people cannot do it alone",
+    ],
+    answer: 0,
+    why: "Motivational interviewing draws out the person's own reasons and confidence. Warnings, orders, and arguments tend to produce resistance.",
+  },
+  {
+    id: 'chwp-t12',
+    q: "What does cultural humility mean in your work?",
+    options: [
+      "Knowing the customs of every culture",
+      "Learning one group's rules and applying them to everyone from that group",
+      "Avoiding any conversation about culture",
+      "Staying curious, learning from each person, and checking your own assumptions and the power in the relationship",
+    ],
+    answer: 3,
+    why: "Cultural humility is an ongoing practice of learning from the person and examining your own assumptions and power, not a set of facts to memorize about a group.",
+  },
+  {
+    id: 'chwp-t13',
+    q: "One neighborhood has far more asthma than another. Which explanation looks at root causes?",
+    options: [
+      "People there do not take care of themselves",
+      "Housing conditions, air quality, and access to care differ between the neighborhoods",
+      "Asthma is mostly bad luck",
+      "Residents prefer not to see doctors",
+    ],
+    answer: 1,
+    why: "Health inequities are produced by conditions such as housing, environment, and access to care. Blaming individuals misses the causes.",
+  },
+  {
+    id: 'chwp-t14',
+    q: "Two sources you are using disagree on the date a Medi-Cal rule starts, and a neighbor asks you. What do you do?",
+    options: [
+      "Pick the later date so they have more time",
+      "Tell them the date you remember best",
+      "Check the state's current page or the county, say as of when the information is current, and give a number to call if you cannot check",
+      "Tell them the date does not matter",
+    ],
+    answer: 2,
+    why: "Medi-Cal rules are changing on a schedule and sources can differ. You check the current source, say how current the information is, and never guess a date for someone.",
+  },
+  {
+    id: 'chwp-t15',
+    q: "A person wants to dispute a decision about their benefits. What is good advocacy?",
+    options: [
+      "Take over and speak for them so it gets done quickly",
+      "Help them say what they want, help them prepare, and speak with them or alongside them if they ask",
+      "Tell them it is not worth the trouble",
+      "File it yourself without telling them",
+    ],
+    answer: 1,
+    why: "Advocacy beside a person keeps them in charge. You support their voice and do not replace it.",
+  },
+  {
+    id: 'chwp-t16',
+    q: "After you explain how to use an inhaler, how do you check that your explanation worked?",
+    options: [
+      "Ask them to show you or explain it back in their own words",
+      "Ask whether they have any questions",
+      "Give them a pamphlet",
+      "Repeat it more loudly",
+    ],
+    answer: 0,
+    why: "Asking a person to show or say it back checks how well you explained. A yes to any questions often hides confusion.",
+  },
+  {
+    id: 'chwp-t17',
+    q: "According to SAMHSA's working definition, recovery is",
+    options: [
+      "having no symptoms ever again",
+      "something that only happens inside treatment",
+      "something professionals decide for a person",
+      "a process of change in which people improve their health and wellness, live a self-directed life, and strive to reach their full potential",
+    ],
+    answer: 3,
+    why: "The working definition describes recovery as a process of change and self-direction, not the absence of symptoms or a status professionals assign.",
+  },
+  {
+    id: 'chwp-t18',
+    q: "You find someone unresponsive with slow, shallow breathing and blue lips. What comes first?",
+    options: [
+      "Wait to see whether they wake up",
+      "Ask them what they took",
+      "Check for a response, give naloxone if you are trained and have it, and call 911",
+      "Give them water",
+    ],
+    answer: 2,
+    why: "This looks like an opioid overdose. You act at once, giving naloxone if you are trained and cleared and calling 911, and you support breathing.",
+  },
+  {
+    id: 'chwp-t19',
+    q: "When is it appropriate to share part of your own story with a person you support?",
+    options: [
+      "When it serves the person, briefly, with the focus returned to them",
+      "Whenever you feel like talking",
+      "Never, in any circumstance",
+      "When it will make them like you",
+    ],
+    answer: 0,
+    why: "Self-disclosure in peer and helping roles is purposeful, brief, and for the person's benefit, not the worker's.",
+  },
+  {
+    id: 'chwp-t20',
+    q: "A family says a relative has not slept for days and is agitated, with no weapon and no talk of harm. What can you help them do?",
+    options: [
+      "Wait until it gets worse",
+      "Call the county mental health access line or 988 for help, and make a plan to call 911 if anything changes",
+      "Go in alone and calm the person yourself",
+      "Tell them to drive the person to a hospital",
+    ],
+    answer: 1,
+    why: "A call line can send a crisis team, and a plan to call 911 for danger keeps everyone safe. You do not go in alone or use force.",
+  },
 ];
 
 export const CHWP_POST: Check[] = [
@@ -258,5 +380,125 @@ export const CHWP_POST: Check[] = [
     ],
     answer: 3,
     why: 'You never promise secrecy and you do not investigate. You listen, tell your supervisor, and record what was said so the right people can act.',
+  },
+  {
+    id: 'chwp-p11',
+    q: "A person says they know they should go to their appointment but keep putting it off. What fits motivational interviewing best?",
+    options: [
+      "Tell them to just go",
+      "Remind them of the risks of missing it",
+      "Say that people who do not go get worse",
+      "Reflect their mixed feelings and ask what would make going feel more doable",
+    ],
+    answer: 3,
+    why: "Reflecting ambivalence and asking about what would help respects the person's own pace and strengthens their reasons.",
+  },
+  {
+    id: 'chwp-p12',
+    q: "A family makes decisions in a way that is unfamiliar to you. What is the best approach?",
+    options: [
+      "Explain that your way is more common",
+      "Ask them to teach you how decisions are made in their family, and adjust how you work together",
+      "Assume you understand because you know a similar family",
+      "Refer them to someone else without asking",
+    ],
+    answer: 1,
+    why: "Cultural humility means asking and learning from the family, not assuming or sending them away.",
+  },
+  {
+    id: 'chwp-p13',
+    q: "Why does a community health worker pay attention to housing and food and not only to medical care?",
+    options: [
+      "Because conditions where people live, work, and eat shape health and are often outside a person's control",
+      "Because medical care does not matter",
+      "Because housing is the worker's medical specialty",
+      "Because food programs are required by law",
+    ],
+    answer: 0,
+    why: "Social conditions are major drivers of health. Many are outside an individual's control, which is why the worker looks at them.",
+  },
+  {
+    id: 'chwp-p14',
+    q: "A person asks whether they are exempt from a new Medi-Cal rule. What is the best response?",
+    options: [
+      "Tell them they are exempt because they look unwell",
+      "Tell them they are not exempt",
+      "Ask the questions that surface possible reasons, help them gather proof, and explain that the county decides",
+      "Refuse to discuss it",
+    ],
+    answer: 2,
+    why: "A worker helps people apply, gather proof, and understand notices. The county decides eligibility and exemptions.",
+  },
+  {
+    id: 'chwp-p15',
+    q: "Which best describes advocacy beside a person?",
+    options: [
+      "Helping them state what they want and supporting them while they do it",
+      "Doing all the talking for them",
+      "Telling them what to ask for",
+      "Contacting the agency without their knowledge",
+    ],
+    answer: 0,
+    why: "Advocacy beside a person strengthens their own voice and keeps them in charge of the decision.",
+  },
+  {
+    id: 'chwp-p16',
+    q: "What is teach-back?",
+    options: [
+      "Teaching the person's family",
+      "Reading the instructions twice",
+      "Giving a quiz with a grade",
+      "Asking the person to explain or show, in their own words, what they will do, to check how well you explained",
+    ],
+    answer: 3,
+    why: "Teach-back tests your explanation, not the person. If they cannot say it back, you explain it again in a different way.",
+  },
+  {
+    id: 'chwp-p17',
+    q: "Which set names common elements of personal recovery?",
+    options: [
+      "Compliance, diagnosis, medication, and supervision",
+      "Connectedness, hope, identity, meaning, and empowerment",
+      "Speed, silence, strength, and sobriety",
+      "Rules, rewards, risk, and rest",
+    ],
+    answer: 1,
+    why: "A widely cited review of personal recovery names connectedness, hope, identity, meaning, and empowerment.",
+  },
+  {
+    id: 'chwp-p18',
+    q: "A person has been given naloxone and starts breathing again. What should you do?",
+    options: [
+      "Leave, because the danger is over",
+      "Tell them to walk it off",
+      "Encourage them to accept emergency care, because naloxone wears off and symptoms may return, and stay until help arrives",
+      "Give them more naloxone right away without checking",
+    ],
+    answer: 2,
+    why: "Naloxone can wear off after 30 to 90 minutes and symptoms may return, so the person should be seen by emergency medical services.",
+  },
+  {
+    id: 'chwp-p19',
+    q: "Which self-disclosure is most appropriate in a helping role?",
+    options: [
+      "A long account of your own crisis to show you understand",
+      "Details about another person's story",
+      "Sharing so that the person will like you",
+      "A brief, purposeful part of your own experience that gives hope, followed by returning the focus to the person",
+    ],
+    answer: 3,
+    why: "Self-disclosure should be brief, purposeful, and for the person's benefit. It should never take over the conversation or share others' stories.",
+  },
+  {
+    id: 'chwp-p20',
+    q: "During a visit a person picks up a heavy object and your partner feels unsafe. What do you do?",
+    options: [
+      "Speak calmly, step back, leave together if you can, and call for help from a safe place",
+      "Grab the object",
+      "Block the door so the person cannot leave",
+      "Argue until it is put down",
+    ],
+    answer: 0,
+    why: "Calm words, distance, and leaving together to call for help keep everyone safer. Physical intervention belongs to trained staff.",
   },
 ];
