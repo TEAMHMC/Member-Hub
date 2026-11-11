@@ -30,6 +30,7 @@ import { CHW_MH_CONFLICT_RESOLUTION } from './pathwayMhConflict';
 import { CHW_MH_WORK_DIGITAL } from './pathwayMhWork';
 import { CHW_SPEC_STREET_MEDICINE } from './pathwaySpecStreet';
 import { CHW_SPEC_BEHAVIORAL_HEALTH } from './pathwaySpecBehavioral';
+import { CHW_SPEC_NAVIGATION } from './pathwaySpecNavigation';
 import { CHW_REENTRY } from './pathwayHrtpCore3';
 import { MH_EDUCATION } from './pathwayHrtpEducation';
 import { MH_PREVENTION } from './pathwayHrtpPrevention';
@@ -44,16 +45,16 @@ export const COMMUNITY_MENTAL_HEALTH_WORKER: Pathway = {
   status: 'published',
   purpose:
     'Learn the foundations of community mental health and community health work: the role, how to connect people to services, how to reach them, how to keep honest records, how to do community health work with people preparing to leave jail or prison, and the three jobs of a community mental health worker: educate, prevent, and intervene.',
-  format: 'Thirty courses, each ending with a practice file you keep. The role, public health and coverage, social determinants and equity, navigation, assessment, outreach, professional conduct, and evaluation courses are at your own pace, about 24 hours. The communication, trauma-informed practice, motivational interviewing, cultural humility, health education and facilitation, advocacy, and capacity building courses, the reentry course, and the three mental health courses on education, prevention, and intervention add lessons at your own pace plus facilitated practice sessions, and the reentry course adds one supervised contact.',
+  format: 'Thirty-one courses, each ending with a practice file you keep. The role, public health and coverage, social determinants and equity, navigation, assessment, outreach, professional conduct, and evaluation courses are at your own pace, about 24 hours. The communication, trauma-informed practice, motivational interviewing, cultural humility, health education and facilitation, advocacy, and capacity building courses, the reentry course, and the three mental health courses on education, prevention, and intervention add lessons at your own pace plus facilitated practice sessions, and the reentry course adds one supervised contact.',
   credentialTitle: 'HMC Community Mental Health Worker Pathway Completion',
   credentialType: 'Course Completion',
   gates: [
-    'Finish the thirty courses and the facilitated practice',
+    'Finish the thirty-one courses and the facilitated practice',
     'Pass the final quiz with 80% or more',
     'Complete the practice file in each course',
   ],
   guidedStart: 'Start with The Community Health Worker Role, then Service Coordination and Navigation. The Mental Health Education, Prevention, and Intervention courses follow.',
-  courses: [CHW_ROLE_FIELD, CHW_PUBLIC_HEALTH_SYSTEMS, CHW_SDOH_EQUITY, CHW_COMMUNICATION, CHW_TRAUMA_INFORMED, CHW_MOTIVATIONAL_INTERVIEWING, CHW_CULTURAL_HUMILITY, CHW_NAVIGATION, CHW_ASSESSMENT, CHW_EDUCATION_FACILITATION, CHW_ADVOCACY, CHW_CAPACITY_BUILDING, CHW_OUTREACH, CHW_PROFESSIONAL_CONDUCT, CHW_EVALUATION, CHW_REENTRY, MH_EDUCATION, MH_PREVENTION, MH_INTERVENTION, CHW_MH_RECOVERY_WELLNESS, CHW_MH_CONDITIONS, CHW_MH_SUBSTANCE_USE, CHW_MH_SUICIDE_PREVENTION, CHW_MH_PEER_PRACTICE, CHW_MH_LIFESPAN, CHW_MH_SYSTEM_ACCESS, CHW_MH_CONFLICT_RESOLUTION, CHW_MH_WORK_DIGITAL, CHW_SPEC_STREET_MEDICINE, CHW_SPEC_BEHAVIORAL_HEALTH],
+  courses: [CHW_ROLE_FIELD, CHW_PUBLIC_HEALTH_SYSTEMS, CHW_SDOH_EQUITY, CHW_COMMUNICATION, CHW_TRAUMA_INFORMED, CHW_MOTIVATIONAL_INTERVIEWING, CHW_CULTURAL_HUMILITY, CHW_NAVIGATION, CHW_ASSESSMENT, CHW_EDUCATION_FACILITATION, CHW_ADVOCACY, CHW_CAPACITY_BUILDING, CHW_OUTREACH, CHW_PROFESSIONAL_CONDUCT, CHW_EVALUATION, CHW_REENTRY, MH_EDUCATION, MH_PREVENTION, MH_INTERVENTION, CHW_MH_RECOVERY_WELLNESS, CHW_MH_CONDITIONS, CHW_MH_SUBSTANCE_USE, CHW_MH_SUICIDE_PREVENTION, CHW_MH_PEER_PRACTICE, CHW_MH_LIFESPAN, CHW_MH_SYSTEM_ACCESS, CHW_MH_CONFLICT_RESOLUTION, CHW_MH_WORK_DIGITAL, CHW_SPEC_STREET_MEDICINE, CHW_SPEC_BEHAVIORAL_HEALTH, CHW_SPEC_NAVIGATION],
   preTest: CHWP_PRE,
   postTest: CHWP_POST,
   plannedCourses: [],

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T07:17:29.690Z",
+  "generatedAt": "2026-11-11T07:32:03.128Z",
   "courses": [
     {
       "id": "hce-1",
@@ -711,6 +711,13 @@
     {
       "id": "chw_spec_behavioral_health",
       "title": "Specialty Track, Behavioral Health and Crisis Response",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "blended"
+    },
+    {
+      "id": "chw_spec_navigation",
+      "title": "Specialty Track, Coverage and Benefits Navigation",
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "blended"
