@@ -251,6 +251,9 @@ export interface Pathway {
   title: string;
   level: Level;
   status: PathwayStatus;
+  /** Ids of courses a learner takes one of, such as a specialty track. Only the longest of them
+   *  counts toward the pathway's hours, so the card does not promise time nobody spends. */
+  chooseOneOf?: string[];
   purpose: string;
   format: string;
   /** Exact credential title per the naming rules. */
@@ -825,8 +828,12 @@ export const pathwayById = (id: string) => PATHWAYS.find((p) => p.id === id);
 export const courseById = (pathwayId: string, courseId: string) =>
   pathwayById(pathwayId)?.courses.find((c) => c.id === courseId);
 
-export const pathwayMinutes = (p: Pathway) =>
-  p.courses.reduce((n, c) => n + c.minutes, 0);
+export const pathwayMinutes = (p: Pathway) => {
+  const alt = new Set(p.chooseOneOf ?? []);
+  const fixed = p.courses.filter((c) => !alt.has(c.id)).reduce((n, c) => n + c.minutes, 0);
+  const choice = Math.max(0, ...p.courses.filter((c) => alt.has(c.id)).map((c) => c.minutes));
+  return fixed + choice;
+};
 
 export const pathwayLessonIds = (p: Pathway) =>
   p.courses.flatMap((c) => c.lessons.map((l) => l.id));

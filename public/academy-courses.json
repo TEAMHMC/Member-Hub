@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-30T23:41:23.446Z",
+  "generatedAt": "2026-11-11T07:38:59.910Z",
   "courses": [
     {
       "id": "hce-1",
@@ -513,6 +513,48 @@
       "delivery": "self-paced"
     },
     {
+      "id": "chw_public_health_systems",
+      "title": "Public Health, Medi-Cal, and Social Programs",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_sdoh_equity",
+      "title": "Social Determinants and Health Equity",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_communication",
+      "title": "Communication and Documentation",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
+      "id": "chw_trauma_informed",
+      "title": "Trauma-Informed Practice",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
+      "id": "chw_motivational_interviewing",
+      "title": "Motivational Interviewing",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
+      "id": "chw_cultural_humility",
+      "title": "Cultural Humility and Relationship Building",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
       "id": "chw_navigation",
       "title": "Service Coordination and Navigation",
       "pathwayId": "community-mental-health-worker",
@@ -520,8 +562,43 @@
       "delivery": "self-paced"
     },
     {
+      "id": "chw_assessment",
+      "title": "Individual and Community Assessment",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_education_facilitation",
+      "title": "Health Education and Facilitation",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
+      "id": "chw_advocacy",
+      "title": "Advocacy, Individual and Policy",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
+      "id": "chw_capacity_building",
+      "title": "Capacity Building and Community Organizing",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
       "id": "chw_outreach",
       "title": "Outreach, Case Finding, and Follow-Up",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_professional_conduct",
+      "title": "Professional Conduct, Ethics, and Safety",
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "self-paced"
@@ -560,6 +637,111 @@
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "self-paced"
+    },
+    {
+      "id": "chw_mh_recovery_wellness",
+      "title": "Hope, Recovery, and Wellness",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_mh_conditions",
+      "title": "Understanding Mental Health Conditions",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_mh_substance_use",
+      "title": "Substance Use, Harm Reduction, and Co-occurring Conditions",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_mh_suicide_prevention",
+      "title": "Suicide Prevention, Safety, and Crisis Planning",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
+      "id": "chw_mh_peer_practice",
+      "title": "Psychiatric Rehabilitation and Peer Support Practice",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
+      "id": "chw_mh_lifespan",
+      "title": "Children, Youth, Families, and Older Adults",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_mh_system_access",
+      "title": "The Behavioral Health System and Access",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_mh_conflict_resolution",
+      "title": "Conflict Resolution",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
+      "id": "chw_mh_work_digital",
+      "title": "Work Readiness and Digital Literacy",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
+    },
+    {
+      "id": "chw_fieldwork_observed",
+      "title": "Observed Field Practice",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "practicum"
+    },
+    {
+      "id": "chw_fieldwork_supervised",
+      "title": "Supervised Service Delivery",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "practicum"
+    },
+    {
+      "id": "chw_case_conference",
+      "title": "Case Conference and Reflection",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
+      "id": "chw_spec_street_medicine",
+      "title": "Specialty Track, Street Medicine and Outreach",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "blended"
+    },
+    {
+      "id": "chw_spec_behavioral_health",
+      "title": "Specialty Track, Behavioral Health and Crisis Response",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "blended"
+    },
+    {
+      "id": "chw_spec_navigation",
+      "title": "Specialty Track, Coverage and Benefits Navigation",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "blended"
     }
   ]
 }
