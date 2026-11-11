@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T03:37:44.044Z",
+  "generatedAt": "2026-11-11T03:44:06.004Z",
   "courses": [
     {
       "id": "hce-1",
@@ -662,6 +662,13 @@
     {
       "id": "chw_mh_suicide_prevention",
       "title": "Suicide Prevention, Safety, and Crisis Planning",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
+      "id": "chw_mh_peer_practice",
+      "title": "Psychiatric Rehabilitation and Peer Support Practice",
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "live"
