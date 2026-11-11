@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T03:53:41.206Z",
+  "generatedAt": "2026-11-11T03:56:51.025Z",
   "courses": [
     {
       "id": "hce-1",
@@ -686,6 +686,13 @@
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "self-paced"
+    },
+    {
+      "id": "chw_mh_conflict_resolution",
+      "title": "Conflict Resolution",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
     }
   ]
 }
