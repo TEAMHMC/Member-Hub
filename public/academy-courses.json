@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T03:44:06.004Z",
+  "generatedAt": "2026-11-11T03:47:24.421Z",
   "courses": [
     {
       "id": "hce-1",
@@ -672,6 +672,13 @@
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "live"
+    },
+    {
+      "id": "chw_mh_lifespan",
+      "title": "Children, Youth, Families, and Older Adults",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "self-paced"
     }
   ]
 }
