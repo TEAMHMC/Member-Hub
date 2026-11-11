@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T02:47:30.271Z",
+  "generatedAt": "2026-11-11T02:52:25.471Z",
   "courses": [
     {
       "id": "hce-1",
@@ -543,6 +543,13 @@
     {
       "id": "chw_motivational_interviewing",
       "title": "Motivational Interviewing",
+      "pathwayId": "community-mental-health-worker",
+      "pathwayTitle": "Community Mental Health Worker Pathway",
+      "delivery": "live"
+    },
+    {
+      "id": "chw_cultural_humility",
+      "title": "Cultural Humility and Relationship Building",
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "live"
