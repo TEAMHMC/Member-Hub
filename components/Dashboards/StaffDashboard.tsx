@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   SlidersHorizontal, LifeBuoy, Megaphone, Users, ShieldCheck,
-  Check, X, Search, Trash2, AlertTriangle, ExternalLink, FileText, Plus, Pencil,
+  Check, X, Search, Trash2, AlertTriangle, ExternalLink, FileText, Plus, Pencil, BarChart3,
 } from 'lucide-react';
 import type { StaffStanding } from '../../types';
 import {
@@ -12,6 +12,7 @@ import {
   type HubAuthorCourse, type HubDraftStatus,
 } from '../../services/api';
 import CurriculumReview from './CurriculumReview';
+import AcademyOutcomes from './AcademyOutcomes';
 import {
   findCourse, editableSections, coursePageDraft, changedSections, releaseSections,
   pageDraftChanged, type EditableSection, type CoursePageDraft,
@@ -39,7 +40,7 @@ import { PATHWAYS } from '../Academy/catalog';
  * admin additionally sees who holds Hub access.
  */
 
-type Tab = 'author' | 'academy' | 'curriculum' | 'content' | 'support' | 'staffAdmin';
+type Tab = 'author' | 'academy' | 'curriculum' | 'content' | 'support' | 'staffAdmin' | 'outcomes';
 
 const ACADEMY_STATES: { value: string; label: string; help: string }[] = [
   { value: 'open', label: 'Open', help: 'Members can see it and enroll now.' },
@@ -48,13 +49,15 @@ const ACADEMY_STATES: { value: string; label: string; help: string }[] = [
   { value: 'hidden', label: 'Hidden', help: 'Not shown to members at all.' },
 ];
 
-const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
+const TABS: { id: Tab; label: string; icon: React.ReactNode; /** The capability that opens it, when it is not named like the tab. */ cap?: StaffStanding['capabilities'][number] }[] = [
   { id: 'author', label: 'My drafts', icon: <Pencil size={16} /> },
   { id: 'academy', label: 'Courses', icon: <SlidersHorizontal size={16} /> },
   { id: 'curriculum', label: 'Curriculum', icon: <FileText size={16} /> },
   { id: 'content', label: 'Announcements', icon: <Megaphone size={16} /> },
   { id: 'support', label: 'Member support', icon: <LifeBuoy size={16} /> },
   { id: 'staffAdmin', label: 'Hub access', icon: <Users size={16} /> },
+  // Individual learner scores, so it needs the same capability as Hub access.
+  { id: 'outcomes', label: 'Outcomes', icon: <BarChart3 size={16} />, cap: 'staffAdmin' },
 ];
 
 const DRAFT_STATUS_LABEL: Record<HubDraftStatus, string> = {
@@ -78,7 +81,10 @@ interface Props {
 }
 
 const StaffDashboard: React.FC<Props> = ({ staff, selfEmail, onExit }) => {
-  const allowed = useMemo(() => TABS.filter((t) => staff.capabilities.includes(t.id)), [staff.capabilities]);
+  const allowed = useMemo(
+    () => TABS.filter((t) => staff.capabilities.includes((t.cap ?? t.id) as StaffStanding['capabilities'][number])),
+    [staff.capabilities],
+  );
   const [tab, setTab] = useState<Tab>(allowed[0]?.id || 'support');
   const [overview, setOverview] = useState<HubStaffOverview | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -135,6 +141,7 @@ const StaffDashboard: React.FC<Props> = ({ staff, selfEmail, onExit }) => {
       {tab === 'author' && <CurriculumPanel mode="author" />}
       {tab === 'curriculum' && <CurriculumHome />}
       {tab === 'staffAdmin' && <AccessPanel selfEmail={selfEmail} />}
+      {tab === 'outcomes' && <AcademyOutcomes />}
     </div>
   );
 };

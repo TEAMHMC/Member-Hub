@@ -358,8 +358,55 @@ export interface HubDraftLive {
 /** A draft as the review queue lists it: no lesson text until it is opened. */
 export type HubDraftListItem = Omit<HubDraft, 'content' | 'sections'> & { sectionCount: number };
 
+// ── Academy outcomes, for staff who hold staffAdmin ──────────────────────
+export interface AcademyOutcomeRow {
+  email: string;
+  name: string;
+  pathwayId: string;
+  enrolled: boolean;
+  baselineScore: number | null;
+  baselineAt: string | null;
+  baselineClean: boolean | null;
+  postScore: number | null;
+  postAt: string | null;
+  postAttempts: number;
+  gain: number | null;
+  gainCounts: boolean;
+  passed: boolean | null;
+}
+
+export interface AcademyPathwayTotals {
+  pathwayId: string;
+  enrolled: number;
+  tookBaseline: number;
+  tookPost: number;
+  measured: number;
+  meanBaseline: number | null;
+  meanPost: number | null;
+  meanGain: number | null;
+  passed: number;
+}
+
+export interface AcademyOutcomes {
+  generatedAt: string;
+  learnerCount: number;
+  truncated: boolean;
+  rows: AcademyOutcomeRow[];
+  totals: AcademyPathwayTotals[];
+  note: string;
+}
+
 export const staffApi = {
   overview: () => req<HubStaffOverview>('/api/hub/staff/overview'),
+
+  // ── Academy outcomes ───────────────────────────────────────────────────
+  outcomes: () => req<AcademyOutcomes>('/api/hub/staff/academy-outcomes'),
+  /** The export as a file. Fetched with the session cookie, so it is not a plain link. */
+  outcomesCsv: async (): Promise<Blob> => {
+    const res = await fetch(`${API_BASE}/api/hub/staff/academy-outcomes.csv`, { credentials: 'include' });
+    if (!res.ok) throw new ApiError(res.status, res.statusText, null);
+    return res.blob();
+  },
 
   // ── Authors ────────────────────────────────────────────────────────────
   authorCourses: () => req<{ courses: HubAuthorCourse[] }>('/api/hub/staff/author/courses'),
@@ -478,6 +525,29 @@ export interface CreditWallet {
   account: 'client' | 'email' | null;
   earnRates?: Record<string, number>;
 }
+
+// ── The learner's Academy record, kept on the server ─────────────────────
+export interface AcademyTestResult { score: number; attempt: number; at: string }
+export interface AcademyBaselineResult extends AcademyTestResult { beforeLearning: boolean }
+
+/** Ids, whole-percent scores and times. Nothing a learner typed and no answers. */
+export interface AcademyServerRecord {
+  enrolled: string[];
+  preTest: Record<string, AcademyBaselineResult>;
+  postTest: Record<string, AcademyTestResult>;
+  postAttempts: Record<string, number>;
+  courseExam: Record<string, AcademyTestResult>;
+}
+
+export const academyRecord = {
+  get: () => req<{ record: AcademyServerRecord }>('/api/client/academy/record'),
+  /** Idempotent. The server merges it in and never lowers a score or replaces a baseline. */
+  put: (record: AcademyServerRecord, name: string) =>
+    req<{ record: AcademyServerRecord }>('/api/client/academy/record', {
+      method: 'PUT',
+      body: JSON.stringify({ record, name }),
+    }),
+};
 
 export const credits = {
   wallet: () => req<CreditWallet>('/api/client/credits'),

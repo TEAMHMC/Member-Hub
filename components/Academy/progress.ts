@@ -13,6 +13,12 @@ export interface TestResult {
   score: number;
   attempt: number;
   at: string;
+  /**
+   * Baselines only. True when no lesson in the pathway had been completed, so the score is a
+   * real starting point. A baseline taken after learning began cannot show growth, and the
+   * outcomes report leaves it out. Absent on results saved before this was recorded.
+   */
+  beforeLearning?: boolean;
 }
 
 export interface LearnerState {
