@@ -31,7 +31,8 @@ import { startEngagementClock, minutesSpent, timeRequirementMet, timeProgressLab
 import SurfaceCard, { CardBadge } from '../Layout/SurfaceCard';
 import type { Block, KnowledgeCheck } from './blocks';
 import TrainingRegistration from './TrainingRegistration';
-import { training as trainingApi, chw as trainingApi_chw, curriculumApi, type ScheduledSession } from '../../services/api';
+import { training as trainingApi, chw as trainingApi_chw, curriculumApi, academyRecord, type ScheduledSession } from '../../services/api';
+import { baselineRequired, baselineOffered, lessonsStarted, toServerRecord, mergeServerRecord, syncFingerprint } from './outcomesSync';
 import { reviewedProse, preservedBlocks, extraSections, mergedCourse, type OverrideMap } from './overrides';
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
@@ -755,6 +756,39 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     saveState(userId, state);
   }, [userId, state]);
 
+  /**
+   * Keep this learner's enrollment, baseline and test results on the server.
+   *
+   * They used to exist only in this browser, so another device or cleared site data lost
+   * them and nobody could say what anyone knew at the start or the end. On opening, what the
+   * server holds is folded into this device, and whatever this device holds is sent up, which
+   * is also how results already sitting in browsers reach the server. The merge never lowers
+   * a score or replaces a baseline, so a stale device cannot damage the record. Best effort:
+   * a failure never blocks the learner, and the next change tries again.
+   */
+  const [recordLoaded, setRecordLoaded] = useState(false);
+  const lastSent = useRef('');
+  useEffect(() => {
+    if (guest) return;
+    let cancelled = false;
+    academyRecord.get()
+      .then(({ record }) => { if (!cancelled) setState((s) => mergeServerRecord(s, record)); })
+      .catch(() => { /* local data still works */ })
+      .finally(() => { if (!cancelled) setRecordLoaded(true); });
+    return () => { cancelled = true; };
+  }, [guest, userId]);
+  useEffect(() => {
+    if (guest || !recordLoaded) return;
+    const fp = syncFingerprint(state);
+    if (fp === lastSent.current) return;
+    const timer = setTimeout(() => {
+      academyRecord.put(toServerRecord(state), memberName)
+        .then(() => { lastSent.current = fp; })
+        .catch(() => { /* tried again on the next change or visit */ });
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [guest, recordLoaded, state, memberName]);
+
   // Write course completions through to the portal. localStorage stays as the fast local
   // cache, but the server holds the record a certificate and an audit rest on — clearing
   // a browser must not erase someone's training history.
@@ -813,6 +847,24 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
       onSignal?.('academy_enroll', { pathwayId: p.id });
     }
     return true;
+  };
+
+  /**
+   * Enrolling leads into the baseline for any pathway that has one.
+   *
+   * It used to enroll and drop the learner on the pathway page, which offered no baseline at
+   * all, so anyone who enrolled from the catalogue never took one. Without a baseline there is
+   * nothing to measure growth against, and the Academy cannot say whether it changed anything.
+   * Every way in now arrives at the baseline, and the lessons wait until it is taken.
+   */
+  const openPathway = (p: Pathway): void => {
+    setView(baselineRequired(p, state)
+      ? { name: 'test', pathwayId: p.id, kind: 'pre' }
+      : { name: 'pathway', pathwayId: p.id });
+  };
+  const enrollAndOpen = (p: Pathway): void => {
+    if (!enroll(p)) return;
+    openPathway(p);
   };
 
   const artifactValue = (courseId: string, fieldId: string, i = 0): string =>
@@ -938,7 +990,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                       {gain !== null && ` · knowledge gain ${gain >= 0 ? '+' : ''}${gain} points`}
                     </p>
                   </div>
-                  <Btn onClick={() => setView({ name: 'pathway', pathwayId: p.id })}>
+                  <Btn onClick={() => openPathway(p)}>
                     <Play size={14} /> Continue
                   </Btn>
                 </div>
@@ -1025,11 +1077,11 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                   body={p.purpose}
                   action={
                     enrollable ? (
-                      <Btn className="w-full" onClick={() => { if (enroll(p)) setView({ name: 'pathway', pathwayId: p.id }); }}>
+                      <Btn className="w-full" onClick={() => enrollAndOpen(p)}>
                         {state.enrolled.includes(p.id) ? 'Continue' : 'Enroll'}
                       </Btn>
                     ) : v.state === 'upcoming' ? (
-                      <Btn className="w-full" onClick={() => { if (enroll(p)) setView({ name: 'pathway', pathwayId: p.id }); }}>
+                      <Btn className="w-full" onClick={() => enrollAndOpen(p)}>
                         Save my spot
                       </Btn>
                     ) : undefined
@@ -1454,9 +1506,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
               </p>
             </div>
             <Btn onClick={() => {
-                if (!enroll(p)) return;
-                // Only pathways with a published baseline check start on one.
-                if (p.preTest?.length) setView({ name: 'test', pathwayId: p.id, kind: 'pre' });
+                enrollAndOpen(p);
               }}>
               Register and start
             </Btn>
@@ -1492,6 +1542,22 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
 
         {hasCourses && (
           <>
+            {registered && baselineOffered(p, state) && (
+              <div className="bg-white rounded-2xl border border-[#233DFF]/30 shadow-sm p-7 space-y-4">
+                <div className="flex items-center gap-2 text-zinc-400">
+                  <ListChecks size={16} />
+                  <p className="text-[10px] font-bold uppercase tracking-widest">Your baseline</p>
+                </div>
+                <p className="text-lg text-zinc-700 leading-relaxed">
+                  {lessonsStarted(p, state)
+                    ? 'You started before taking your baseline, so it cannot show how much you have learned. It is still worth taking, and it is recorded as taken after you began.'
+                    : `Take this before your first lesson. It is ${p.preTest?.length} questions. Guessing is fine and there is no penalty. It is how we, and you, can see what you gained.`}
+                </p>
+                <Btn onClick={() => setView({ name: 'test', pathwayId: p.id, kind: 'pre' })}>
+                  Take your baseline
+                </Btn>
+              </div>
+            )}
             {registered && pre && p.postTest && (
               <div className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-7 space-y-4">
                 <div className="flex items-center gap-2 text-zinc-400">
@@ -1704,9 +1770,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                 </Btn>
               ) : (
                 <Btn onClick={() => {
-                if (!enroll(p)) return;
-                // Only pathways with a published baseline check start on one.
-                if (p.preTest?.length) setView({ name: 'test', pathwayId: p.id, kind: 'pre' });
+                enrollAndOpen(p);
               }}>
                   Enroll
                 </Btn>
@@ -2062,7 +2126,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
                       onClick={() => {
                         // Locked rows enroll rather than doing nothing. A row that
                         // looks clickable and is not reads as broken.
-                        if (locked) { enroll(p); return; }
+                        if (locked) { enrollAndOpen(p); return; }
                         setView({ name: 'lesson', pathwayId, courseId, index: i });
                       }}
                       aria-label={locked ? `${l.title}. Available once you enroll.` : l.title}
@@ -2187,6 +2251,9 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
     // Sending someone to the course page rather than an error, because enrolling
     // is free and one click away: this is a gate, not a wall.
     if (!state.enrolled.includes(p.id)) return renderCourse(pathwayId, courseId);
+    // The baseline comes before the lessons, so what the learner gains can be measured. Only
+    // while no lesson is done: somebody already partway through is never locked out.
+    if (baselineRequired(p, state)) return renderTest(p.id, 'pre');
     const isLast = index === c.lessons.length - 1;
     // v2 courses embed their checks in the lesson blocks where they belong, so
     // the end-of-course block would repeat them.
@@ -2428,7 +2495,7 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
           const at = new Date().toISOString();
           set((s) => {
             if (kind === 'pre') {
-              return { ...s, preTest: { ...s.preTest, [p.id]: { score, attempt: 1, at } } };
+              return { ...s, preTest: { ...s.preTest, [p.id]: { score, attempt: 1, at, beforeLearning: !lessonsStarted(p, s) } } };
             }
             const attempt = (s.postAttempts[p.id] || 0) + 1;
             const best = s.postTest[p.id];

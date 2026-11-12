@@ -11,6 +11,7 @@ import TodaysVisit from './TodaysVisit';
 import VolunteerPage from '../Pages/VolunteerPage';
 import OrganizationsPage from '../Pages/OrganizationsPage';
 import MemberReferrals from './MemberReferrals';
+import LearningResults from './LearningResults';
 import { isOpen as referralIsOpen } from './referralCopy';
 import { useEvents } from '../../services/hooks';
 import Academy from '../Academy/Academy';
@@ -1044,6 +1045,15 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ user, initialTab = 'd
           </div>
         )}
       </Card>
+      {/* Baseline, post-test and the change between them. Renders nothing until somebody has
+          enrolled, so the page is unchanged for a member who has not started the Academy. */}
+      {!guest && (
+        <LearningResults
+          userId={user.id}
+          memberName={`${user.firstName} ${user.lastName}`.trim() || 'Member'}
+          onOpenAcademy={() => { setActiveTab('academy'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+        />
+      )}
     </div>
   );
 
