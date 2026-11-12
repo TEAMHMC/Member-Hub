@@ -485,7 +485,7 @@ export const CHW_MH_RECOVERY_WELLNESS: Course = {
       minutes: 35,
       blocks: [
         { kind: 'why', text: [
-          "Words carry attitudes. A person who hears himself called a frequent flyer, a manipulator, or a schizophrenic learns what the speaker thinks of him, and so does everyone else in the room. The same is true in your notes, which other people will read. The words you choose are among the few things in this work that cost nothing and change the result.",
+          "Words carry attitudes. A person who hears himself called a frequent flyer, a manipulator, or a schizophrenic learns what the speaker thinks of him, and so does everyone else in the room. The same is true in your notes, which other people will read. The words you choose are among the few things in this work that are fully in your hands and change the result.",
         ] },
         { kind: 'concept', title: 'What stigma does', text: [
           "A National Institute on Drug Abuse page on language for providers defines stigma as discrimination against an identifiable group. It says stigma about people with substance use disorder can include inaccurate thoughts that they are dangerous, incapable of managing treatment, or at fault for their condition. It says feeling stigmatized can reduce people's willingness to seek treatment, and that stigmatizing views can lead others to feel pity, fear, anger, and a desire for social distance. It adds that stigmatizing language can influence the perceptions of health care providers and the care they give.",

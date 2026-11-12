@@ -671,7 +671,7 @@ export const CHW_MH_SUBSTANCE_USE: Course = {
     ] },
   },
   furtherLearning: [
-    { name: 'SAMHSA: Overdose Prevention and Response Toolkit (PEP23-03-00-001)', use: 'Signs of overdose, response steps, naloxone, and harm reduction strategies.', url: 'https://store.samhsa.gov/product/overdose-prevention-and-response-toolkit/pep23-03-00-001' },
+    { name: 'SAMHSA: Overdose Prevention and Response Toolkit (PEP23-03-00-001)', use: 'Signs of overdose, response steps, naloxone, and harm reduction strategies.', url: 'https://www.samhsa.gov/resource/recovery/overdose-prevention-response-toolkit' },
     { name: 'SAMHSA: Treatment Improvement Protocol 42, Substance Use Disorder Treatment for People With Co-Occurring Disorders', use: 'Guidance on screening, assessment, integrated treatment, and special populations.', url: 'https://store.samhsa.gov/product/tip-42-substance-use-treatment-persons-co-occurring-disorders/pep20-02-01-004' },
     { name: 'SAMHSA: Treatment Improvement Protocol 35, Enhancing Motivation for Change in Substance Use Disorder Treatment', use: 'Motivational interviewing and the stages of change in substance use treatment.', url: 'https://store.samhsa.gov/sites/default/files/tip-35-pep19-02-01-003.pdf' },
     { name: 'National Institute on Drug Abuse: Drugs, Brains, and Behavior, Treatment and Recovery', use: 'Treatment, medications, behavioral therapies, and relapse.', url: 'https://nida.nih.gov/publications/drugs-brains-behavior-science-addiction/treatment-recovery' },
