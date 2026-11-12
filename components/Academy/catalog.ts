@@ -244,6 +244,15 @@ export interface Capstone {
 }
 
 export interface Pathway {
+  /**
+   * Not shown to members until a staff member chooses a state for it in the Courses tab.
+   *
+   * The ordinary default shows an in-development pathway as upcoming, which suits one that
+   * is real and on its way. A course being written in the Hub has nothing a member should
+   * see yet, and a card carrying placeholder text is worse than no card. Any staff decision
+   * overrides this, so releasing the course is a choice made on purpose.
+   */
+  hiddenUntilReleased?: boolean;
   /** Program family. Mental health education is a different lane from the
    *  health-professions pathways and serves different users. */
   family?: 'Health + Education Pathways' | 'Mental Health + Community Education';
@@ -411,6 +420,7 @@ import { IF_MORE_COURSES } from './pathwayInternshipsMore';
 import type { Block, SourceRef, ReadingLevel } from './blocks';
 import { CMHW_FACILITATOR, UNSTOPPABLE_CE } from './pathwayMentalHealth';
 import { COMMUNITY_MENTAL_HEALTH_WORKER } from './pathwayHrtp';
+import { UNSTOPPABLE_YOUTH } from './courseUnstoppableYouth';
 import { STEM_CAMP } from './programStemCollab';
 import { YS_MORE_COURSES } from './pathwayYouthMore';
 import { applyEvidence } from './evidenceAdditions';
@@ -806,6 +816,31 @@ PATHWAYS.push({
   version: '2.0 migration',
   effectiveDate: 'Migrated from the Volunteer Portal training system',
   nextReview: 'With the LACDMH approval renewal',
+});
+
+// Unstoppable Youth. A course being written in the Hub, so it carries nothing but a shape and
+// placeholders. 'in-development' with no written blocks means pathwayHasContent is false, so
+// learners are not offered an open course. It still appears in the Hub's Curriculum editor,
+// which is the point. See courseUnstoppableYouth.ts for what it deliberately leaves out.
+PATHWAYS.push({
+  family: 'Mental Health + Community Education',
+  id: 'unstoppable-youth',
+  title: 'Unstoppable Youth',
+  level: 'Foundations',
+  status: 'in-development',
+  hiddenUntilReleased: true,
+  purpose: '[PLACEHOLDER] One or two sentences on what this course offers young people.',
+  format: 'Reading and activities you do on your own time.',
+  credentialTitle: 'Unstoppable Youth',
+  credentialType: 'Course Completion',
+  gates: [
+    'Finish every module',
+  ],
+  courses: [UNSTOPPABLE_YOUTH],
+  plannedCourses: [],
+  version: 'Draft, not released',
+  effectiveDate: 'Not yet released',
+  nextReview: 'On release',
 });
 
 // HMC's community mental health worker training, as far as it can be learned in text. See pathwayHrtp.ts.

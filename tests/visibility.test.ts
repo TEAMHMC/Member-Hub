@@ -65,5 +65,21 @@ for (const p of PATHWAYS) {
   ok(overlap.length === 0, `${p.title}: no course appears as both written and planned`, overlap.join(', '));
 }
 
+console.log('A course still being written is hidden until staff release it');
+// Unstoppable Youth ships as a shell of placeholders so students can write it in the Hub.
+// The ordinary default would show an in-development pathway to members as upcoming, with
+// placeholder text on the card. It has to start hidden, and a staff decision has to be what
+// changes that.
+const youth = PATHWAYS.find((p) => p.id === 'unstoppable-youth');
+ok(Boolean(youth), 'the Unstoppable Youth pathway exists');
+ok(youth?.hiddenUntilReleased === true, 'Unstoppable Youth is marked hidden until released');
+ok(visFn.includes('hiddenUntilReleased') && visFn.indexOf('visibility[id]') < visFn.indexOf('hiddenUntilReleased'),
+  'a staff decision is read before the hidden default, so choosing a state is what releases it');
+ok(visFn.includes("{ state: 'hidden' }"), 'the default for such a course is hidden, not upcoming');
+for (const p of PATHWAYS) {
+  if (p.id === 'unstoppable-youth') continue;
+  ok(!p.hiddenUntilReleased, `${p.title}: no other pathway is held back by this flag`);
+}
+
 console.log(`\n${checks - failures}/${checks} passed${failures ? `, ${failures} FAILED` : ''}\n`);
 process.exit(failures ? 1 : 0);

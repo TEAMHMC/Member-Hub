@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T07:38:59.910Z",
+  "generatedAt": "2026-11-11T20:57:56.035Z",
   "courses": [
     {
       "id": "hce-1",
@@ -504,6 +504,13 @@
       "pathwayId": "unstoppable-ce",
       "pathwayTitle": "Unstoppable Continuing Education",
       "delivery": "live"
+    },
+    {
+      "id": "unstoppable-youth",
+      "title": "Unstoppable Youth",
+      "pathwayId": "unstoppable-youth",
+      "pathwayTitle": "Unstoppable Youth",
+      "delivery": "self-paced"
     },
     {
       "id": "chw_role_field",
