@@ -491,14 +491,14 @@ export const CHWP_POST: Check[] = [
   },
   {
     id: 'chwp-p20',
-    q: "During a visit a person picks up a heavy object and your partner feels unsafe. What do you do?",
+    q: "A neighbor says her adult daughter has been up for days, hears voices, and refuses help, but has not threatened anyone and has no weapon. What can you help the family do?",
     options: [
-      "Speak calmly, step back, leave together if you can, and call for help from a safe place",
-      "Grab the object",
-      "Block the door so the person cannot leave",
-      "Argue until it is put down",
+      "Tell them to wait until the daughter hurts someone",
+      "Go to the house alone and talk her into going to a hospital",
+      "Help them call 988 or the county mental health access line to ask for a crisis team, and agree on when they would call 911",
+      "Call the police first, because only police can respond",
     ],
-    answer: 0,
-    why: "Calm words, distance, and leaving together to call for help keep everyone safer. Physical intervention belongs to trained staff.",
+    answer: 2,
+    why: "A call line can send a crisis team, and an agreed plan to call 911 for danger keeps everyone safe. A worker does not go in alone, use force, or wait for harm.",
   },
 ];

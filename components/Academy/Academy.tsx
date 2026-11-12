@@ -1787,13 +1787,16 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
             <dl className="space-y-3">
               {[
                 ['Delivery', c.delivery === 'live' ? 'Scheduled session'
-                  : c.delivery === 'blended' ? 'Video and written, self-paced'
+                  : c.delivery === 'blended' ? ((c.requirements || []).some((r) => r.kind === 'attend') ? 'Reading on your own, plus scheduled practice sessions' : 'Video and written, self-paced')
+                  : c.delivery === 'practicum' ? 'Supervised field hours, with a short guide'
                   : c.delivery === 'practical' ? 'Practical, scheduled'
                   : 'Self-paced, text first'],
                 ['Estimated time', `${c.minutes} minutes`],
                 ['Modules', `${c.lessons.length}`],
-                ['Knowledge checks', `${c.checks.length}`],
-                ['Applied activity', c.activity ? 'Yes, with a saved artifact' : 'None'],
+                // Lessons carry their own checks inline, so counting only the course-level list showed 0
+                // for every course written that way.
+                ['Knowledge checks', `${c.checks.length + c.lessons.reduce((n, l) => n + (l.blocks || []).filter((b) => b.kind === 'check').length, 0)}`],
+                ['Applied activity', c.activity ? 'Yes, with a saved artifact' : c.artifact ? 'Yes, a practice file you keep' : 'None'],
                 ...(c.price?.amountUsd ? [['Cost', `$${c.price.amountUsd}`]] : []),
               ].map(([k, v]) => (
                 <div key={k} className="flex items-baseline justify-between gap-4 border-b border-zinc-50 pb-2.5 last:border-0 last:pb-0">
