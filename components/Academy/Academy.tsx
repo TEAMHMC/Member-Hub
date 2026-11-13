@@ -34,6 +34,7 @@ import TrainingRegistration from './TrainingRegistration';
 import { training as trainingApi, chw as trainingApi_chw, curriculumApi, academyRecord, type ScheduledSession } from '../../services/api';
 import { baselineRequired, baselineOffered, lessonsStarted, toServerRecord, mergeServerRecord, syncFingerprint } from './outcomesSync';
 import { reviewedProse, preservedBlocks, extraSections, mergedCourse, type OverrideMap } from './overrides';
+import { applyStructureOverrides } from './courseStructure';
 import {
   loadState, saveState, coursePercent, isCourseComplete, pathwayPercent,
   scoreTest, knowledgeGain, evaluateGates, credentialId, trainingHours,
@@ -646,7 +647,14 @@ const Academy: React.FC<AcademyProps> = ({ userId, memberName, onNavigateTab, on
   useEffect(() => {
     let cancelled = false;
     curriculumApi.publishedContent()
-      .then((d) => { if (!cancelled) setOverrides(d); })
+      .then((d) => {
+        if (cancelled) return;
+        // Authored lessons, questions, tests and the rest are put over the compiled catalogue
+        // before anything renders from the new state, so progress, the gates, the renderer and
+        // the baseline scoring all see the same course. See courseStructure.ts.
+        applyStructureOverrides(PATHWAYS, d as OverrideMap);
+        setOverrides(d);
+      })
       .catch(() => { /* the catalogue renders without corrections */ });
     return () => { cancelled = true; };
   }, []);
