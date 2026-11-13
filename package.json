@@ -8,7 +8,7 @@
     "build": "npm run generate:courses && vite build",
     "preview": "vite preview",
     "test:curriculum": "tsx tests/curriculum.test.ts",
-    "test": "npm run test:curriculum && npm run test:overrides && npm run test:course-editor && npm run test:referrals && npm run test:visibility && npm run test:audience && npm run test:today && npm run test:tool-links && npm run test:info-pages && npm run test:sunny-style && npm run test:unstoppable-event && npm run test:notifications && npm run test:signals && npm run test:engagement && npm run test:event-time && npm run test:outcomes-sync && tsc --noEmit",
+    "test": "npm run test:curriculum && npm run test:overrides && npm run test:course-editor && npm run test:referrals && npm run test:visibility && npm run test:audience && npm run test:today && npm run test:tool-links && npm run test:info-pages && npm run test:sunny-style && npm run test:unstoppable-event && npm run test:notifications && npm run test:signals && npm run test:engagement && npm run test:event-time && npm run test:outcomes-sync && npm run test:course-structure && tsc --noEmit",
     "generate:courses": "tsx scripts/generate-course-manifest.ts",
     "test:overrides": "tsx tests/overrides.test.ts",
     "test:referrals": "tsx tests/referral-copy.test.ts",
@@ -32,7 +32,8 @@
     "test:render:catalog": "node tests/browser/academy-catalog.cjs",
     "test:render:ordinal": "node tests/browser/course-ordinal.cjs",
     "test:render:events": "node tests/browser/events-view.cjs",
-    "test:outcomes-sync": "tsx tests/outcomes-sync.test.ts"
+    "test:outcomes-sync": "tsx tests/outcomes-sync.test.ts",
+    "test:course-structure": "tsx tests/course-structure.test.ts"
   },
   "dependencies": {
     "lucide-react": "^0.562.0",

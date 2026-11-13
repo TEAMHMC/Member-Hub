@@ -1,3 +1,4 @@
+import type { CourseStructure, PathwayTests } from '../components/Academy/courseStructure';
 // Live API client for the HMC client portal (Helping + Healing Hub / Member Hub).
 // Talks to the real Cloud Run backend and sends credentials so the first-party
 // hmc_vid (visitor) and hmc_client (session) cookies flow across *.healthmatters.clinic.
@@ -245,6 +246,11 @@ export interface MemberLookup {
 export interface HubCourseOverride {
   content: string;
   sections: { heading: string; body: string }[];
+  page?: CoursePageOverride;
+  /** Lessons, questions, activity, sources and exam, authored as data. */
+  structure?: CourseStructure;
+  /** A pathway's baseline and post-test, on the tests:<pathwayId> item only. */
+  pathwayTests?: PathwayTests;
   version: number;
 }
 
@@ -282,8 +288,12 @@ export interface HubTier {
 }
 
 /** One Academy course, as the review list shows it. */
+/** A course, or a pathway's baseline and post-test, which are edited like one. */
+export type HubItemKind = 'course' | 'tests';
+
 export interface HubCurriculumCourse {
   id: string;
+  kind?: HubItemKind;
   title: string;
   /** A correction has been released over the built-in text. Not the same as reviewed. */
   corrected: boolean;
@@ -304,6 +314,10 @@ export interface CoursePageOverride {
 
 export interface HubCurriculumDetail {
   id: string;
+  kind?: HubItemKind;
+  /** Released structure and tests, so the editor starts from the live version. */
+  structure?: CourseStructure | null;
+  pathwayTests?: PathwayTests | null;
   title: string;
   content: string;
   sections: { heading: string; body: string }[];
@@ -319,6 +333,7 @@ export type HubDraftStatus = 'draft' | 'submitted' | 'returned' | 'approved';
 
 export interface HubAuthorCourse {
   id: string;
+  kind?: HubItemKind;
   title: string;
   /** This author's draft of the course, or null when they have not started one. */
   status: HubDraftStatus | null;
@@ -327,6 +342,9 @@ export interface HubAuthorCourse {
 
 export interface HubDraft {
   id: string;
+  kind?: HubItemKind;
+  structure?: CourseStructure | null;
+  pathwayTests?: PathwayTests | null;
   moduleId: string;
   moduleTitle: string;
   authorName: string;
@@ -348,6 +366,8 @@ export interface HubDraft {
 }
 
 export interface HubDraftLive {
+  structure?: CourseStructure | null;
+  pathwayTests?: PathwayTests | null;
   content: string;
   sections: { heading: string; body: string }[];
   page: CoursePageOverride | null;
@@ -356,7 +376,14 @@ export interface HubDraftLive {
 }
 
 /** A draft as the review queue lists it: no lesson text until it is opened. */
-export type HubDraftListItem = Omit<HubDraft, 'content' | 'sections'> & { sectionCount: number };
+export type HubDraftListItem = Omit<HubDraft, 'content' | 'sections' | 'structure' | 'pathwayTests'> & {
+  sectionCount: number;
+  lessonCount?: number;
+  questionCount?: number;
+};
+
+/** What the portal's curriculum rules say about a draft. */
+export interface HubValidation { ok: boolean; failures: Array<{ label: string; detail: string }>; debt: string[] }
 
 // ── Academy outcomes, for staff who hold staffAdmin ──────────────────────
 export interface AcademyOutcomeRow {
@@ -411,7 +438,7 @@ export const staffApi = {
   // ── Authors ────────────────────────────────────────────────────────────
   authorCourses: () => req<{ courses: HubAuthorCourse[] }>('/api/hub/staff/author/courses'),
   authorDraft: (id: string) =>
-    req<{ moduleId: string; title: string; draft: HubDraft | null; live: HubDraftLive }>(
+    req<{ moduleId: string; kind?: HubItemKind; title: string; draft: HubDraft | null; live: HubDraftLive }>(
       `/api/hub/staff/author/drafts/${encodeURIComponent(id)}`,
     ),
   saveDraft: (id: string, body: Record<string, unknown>) =>
@@ -434,7 +461,7 @@ export const staffApi = {
   reviewQueue: (status: 'submitted' | 'returned' | 'approved' = 'submitted') =>
     req<{ drafts: HubDraftListItem[]; canDecide: boolean }>(`/api/hub/staff/drafts?status=${status}`),
   reviewDraft: (draftId: string) =>
-    req<{ draft: HubDraft; live: HubDraftLive; liveChangedSinceDraft: boolean; canDecide: boolean }>(
+    req<{ draft: HubDraft; live: HubDraftLive; liveChangedSinceDraft: boolean; canDecide: boolean; validation?: HubValidation | null }>(
       `/api/hub/staff/drafts/${encodeURIComponent(draftId)}`,
     ),
   approveDraft: (draftId: string, body: Record<string, unknown>) =>
