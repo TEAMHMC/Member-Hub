@@ -69,6 +69,19 @@ export const CHW_OUTREACH: Course = {
         {"kind":"case","title":"Three first contacts","scenario":true,"text":["Situation 1: A woman is sitting at a bus stop with two bags, looking at her phone. What do you do?","Answer: Greet her from a respectful distance, introduce yourself, and offer water and a resource card. If she does not look up, say you will be back Thursday and leave.","Situation 2: A man says, \"I have heard it all before. Leave me alone.\" What do you do?","Answer: Thank him, say you will not bother him, and leave a card within reach if he wants it. A calm first no can become a yes in a month.","Situation 3: A young person asks you for money. What do you do?","Answer: Say kindly that you do not give money, and offer what you do have, such as food, a snack bag, or a connection to a program. Tell your lead."]},
         {"kind":"myths","items":[{"myth":"If someone says no, outreach has failed.","reality":"A respectful no is the beginning of trust. Many people accept help after several contacts."},{"myth":"People who are unhoused do not want help.","reality":"Most want a way out of their situation but have been let down by systems before. They are careful, not unwilling."}]},
         {"kind":"case","title":"Trust built over six weeks","scenario":false,"text":["Week 1: Dana and a partner stop by a bus stop on Thursdays. They hand out water and cards. One man declines and says nothing more. Week 2: they return at the same time. He takes a card without a word. Week 3: he nods. Week 4: he asks where the closest laundromat is. They give him the address and a card with a quarter roll for the machines, if their program allows it.","Week 5: he asks about getting an ID. They explain the steps and offer to go with him. Week 6: they go together. He says later that he decided to trust them because they did not push, and because they came back each Thursday.","Nothing in those six weeks was dramatic. The work was consistency, and the willingness to hear a no."]},
+        { kind: 'check', check: {
+          id: 'hrtp-c13-q4',
+          q: "A man says he has heard it all before and tells you to leave him alone. What fits the lesson?",
+          options: [
+            "Explain why he should reconsider",
+            "Accept the no without argument, thank him, and leave the door open by saying when you will be back",
+            "Stand where he cannot leave until he listens",
+            "Write a note about his attitude",
+          ],
+          answer: 1,
+          rationale: "The lesson says to accept a no without argument and leave the door open, and that a respectful no is the beginning of trust.",
+          distractors: "Arguing or blocking an exit damages trust, and a note about attitude is a label, not a record of what happened.",
+        } },
         ev([
           'SAMHSA and USICH, Lessons Learned from SAMHSA\'s Expert Panel on the Role of Outreach and Engagement (2016): engaging some people can take months or years of persistent, proactive effort.',
           'California HCAI, CHW/P/R Training Program Best Practices Framework: outreach is one of the 11 core competencies, with case finding, recruitment, and follow-up.',
@@ -162,6 +175,19 @@ export const CHW_OUTREACH: Course = {
         {"kind":"steps","title":"Day of release","items":[{"label":"Before","text":"Confirm with the program and the facility whether you may be present and what they need from you."},{"label":"Meet","text":"Meet the person at the agreed place and time. Bring water, a snack, a phone charger, and the plan."},{"label":"Coverage","text":"Check that Medi-Cal is active, and write down the plan for the first health visit."},{"label":"Next","text":"Confirm where the person will sleep tonight and any check-in they must make."},{"label":"Record","text":"Write the facts, set the follow-up date, and tell your supervisor."}]},
         {"kind":"case","title":"A two-week plan","scenario":false,"text":["A program serves people leaving a county jail. Week 1: the worker confirms with program staff which days people are released, what the facility allows, and who the contact is. Week 2: she attends a release day with a partner, meets two people, confirms their coverage, and sets first appointments.","She adds a follow-up call for the next day and a visit for the next week. She keeps her notes brief and factual. At the end of two weeks she tells her lead what worked, what the facility asked her to change, and what she would do differently. That is a plan a team can learn from."]},
         {"kind":"myths","items":[{"myth":"The best place to find people is wherever the most people are.","reality":"Large crowds are easy to find and often already served. Quiet places, such as laundromats, libraries, and small meal programs, often reach people who are missed."},{"myth":"If I visit once and no one needs anything, the spot is not useful.","reality":"People watch before they approach. A spot can take weeks to become useful. Stay on a schedule long enough to be known."}]},
+        { kind: 'check', check: {
+          id: 'hrtp-c13-q5',
+          q: "According to the lesson, what makes a case-finding route work?",
+          options: [
+            "Going wherever the largest crowds are",
+            "Going to places and people already trusted, at the times people are there, and coming back on a regular schedule",
+            "Visiting once in each place so no site is repeated",
+            "Waiting for people to come to the office",
+          ],
+          answer: 1,
+          rationale: "The lesson says to look where people already go, ask partners who is not being reached, go when people are there, and come back at the same time each week. Consistency matters more than coverage.",
+          distractors: "Large crowds are often already served, and one visit gives people no time to watch and decide to approach.",
+        } },
         ev([
           'California HCAI Framework: outreach skills include case finding, recruitment, follow-up, and field outreach.',
           'California DHCS, CalAIM Justice-Involved Reentry Initiative: pre-release Medi-Cal services and connection to community-based providers, including community health workers and peer support specialists.',
@@ -197,6 +223,19 @@ export const CHW_OUTREACH: Course = {
         {"kind":"example","title":"A good entry and a weak one","text":["Good: \"Oct 12, 10:15 a.m., 6th and Main. Spoke with a man about 50, no name given. He asked about a shower. I gave him the list. He agreed I could check in Thursday at the same place. No phone. Next step: Thursday.\"","Weak: \"Talked to a guy, seemed high, wants stuff.\"","The first shows what happened, what was agreed, and what is next. The second has a label and no plan."]},
         {"kind":"list","title":"Consent language that works","items":["\"Is it okay if I write a few notes so that I remember what we talked about?\"","\"May I check in with you again? How would you like me to reach you?\"","\"Is it safe to leave a message, and what should I say?\""]},
         {"kind":"concept","title":"What people tell you","text":["People may tell you things that are private, painful, or serious. Keep what you hear private, except where your supervisor has told you that something must be shared. Ask your supervisor, before you start, which situations you are required to report, and how. If someone tells you about a risk to a child, an older adult, a dependent adult, or themselves, tell your supervisor right away.","You do not have to decide what is reportable by yourself. That is the point of a supervisor."]},
+        { kind: 'check', check: {
+          id: 'hrtp-c13-q6',
+          q: "A person has not answered your messages. What does the three-attempt rule say?",
+          options: [
+            "Keep trying every day until they answer",
+            "Try up to three times, at different times and in different ways, record each try, then stop and tell your lead",
+            "Stop after one try so you do not bother them",
+            "Ask a friend of theirs to pass on the message",
+          ],
+          answer: 1,
+          rationale: "The lesson says to try up to three times over a reasonable period, record each try, and after three stop and tell your lead. Do not keep contacting someone who has not agreed to it.",
+          distractors: "Repeated contact without consent is intrusive, and asking others to pass on a message can share private information.",
+        } },
         ev([
           'California HCAI Framework: documentation and follow-up are part of communication and service coordination.',
           'U.S. HHS Office for Civil Rights, Summary of the HIPAA Privacy Rule: health information is kept private and shared only as the rule allows.',
@@ -248,6 +287,11 @@ export const CHW_OUTREACH: Course = {
         {"kind":"example","title":"A verification call","text":["\"Hello, this is Dana from Health Matters Clinic. I am confirming the information we have for your food pantry so that we send people at the right time. Are you still open Tuesdays and Thursdays, 10 to 1? Do people need ID or proof of address? Is there a limit on visits? Who should we ask for? Thank you.\"","If you cannot reach anyone after two tries on different days, mark the listing as unconfirmed and tell your lead. Do not send people to a listing you could not confirm."]},
         {"kind":"list","title":"What a good directory listing holds","items":["The agency name and the name of a contact person.","Address, with the nearest bus line or landmark.","Days and hours, and any hours that change by season.","Who is eligible, what to bring, and any limit on visits.","The date it was last confirmed and by whom."]},
         {"kind":"concept","title":"When a listing is wrong","text":["Mark it as unconfirmed right away so no one is sent there. Tell your lead, and ask the agency for the correct information. Update the listing, with the date, once you have confirmed it. If an agency has closed, say so, and look for the closest alternative so that the people who depend on it are not left without a place to go."]},
+        { kind: 'takeaways', items: [
+          "A directory is useful only if it is true.",
+          "Verify each listing with the agency, record the date and who you spoke to, and mark a wrong listing unconfirmed at once.",
+          "If an agency has closed, say so and look for the closest alternative.",
+        ] },
         ev([
           'California HCAI Framework: maintaining accurate resource directories is part of outreach and service coordination.',
           '211 Los Angeles County: a model of a resource database that is checked and updated against agency information.',
@@ -329,6 +373,19 @@ export const CHW_EVALUATION: Course = {
         {"kind":"concept","title":"Why small programs should still measure","text":["A small program does not need a research team. It needs a few measures that matter, defined in advance, recorded the same way each time, and looked at on a schedule. A worker who learns to do this is valuable to any employer."]},
         {"kind":"case","title":"A program year in numbers","scenario":false,"text":["A small program reports: 1,200 flyers, 60 events, 400 contacts, 120 referrals, 70 people now enrolled in coverage, 45 of those still enrolled six months later.","The first four numbers are outputs. They show effort. The last two are outcomes. They show that people got coverage and kept it. If the program wants funding, it should lead with the last two and use the first four to show how it got there. If it wants to improve, it should ask why only 45 of 70 kept coverage, and what the staff could do about it."]},
         {"kind":"list","title":"Questions an evaluator asks","items":["Who is this program for, and did it reach them?","What did it do, and how much of it was delivered?","What changed for the people it served?","How do we know, and what else could explain it?","What should we change?"]},
+        { kind: 'check', check: {
+          id: 'hrtp-c15-q4',
+          q: "Which of these is an outcome and not an output?",
+          options: [
+            "We made 340 calls",
+            "We held 12 workshops",
+            "Seventy percent of the people we referred kept their clinic appointment",
+            "We enrolled 44 people",
+          ],
+          answer: 2,
+          rationale: "An output is what a program did. An outcome is what changed for people. Keeping an appointment is a change for the person, while calls, workshops, and enrollments count activity.",
+          distractors: "The other three count effort and not what changed for people.",
+        } },
         ev([
           'Centers for Disease Control and Prevention, Framework for Program Evaluation in Public Health, MMWR 1999;48(RR-11), updated in MMWR 2024;73(RR-6): the steps and standards of public health evaluation.',
           'California HCAI Framework: evaluation and research is one of the 11 core competencies, and programs should survey participants 6 to 12 months after training.',
@@ -362,6 +419,19 @@ export const CHW_EVALUATION: Course = {
         {"kind":"concept","title":"Who is missing from your count","text":["Your counts show only the people you reach. People you never meet, people who do not return, and people who decline are not in the data. A program that serves the easiest to reach can look more successful than one that works with those who are hardest to reach.","You cannot fix this alone, but you can help by recording attempts and declines as well as successes. Those numbers tell the program who it is missing."]},
         {"kind":"steps","title":"Asking a good survey question","items":[{"label":"One idea","text":"Ask about one thing at a time. \"Was the class clear and useful?\" asks two things."},{"label":"Plain words","text":"Use words the person uses. Avoid jargon."},{"label":"Fair choices","text":"Offer answers that cover the range, including a way to say no or not sure."},{"label":"Try it","text":"Ask two people to read it back to you before you use it widely."}]},
         {"kind":"concept","title":"Following up later","text":["Programs learn most when they ask people again after some time has passed. California's training framework suggests surveying participants six to twelve months after training. A later question, such as \"Are you still working in this field?\", tells a program more than a smile on the last day of class."]},
+        { kind: 'check', check: {
+          id: 'hrtp-c15-q5',
+          q: "Your tally of types adds up to 10 encounters, but your tally of outcomes adds up to 9. What do you do?",
+          options: [
+            "Round the outcomes up to 10",
+            "Go back to the entries and look for a missing or double-counted encounter",
+            "Drop one encounter from the types",
+            "Leave it, because a small difference does not matter",
+          ],
+          answer: 1,
+          rationale: "The lesson says that when totals do not match, you go back to the entries and look for a missing or double-counted encounter. A count you cannot trace is not a count.",
+          distractors: "Rounding up or dropping an entry hides the problem, and the lesson lists rounding up as a common mistake.",
+        } },
         ev([
           'California HCAI Framework: basic evaluation and research methods are part of the core competencies.',
           'CDC, Program Evaluation Framework, 2024 (MMWR Recomm Rep 2024;73(RR-6)): credible evidence depends on well-defined measures and accurate data.',

@@ -6,7 +6,7 @@
 // rules: a system error returns not-eligible, never eligible. Nothing here
 // awards a credential on partial evidence.
 
-import { PASS_THRESHOLD, pathwayById, type Check, type Pathway } from './catalog';
+import { PASS_THRESHOLD, pathwayById, type Check, type Course, type Pathway } from './catalog';
 
 export interface TestResult {
   /** Percentage 0-100. */
@@ -205,13 +205,36 @@ export const isCourseEarned = (
   minutesSpent: number,
 ): boolean => courseGates(p, courseId, s, minutesSpent).every((g) => g.met);
 
+/**
+ * The courses a learner actually has to take.
+ *
+ * A pathway can offer a choice, such as three specialty tracks of which a learner takes one.
+ * Counting every course in the pathway would ask for all three, and a learner who finished
+ * their chosen track could never finish the pathway. When the learner has completed one of
+ * the alternatives, that one counts. Otherwise the alternative they have most progress in
+ * counts, so the progress bar and the gate move as they work.
+ */
+export function requiredCourses(p: Pathway, s: LearnerState): Course[] {
+  const alt = new Set(p.chooseOneOf ?? []);
+  if (!alt.size) return p.courses;
+  const fixed = p.courses.filter((c) => !alt.has(c.id));
+  const choices = p.courses.filter((c) => alt.has(c.id));
+  if (!choices.length) return fixed;
+  const done = choices.find((c) => isCourseComplete(p, c.id, s));
+  const chosen =
+    done ??
+    choices.reduce((best, c) => (coursePercent(p, c.id, s) > coursePercent(p, best.id, s) ? c : best), choices[0]);
+  return [...fixed, chosen];
+}
+
 export function pathwayPercent(p: Pathway, s: LearnerState): number {
-  if (!p.courses.length) return 0;
-  const total = p.courses.reduce(
+  const courses = requiredCourses(p, s);
+  if (!courses.length) return 0;
+  const total = courses.reduce(
     (n, c) => n + c.lessons.length + (c.activity ? 1 : 0) + (c.artifact ? 1 : 0),
     0
   );
-  const done = p.courses.reduce(
+  const done = courses.reduce(
     (n, c) =>
       n +
       c.lessons.filter((l) => s.lessons.includes(l.id)).length +
@@ -223,7 +246,7 @@ export function pathwayPercent(p: Pathway, s: LearnerState): number {
 }
 
 export const allCoursesComplete = (p: Pathway, s: LearnerState) =>
-  p.courses.length > 0 && p.courses.every((c) => isCourseComplete(p, c.id, s));
+  p.courses.length > 0 && requiredCourses(p, s).every((c) => isCourseComplete(p, c.id, s));
 
 // ── Assessment ───────────────────────────────────────────────────────────
 
@@ -276,7 +299,8 @@ export function evaluateGates(
   const post = s.postTest[p.id]?.score ?? null;
   const postMet = post !== null && post >= PASS_THRESHOLD;
   const capstoneText = (s.capstone[p.id] || '').trim();
-  const artifactCourses = p.courses.filter((c) => c.artifact);
+  const required = requiredCourses(p, s);
+  const artifactCourses = required.filter((c) => c.artifact);
   const artifactsDone = artifactCourses.filter((c) => isArtifactComplete(c, s)).length;
   // A capstone is scored by a reviewer. The learner-facing gate is submission;
   // the credential rules require reviewer approval before issuance, which the
@@ -298,9 +322,9 @@ export function evaluateGates(
   }
   gates.push(
     {
-      label: `Finish all ${p.courses.length} courses and their activities`,
+      label: `Finish all ${required.length} courses and their activities`,
       met: coursesDone,
-      detail: `${p.courses.filter((c) => isCourseComplete(p, c.id, s)).length} of ${p.courses.length} complete`,
+      detail: `${required.filter((c) => isCourseComplete(p, c.id, s)).length} of ${required.length} complete`,
     },
     {
       label: `Pass the final quiz with ${PASS_THRESHOLD}% or more`,
