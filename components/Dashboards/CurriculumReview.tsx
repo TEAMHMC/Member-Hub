@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { staffApi, ApiError, type HubDraft, type HubDraftListItem, type HubDraftLive, type HubDraftStatus } from '../../services/api';
+import { staffApi, ApiError, type HubDraft, type HubDraftListItem, type HubDraftLive, type HubDraftStatus, type HubValidation } from '../../services/api';
 import { findCourse, editableSections } from '../Academy/editorSource';
+import { StructureEditor, TestsEditor } from './StructureEditor';
+import { diffStructure, tidy, type FullStructure, type PathwayTests } from '../Academy/courseStructure';
+import { editorStart } from '../Academy/editorStart';
 
 /**
  * The review queue for course drafts that authors have submitted.
@@ -52,6 +55,15 @@ const CurriculumReview: React.FC<{ onCount?: (n: number) => void }> = ({ onCount
   const [canDecide, setCanDecide] = useState(false);
   const [sections, setSections] = useState<{ heading: string; body: string }[]>([]);
   const [edited, setEdited] = useState(false);
+  // The authored structure or tests in the draft. The reviewer may correct them, and only what
+  // they changed from what was submitted is sent back, so approving untouched sends nothing.
+  const [struct, setStruct] = useState<FullStructure | null>(null);
+  const [submittedStruct, setSubmittedStruct] = useState<FullStructure | null>(null);
+  const [compiled, setCompiled] = useState<FullStructure | null>(null);
+  const [tests, setTests] = useState<PathwayTests | null>(null);
+  const [submittedTests, setSubmittedTests] = useState<PathwayTests | null>(null);
+  const [validation, setValidation] = useState<HubValidation | null>(null);
+  const [ack, setAck] = useState(false);
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -69,10 +81,21 @@ const CurriculumReview: React.FC<{ onCount?: (n: number) => void }> = ({ onCount
 
   const open = (id: string) => {
     setOpenId(id); setDraft(null); setErr(null); setDone(null); setNote(''); setEdited(false);
+    setStruct(null); setSubmittedStruct(null); setCompiled(null); setTests(null); setSubmittedTests(null); setValidation(null); setAck(false);
     staffApi.reviewDraft(id)
       .then((r) => {
         setDraft(r.draft); setLive(r.live); setLiveChanged(r.liveChangedSinceDraft); setCanDecide(r.canDecide);
         setSections(r.draft.sections.map((s) => ({ ...s })));
+        setValidation(r.validation || null);
+        const st = editorStart(r.draft.moduleId, r.draft.kind, {
+          content: r.live.content, sections: r.live.sections, page: r.live.page, version: r.live.version,
+          structure: r.live.structure, pathwayTests: r.live.pathwayTests,
+        }, { structure: r.draft.structure, pathwayTests: r.draft.pathwayTests });
+        if (st.kind === 'tests') {
+          if (r.draft.pathwayTests) { setTests(st.start); setSubmittedTests(JSON.parse(JSON.stringify(st.start))); }
+        } else if (st.start && r.draft.structure) {
+          setCompiled(st.compiled); setStruct(st.start); setSubmittedStruct(JSON.parse(JSON.stringify(st.start)));
+        }
       })
       .catch(() => setErr('That draft could not be opened.'));
   };
@@ -99,10 +122,26 @@ const CurriculumReview: React.FC<{ onCount?: (n: number) => void }> = ({ onCount
     try {
       const body: Record<string, unknown> = { note: note.trim() };
       if (edited) { body.content = draft.content || ''; body.sections = sections; }
+      const sEdited = Boolean(struct && submittedStruct && JSON.stringify(tidy(struct)) !== JSON.stringify(tidy(submittedStruct)));
+      if (sEdited && compiled && struct) body.structure = diffStructure(compiled, struct);
+      const tEdited = Boolean(tests && submittedTests && JSON.stringify(tidy(tests)) !== JSON.stringify(tidy(submittedTests)));
+      if (tEdited && tests) body.pathwayTests = tests;
+      if (ack) body.acknowledgeFailures = true;
       const r = await staffApi.approveDraft(draft.id, body);
       setDone(`Released as version ${r.version}. Members reading this course see it now.`);
       setOpenId(null); setDraft(null); load();
-    } catch (e) { fail(e, 'That could not be released. Nothing was changed.'); }
+    } catch (e) {
+      const code = e instanceof ApiError ? e.code : null;
+      let parsed: { failures?: HubValidation['failures']; debt?: string[]; detail?: string } = {};
+      if (e instanceof ApiError) { try { parsed = JSON.parse(e.message); } catch { /* generic below */ } }
+      if (code === 'validation_failures' && parsed.failures) {
+        setValidation({ ok: false, failures: parsed.failures, debt: parsed.debt || [] });
+        setAck(false);
+        setErr('The portal\'s curriculum rules stopped this release. Read what they found above. If you judge it acceptable, tick the box and release again.');
+      } else if ((code === 'invalid_structure' || code === 'invalid_tests') && parsed.detail) {
+        setErr(`It cannot be released yet. ${parsed.detail[0].toUpperCase()}${parsed.detail.slice(1)}.`);
+      } else fail(e, 'That could not be released. Nothing was changed.');
+    }
     finally { setBusy(false); }
   };
 
@@ -170,7 +209,46 @@ const CurriculumReview: React.FC<{ onCount?: (n: number) => void }> = ({ onCount
               </div>
             )}
 
-            <div className={card}>
+            {validation && (
+              <div className={card}>
+                <p className={label}>The portal's curriculum rules</p>
+                {validation.ok ? (
+                  <p className="mt-3 text-sm text-emerald-700">Every rule passes for what this draft changes.</p>
+                ) : (
+                  <>
+                    <p className="mt-3 text-sm text-amber-900">
+                      {validation.failures.length} {validation.failures.length === 1 ? 'rule is' : 'rules are'} not met. These are advice to you and not a wall. Releasing with any of them open needs your acknowledgement, which is recorded.
+                    </p>
+                    <ul className="mt-3 space-y-1.5">
+                      {validation.failures.map((x, i) => (
+                        <li key={i} className="text-sm text-amber-900 rounded-xl bg-amber-50 border border-amber-200 px-4 py-2">
+                          <span className="font-semibold">{x.label}</span>{x.detail ? `. ${x.detail}` : ''}
+                        </li>
+                      ))}
+                    </ul>
+                    {waiting && canDecide && (
+                      <label className="mt-4 flex items-start gap-3 text-sm text-zinc-800">
+                        <input type="checkbox" className="mt-1" checked={ack} onChange={(e) => setAck(e.target.checked)} />
+                        I have read these and want to release anyway. This is recorded.
+                      </label>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
+            {tests && (
+              <fieldset disabled={!(canDecide && waiting)} className="min-w-0 border-0 p-0 m-0">
+                <TestsEditor value={tests} onChange={setTests} />
+              </fieldset>
+            )}
+            {struct && (
+              <fieldset disabled={!(canDecide && waiting)} className="min-w-0 border-0 p-0 m-0">
+                <StructureEditor value={struct} onChange={setStruct} />
+              </fieldset>
+            )}
+
+            <div className={sections.length > 0 ? card : 'hidden'}>
               <p className={label}>{sections.length} {sections.length === 1 ? 'lesson' : 'lessons'} in this draft</p>
               <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
                 {canDecide && waiting
@@ -284,6 +362,8 @@ const CurriculumReview: React.FC<{ onCount?: (n: number) => void }> = ({ onCount
                       {d.authorName || d.authorEmail}
                       {d.submittedAt ? ` · submitted ${day(d.submittedAt)}` : ''}
                       {d.sectionCount ? ` · ${d.sectionCount} ${d.sectionCount === 1 ? 'lesson' : 'lessons'}` : ''}
+                      {d.lessonCount ? ` · ${d.lessonCount} ${d.lessonCount === 1 ? 'lesson' : 'lessons'}` : ''}
+                      {d.questionCount ? ` · ${d.questionCount} ${d.questionCount === 1 ? 'question' : 'questions'}` : ''}
                     </p>
                   </div>
                   <span className="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider shrink-0 bg-zinc-100 text-zinc-500">

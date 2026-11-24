@@ -25,6 +25,21 @@ const courses = (PATHWAYS as any[]).flatMap((p) =>
   })),
 );
 
+/*
+ * A pathway's baseline and post-test, listed as items the Curriculum editor can open.
+ *
+ * They belong to the pathway, not to any one of its courses, so each pathway gets one item
+ * with the id tests:<pathwayId>. Every pathway is listed, including one with no tests yet,
+ * because a course being written needs somewhere to write them. Kept apart from `courses` so
+ * the portal's cohort scheduler, which reads that list, is never offered something that is not
+ * a course.
+ */
+const pathwayTests = (PATHWAYS as any[]).map((p) => ({
+  id: `tests:${p.id}`,
+  pathwayId: p.id,
+  title: `Baseline and post-test: ${p.title}`,
+}));
+
 mkdirSync(dirname(outPath), { recursive: true });
 
 /*
@@ -45,14 +60,16 @@ const previous = existsSync(outPath)
   : null;
 
 const unchanged =
-  previous && JSON.stringify(previous.courses) === JSON.stringify(courses);
+  previous
+  && JSON.stringify(previous.courses) === JSON.stringify(courses)
+  && JSON.stringify(previous.pathwayTests) === JSON.stringify(pathwayTests);
 
 if (unchanged) {
   console.log(`[academy-courses] ${courses.length} courses unchanged; left as is`);
 } else {
   writeFileSync(
     outPath,
-    JSON.stringify({ generatedAt: new Date().toISOString(), courses }, null, 2) + '\n',
+    JSON.stringify({ generatedAt: new Date().toISOString(), courses, pathwayTests }, null, 2) + '\n',
   );
   console.log(`[academy-courses] wrote ${courses.length} courses to ${outPath}`);
 }

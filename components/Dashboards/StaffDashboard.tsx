@@ -9,10 +9,13 @@ import {
   type HubStaffOverview, type MemberLookup,
   type HubPerson, type HubTier,
   type HubCurriculumCourse, type HubCurriculumDetail,
-  type HubAuthorCourse, type HubDraftStatus,
+  type HubAuthorCourse, type HubDraftStatus, type HubItemKind,
 } from '../../services/api';
 import CurriculumReview from './CurriculumReview';
 import AcademyOutcomes from './AcademyOutcomes';
+import { StructureEditor, TestsEditor } from './StructureEditor';
+import { diffStructure, tidy, type CourseStructure, type FullStructure, type PathwayTests } from '../Academy/courseStructure';
+import { editorStart } from '../Academy/editorStart';
 import {
   findCourse, editableSections, coursePageDraft, changedSections, releaseSections,
   pageDraftChanged, type EditableSection, type CoursePageDraft,
@@ -139,7 +142,7 @@ const StaffDashboard: React.FC<Props> = ({ staff, selfEmail, onExit }) => {
       {tab === 'content' && <AnnouncementsPanel overview={overview} onChanged={load} />}
       {tab === 'support' && <SupportPanel />}
       {tab === 'author' && <CurriculumPanel mode="author" />}
-      {tab === 'curriculum' && <CurriculumHome />}
+      {tab === 'curriculum' && <CurriculumHome canApprove={staff.capabilities.includes('approve')} />}
       {tab === 'staffAdmin' && <AccessPanel selfEmail={selfEmail} />}
       {tab === 'outcomes' && <AcademyOutcomes />}
     </div>
@@ -152,7 +155,7 @@ const StaffDashboard: React.FC<Props> = ({ staff, selfEmail, onExit }) => {
  * Opens on the queue, because a draft somebody handed over is the thing waiting on a person,
  * and a count on the button means nobody has to open it to find out.
  */
-const CurriculumHome: React.FC = () => {
+const CurriculumHome: React.FC<{ canApprove: boolean }> = ({ canApprove }) => {
   const [view, setView] = useState<'review' | 'courses'>('review');
   const [waiting, setWaiting] = useState<number | null>(null);
   const pill = (active: boolean) =>
@@ -167,7 +170,7 @@ const CurriculumHome: React.FC = () => {
         </button>
         <button onClick={() => setView('courses')} className={pill(view === 'courses')}>All courses</button>
       </div>
-      {view === 'review' ? <CurriculumReview onCount={setWaiting} /> : <CurriculumPanel />}
+      {view === 'review' ? <CurriculumReview onCount={setWaiting} /> : <CurriculumPanel canApprove={canApprove} />}
     </div>
   );
 };
@@ -478,7 +481,7 @@ const REQUIREMENT_KINDS = ['attend', 'assignment', 'practicum', 'evaluation'] as
  * What it still will not touch: knowledge checks, the exam and the CE approval. Those are
  * the assessment record and the approved title, and neither belongs in a prose editor.
  */
-const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 'release' }) => {
+const CurriculumPanel: React.FC<{ mode?: 'release' | 'author'; canApprove?: boolean }> = ({ mode = 'release', canApprove = false }) => {
   // In author mode this is the same editor with a different ending. Nothing an author does
   // reaches a learner: it saves a draft and submits it to a reviewer, who decides.
   const author = mode === 'author';
@@ -499,6 +502,53 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
   const [done, setDone] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [preview, setPreview] = useState(false);
+
+  // Whether this editor writes the course as structure (lessons, blocks, questions, tests) and
+  // not just prose. Authors draft it and people who can approve release it. A Curriculum Lead
+  // releasing directly keeps the prose editor, because questions and answer keys are what a
+  // Clinical Reviewer vouches for.
+  const structureMode = author || canApprove;
+  const [kind, setKind] = useState<'course' | 'tests'>('course');
+  const [struct, setStruct] = useState<FullStructure | null>(null);
+  const [openedStruct, setOpenedStruct] = useState<FullStructure | null>(null);
+  const [compiled, setCompiled] = useState<FullStructure | null>(null);
+  const [tests, setTests] = useState<PathwayTests | null>(null);
+  const [openedTests, setOpenedTests] = useState<PathwayTests | null>(null);
+  const [failures, setFailures] = useState<Array<{ label: string; detail: string }> | null>(null);
+  const [ack, setAck] = useState(false);
+
+  const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
+
+  /**
+   * Starts the structure or tests editor from what is live, or from the author's own draft.
+   *
+   * The editor works on the whole course, but only what differs from the compiled course is
+   * ever stored, so the starting point has three layers: the compiled course (kept so the
+   * difference can be taken), what is released over it, and the author's draft over that.
+   */
+  const startEditing = (
+    id: string,
+    itemKind: HubItemKind | undefined,
+    live: { content: string; sections: { heading: string; body: string }[]; page?: unknown; version: number; structure?: CourseStructure | null; pathwayTests?: PathwayTests | null },
+    draft?: { structure?: CourseStructure | null; pathwayTests?: PathwayTests | null } | null,
+  ) => {
+    setFailures(null); setAck(false);
+    const st = editorStart(id, itemKind, live, draft);
+    if (st.kind === 'tests') {
+      setKind('tests');
+      setOpenedTests(st.opened); setTests(st.start);
+      setStruct(null); setOpenedStruct(null); setCompiled(null);
+      return;
+    }
+    setKind('course');
+    setTests(null); setOpenedTests(null);
+    setCompiled(st.compiled); setOpenedStruct(st.opened); setStruct(st.start);
+  };
+
+  const structChangedNow = () =>
+    Boolean(struct && openedStruct && JSON.stringify(tidy(struct)) !== JSON.stringify(tidy(openedStruct)));
+  const testsChangedNow = () =>
+    Boolean(tests && openedTests && JSON.stringify(tidy(tests)) !== JSON.stringify(tidy(openedTests)));
 
   const load = () => {
     if (author) {
@@ -521,9 +571,9 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
   const openAuthor = (id: string) => {
     setOpenId(id); setDetail(null); setErr(null); setDone(null); setNote(''); setPreview(false); setDraftState(null);
     staffApi.authorDraft(id)
-      .then(({ title, draft: saved, live }) => {
+      .then(({ title, kind: itemKind, draft: saved, live }) => {
         const d: HubCurriculumDetail = {
-          id, title, content: live.content || '', sections: live.sections || [],
+          id, kind: itemKind, title, content: live.content || '', sections: live.sections || [],
           page: live.page || undefined, version: live.version || 0, hasCorrection: live.hasCorrection, history: [],
         };
         setDetail(d);
@@ -548,8 +598,9 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
           return [...base, ...released.filter((s) => s.heading.trim() && !have.has(norm(s.heading))).map((s) => ({ ...s, corrected: true }))];
         };
 
+        startEditing(id, itemKind, live as never, mine);
         const found = findCourse(id);
-        setInCatalogue(Boolean(found));
+        setInCatalogue(Boolean(found) || id.startsWith('tests:'));
         if (found) {
           setOpenedSections(withExtras(editableSections(found.course, liveOv), liveOv.sections));
           setSections(withExtras(editableSections(found.course, draftOv), draftOv.sections));
@@ -572,10 +623,11 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
     staffApi.course(id)
       .then((d) => {
         setDetail(d);
+        startEditing(id, d.kind, { content: d.content || '', sections: d.sections || [], page: d.page, version: d.version || 0, structure: d.structure, pathwayTests: d.pathwayTests }, null);
         // What is on the page right now: the catalogue, with any released correction over it.
         const found = findCourse(id);
         const override = { content: d.content || '', sections: d.sections || [], page: d.page || undefined, version: d.version || 0 };
-        setInCatalogue(Boolean(found));
+        setInCatalogue(Boolean(found) || id.startsWith('tests:'));
         if (found) {
           const secs = editableSections(found.course, override);
           setSections(secs);
@@ -635,7 +687,7 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
     const changed = changedSections(sections, openedSections);
     const pageChanged = page && openedPage ? pageDraftChanged(page, openedPage) : false;
     const incomplete = sections.find((s) => (s.heading.trim() && !s.body.trim()) || (!s.heading.trim() && s.body.trim()));
-    if (submit && !changed.length && !pageChanged) {
+    if (submit && !changed.length && !pageChanged && !structChangedNow() && !testsChangedNow()) {
       setErr('Nothing has changed yet, so there is nothing to submit.');
       return;
     }
@@ -650,7 +702,12 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
         body.content = detail.content || '';
         body.sections = releaseSections(detail.sections || [], changed);
       }
-      if (page) body.page = pagePayload();
+      if (page && kind === 'course') body.page = pagePayload();
+      // Only what differs from the compiled course is stored, so the parts an author did not
+      // touch keep following the course as it was written. An empty difference is sent too:
+      // it is how a draft that put everything back is told apart from one that never touched it.
+      if (kind === 'course' && struct && compiled) body.structure = diffStructure(compiled, struct);
+      if (kind === 'tests' && tests) body.pathwayTests = tests;
       await staffApi.saveDraft(detail.id, body);
       if (!submit && incomplete) {
         setDraftState((s) => ({ status: 'draft', decisionNote: s?.decisionNote || '' }));
@@ -669,7 +726,11 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
       load();
     } catch (e) {
       const code = e instanceof ApiError ? e.code : null;
-      setErr((code && DRAFT_ERRORS[code]) || 'That could not be saved. Nothing was changed.');
+      let why = '';
+      if (e instanceof ApiError && (code === 'invalid_structure' || code === 'invalid_tests')) {
+        try { why = String(JSON.parse(e.message).detail || ''); } catch { /* generic below */ }
+      }
+      setErr(why ? `It cannot be submitted yet. ${why[0].toUpperCase()}${why.slice(1)}.` : ((code && DRAFT_ERRORS[code]) || 'That could not be saved. Nothing was changed.'));
     } finally { setBusy(false); }
   };
 
@@ -690,11 +751,13 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
     if (!detail) return;
     const changed = changedSections(sections, openedSections);
     const pageChanged = page && openedPage ? pageDraftChanged(page, openedPage) : false;
-    if (!changed.length && !pageChanged) {
+    const sChanged = structChangedNow();
+    const tChanged = testsChangedNow();
+    if (!changed.length && !pageChanged && !sChanged && !tChanged) {
       setErr('Nothing has changed yet, so there is nothing to release.');
       return;
     }
-    const incomplete = sections.find((s) => (s.heading.trim() && !s.body.trim()) || (!s.heading.trim() && s.body.trim()));
+    const incomplete = !structureMode && sections.find((s) => (s.heading.trim() && !s.body.trim()) || (!s.heading.trim() && s.body.trim()));
     if (incomplete) { setErr('Every section needs both a heading and a body.'); return; }
 
     setBusy(true); setErr(null); setDone(null);
@@ -705,13 +768,37 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
         // Corrections released earlier are kept, so releasing one lesson does not drop them.
         body.sections = releaseSections(detail.sections || [], changed);
       }
-      if (page) body.page = pagePayload();
+      if (page && kind === 'course') body.page = pagePayload();
+      if (sChanged && compiled && struct) body.structure = diffStructure(compiled, struct);
+      if (tChanged && tests) body.pathwayTests = tests;
+      if (ack) body.acknowledgeFailures = true;
       const r = await staffApi.releaseCourseFull(detail.id, body);
       setDone(`Released as version ${r.version}. Members reading this course see it now.`);
+      setFailures(null); setAck(false);
       load();
-      open(detail.id);
-    } catch {
-      setErr('That could not be released. Nothing was changed.');
+      if (structureMode) {
+        // Stay where the editor is, so the confirmation is not cleared by reopening.
+        if (struct) setOpenedStruct(clone(struct));
+        if (tests) setOpenedTests(clone(tests));
+        setDetail((d) => (d ? { ...d, version: r.version, hasCorrection: true } : d));
+      } else {
+        open(detail.id);
+      }
+    } catch (e) {
+      const code = e instanceof ApiError ? e.code : null;
+      let parsed: { failures?: Array<{ label: string; detail: string }>; detail?: string } = {};
+      if (e instanceof ApiError) { try { parsed = JSON.parse(e.message); } catch { /* generic below */ } }
+      if (code === 'validation_failures' && parsed.failures) {
+        setFailures(parsed.failures);
+        setAck(false);
+        setErr('The portal\'s curriculum rules stopped this release. Read what they found below. If you judge it acceptable, tick the box and release again.');
+      } else if (code === 'structure_requires_reviewer') {
+        setErr('Only a Clinical Reviewer or a Hub Administrator can release lessons, questions or tests. Save it as a draft instead.');
+      } else if ((code === 'invalid_structure' || code === 'invalid_tests') && parsed.detail) {
+        setErr(`It cannot be released yet. ${parsed.detail[0].toUpperCase()}${parsed.detail.slice(1)}.`);
+      } else {
+        setErr('That could not be released. Nothing was changed.');
+      }
     } finally { setBusy(false); }
   };
 
@@ -748,6 +835,8 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
           <p className="text-sm text-zinc-600 mt-3 leading-relaxed">
             {!inCatalogue
               ? 'This build does not carry the course, so only what has already been released is shown.'
+              : kind === 'tests'
+                ? 'The questions a learner answers before the pathway and after it. Their answer keys are shown and editable here.'
               : author
                 ? 'Everything below starts as what a learner reads right now. Write or change what needs changing, save as you go, and submit it when it is ready. Only you and the reviewers can see a draft. Nothing reaches members until a Clinical Reviewer releases it.'
                 : 'Everything below is what a learner reads right now. Change what needs changing and release it. Knowledge checks, the exam and the CE approval are not edited here.'}
@@ -825,7 +914,7 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
           </div>
         ) : (
           <>
-            {page && (
+            {page && kind === 'course' && (
               <>
                 <div className={card}>
                   <label className={label} htmlFor="curr-promise">The one line on the course card</label>
@@ -937,6 +1026,23 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
               </>
             )}
 
+            {kind === 'tests' ? (
+              tests && (
+                <fieldset disabled={!structureMode} className="min-w-0 border-0 p-0 m-0 space-y-3">
+                  {!structureMode && (
+                    <div className={card}>
+                      <p className="text-sm text-zinc-600 leading-relaxed">
+                        Only a Clinical Reviewer or a Hub Administrator can release a baseline or post-test. You can read it here. To propose a change, draft it under My drafts.
+                      </p>
+                    </div>
+                  )}
+                  <TestsEditor value={tests} onChange={setTests} />
+                </fieldset>
+              )
+            ) : structureMode ? (
+              struct && <StructureEditor value={struct} onChange={setStruct} />
+            ) : (
+              <>
             <div className={card}>
               <p className={label}>The modules a learner reads</p>
               <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
@@ -983,6 +1089,8 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
             >
               <Plus size={14} /> Add a module
             </button>
+              </>
+            )}
           </>
         )}
 
@@ -1005,8 +1113,20 @@ const CurriculumPanel: React.FC<{ mode?: 'release' | 'author' }> = ({ mode = 're
             onChange={(e) => setNote(e.target.value)}
           />
           {err && <p className="text-sm font-semibold text-[#FF6F91] mt-4" role="alert">{err}</p>}
+          {failures && failures.length > 0 && (
+            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 space-y-3">
+              <p className="text-sm font-semibold text-amber-900">The portal's curriculum rules found {failures.length} {failures.length === 1 ? 'problem' : 'problems'}</p>
+              <ul className="space-y-1.5">
+                {failures.map((x, i) => <li key={i} className="text-sm text-amber-900"><span className="font-semibold">{x.label}</span>{x.detail ? `. ${x.detail}` : ''}</li>)}
+              </ul>
+              <label className="flex items-start gap-3 text-sm text-amber-900">
+                <input type="checkbox" className="mt-1" checked={ack} onChange={(e) => setAck(e.target.checked)} />
+                I have read these and want to release anyway. This is recorded.
+              </label>
+            </div>
+          )}
           {done && <p className="text-sm font-semibold text-emerald-700 mt-4" role="status">{done}</p>}
-          {!author && (
+          {!author && !(kind === 'tests' && !structureMode) && (
             <button onClick={release} className={`${primary} mt-5`} disabled={busy}>
               {busy ? 'Releasing' : 'Release to members'}
             </button>

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T20:57:56.035Z",
+  "generatedAt": "2026-11-13T01:06:56.601Z",
   "courses": [
     {
       "id": "hce-1",
@@ -749,6 +749,58 @@
       "pathwayId": "community-mental-health-worker",
       "pathwayTitle": "Community Mental Health Worker Pathway",
       "delivery": "blended"
+    }
+  ],
+  "pathwayTests": [
+    {
+      "id": "tests:health-careers-exploration",
+      "pathwayId": "health-careers-exploration",
+      "title": "Baseline and post-test: Health Careers Exploration"
+    },
+    {
+      "id": "tests:youth-steam",
+      "pathwayId": "youth-steam",
+      "title": "Baseline and post-test: Youth Mentorship + STEAM"
+    },
+    {
+      "id": "tests:field-based-community-health",
+      "pathwayId": "field-based-community-health",
+      "title": "Baseline and post-test: Field-Based Community Health"
+    },
+    {
+      "id": "tests:clinical-exposure-simulation",
+      "pathwayId": "clinical-exposure-simulation",
+      "title": "Baseline and post-test: Clinical Exposure + Simulation"
+    },
+    {
+      "id": "tests:internships-fellowships",
+      "pathwayId": "internships-fellowships",
+      "title": "Baseline and post-test: Internships + Fellowships"
+    },
+    {
+      "id": "tests:mentor-leader",
+      "pathwayId": "mentor-leader",
+      "title": "Baseline and post-test: Mentor + Leader"
+    },
+    {
+      "id": "tests:unstoppable-facilitator",
+      "pathwayId": "unstoppable-facilitator",
+      "title": "Baseline and post-test: Unstoppable Facilitator Training"
+    },
+    {
+      "id": "tests:unstoppable-ce",
+      "pathwayId": "unstoppable-ce",
+      "title": "Baseline and post-test: Unstoppable Continuing Education"
+    },
+    {
+      "id": "tests:unstoppable-youth",
+      "pathwayId": "unstoppable-youth",
+      "title": "Baseline and post-test: Unstoppable Youth"
+    },
+    {
+      "id": "tests:community-mental-health-worker",
+      "pathwayId": "community-mental-health-worker",
+      "title": "Baseline and post-test: Community Mental Health Worker Pathway"
     }
   ]
 }

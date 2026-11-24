@@ -30,6 +30,7 @@
 
 import type { Course, Lesson } from './catalog';
 import type { Block } from './blocks';
+import type { CourseStructure, PathwayTests } from './courseStructure';
 
 export interface CoursePageOverride {
   promise?: string;
@@ -45,6 +46,10 @@ export interface CourseOverride {
   sections: { heading: string; body: string }[];
   /** The rest of the course page, rewritten in the Hub's Curriculum tab. */
   page?: CoursePageOverride;
+  /** Lessons, questions, activity, sources and exam, authored as data. */
+  structure?: CourseStructure;
+  /** A pathway's baseline and post-test. Present only on the tests:<pathwayId> item. */
+  pathwayTests?: PathwayTests;
   version: number;
 }
 
@@ -79,6 +84,9 @@ export const reviewedProse = (
   override: CourseOverride | undefined,
 ): string[] | null => {
   if (!override || !Array.isArray(override.sections)) return null;
+  // Authored lessons carry their own text. An older prose correction matching one by title
+  // would otherwise quietly overwrite what the author wrote.
+  if (override.structure?.lessons) return null;
   const want = norm(lesson.title);
   if (!want) return null;
   const hit = override.sections.find((s) => norm(s.heading) === want);
@@ -110,6 +118,7 @@ export const extraSections = (
   override: CourseOverride | undefined,
 ): { heading: string; paragraphs: string[] }[] => {
   if (!override || !Array.isArray(override.sections)) return [];
+  if (override.structure?.lessons) return [];
   const titles = new Set(course.lessons.map((l) => norm(l.title)));
   return override.sections
     .filter((s) => !titles.has(norm(s.heading)))
